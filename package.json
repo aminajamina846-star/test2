@@ -1,0 +1,15 @@
+{
+  "name": "adi-airdrop-mining-app",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "ADI$ Airdrop & Cloud Mining WebApp with tasks, referral system, daily rewards, and admin control dashboard.",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "build": "node -e \"console.log('Build complete')\""
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

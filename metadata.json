@@ -1,0 +1,6 @@
+{
+  "name": "ADI$ Airdrop & Mining App",
+  "description": "ADI$ Airdrop & Cloud Mining WebApp with tasks, referral system, daily rewards, and admin control dashboard.",
+  "permissions": [],
+  "capabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
