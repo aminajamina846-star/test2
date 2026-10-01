@@ -2322,51 +2322,80 @@
       });
     }
 
-    // LEADERBOARD & BADGES SYSTEM (TOP 20 MEMBERS)
+        // ==========================================
+    // LEADERBOARD RENDER FUNCTION
+    // ==========================================
     function loadLeaderboard() {
       const container = document.getElementById('leaderboard-container');
       if (!container) return;
 
-      const defaultMiners = [
-        { uid: 'seed1', username: 'CryptoWhale_Pro', balance: 14250, totalMined: 12000 },
-        { uid: 'seed2', username: 'Satoshi_Miner', balance: 10920, totalMined: 9500 },
-        { uid: 'seed3', username: 'BinanceHunter', balance: 8540, totalMined: 7800 },
-        { uid: 'seed4', username: 'AirdropMaster', balance: 6320, totalMined: 5500 },
-        { uid: 'seed5', username: 'Tariqul_BD', balance: 5100, totalMined: 4400 },
-        { uid: 'seed6', username: 'Web3Miner', balance: 4250, totalMined: 3900 },
-        { uid: 'seed7', username: 'TonBull', balance: 3600, totalMined: 3100 },
-        { uid: 'seed8', username: 'CryptoQueen', balance: 3140, totalMined: 2800 },
-        { uid: 'seed9', username: 'HasanRaza', balance: 2790, totalMined: 2400 },
-        { uid: 'seed10', username: 'MoonShot_99', balance: 2450, totalMined: 2100 },
-        { uid: 'seed11', username: 'AlphaNode', balance: 2120, totalMined: 1900 },
-        { uid: 'seed12', username: 'Rakib_Official', balance: 1850, totalMined: 1600 },
-        { uid: 'seed13', username: 'BlockForge', balance: 1600, totalMined: 1400 },
-        { uid: 'seed14', username: 'TelegramKing', balance: 1380, totalMined: 1200 },
-        { uid: 'seed15', username: 'Shakil_Ahmed', balance: 1150, totalMined: 1000 },
-        { uid: 'seed16', username: 'AdiPioneer', balance: 920, totalMined: 800 },
-        { uid: 'seed17', username: 'DexTrader', balance: 780, totalMined: 650 },
-        { uid: 'seed18', username: 'Tanvir_77', balance: 640, totalMined: 550 },
-        { uid: 'seed19', username: 'CyberWolf', balance: 490, totalMined: 400 },
-        { uid: 'seed20', username: 'GreenMiner', balance: 320, totalMined: 250 }
-      ];
+      database.ref('users').orderByChild('balance').limitToLast(10).on('value', (snapshot) => {
+        if (!snapshot.exists()) {
+          container.innerHTML = '<div style="text-align: center; color: var(--text-sub); font-size: 12px; padding: 10px 0;">No miners found</div>';
+          return;
+        }
 
-      const renderRanks = (usersMap) => {
-        const userMapList = [];
-        let meFound = false;
-
-        if (usersMap) {
-          Object.keys(usersMap).forEach(uid => {
-            const u = usersMap[uid];
-            const bal = Number(u.balance) || 0;
-            const uname = u.username || u.name || (uid.length > 8 ? uid.substring(0, 8) + '...' : uid);
-            if (uid === userId) meFound = true;
-            userMapList.push({ uid, username: uname, balance: bal, totalMined: u.totalMined || 0 });
+        let usersList = [];
+        snapshot.forEach((childSnap) => {
+          const uData = childSnap.val();
+          usersList.push({
+            id: childSnap.key,
+            username: uData.username || "Anonymous Miner",
+            balance: Number(uData.balance) || 0,
+            walletAddress: uData.walletAddress || ""
           });
-        }
+        });
 
-        if (!meFound) {
-          userMapList.push({ uid: userId, username: userName, balance: userBalance, totalMined: totalMinedAmount });
-        }
+        // Top balance scalar descending sort
+        usersList.sort((a, b) => b.balance - a.balance);
+
+        let html = '';
+        usersList.forEach((user, index) => {
+          const rank = index + 1;
+          let rankBadge = `<span style="font-weight: 800; width: 22px; text-align: center; color: #888;">#${rank}</span>`;
+          
+          if (rank === 1) {
+            rankBadge = `<span style="color: #ffd700; font-weight: 800; width: 22px; text-align: center; font-size: 14px;"><i class="fa-solid fa-crown"></i></span>`;
+          } else if (rank === 2) {
+            rankBadge = `<span style="color: #c0c0c0; font-weight: 800; width: 22px; text-align: center; font-size: 13px;"><i class="fa-solid fa-medal"></i></span>`;
+          } else if (rank === 3) {
+            rankBadge = `<span style="color: #cd7f32; font-weight: 800; width: 22px; text-align: center; font-size: 13px;"><i class="fa-solid fa-award"></i></span>`;
+          }
+
+          const isCurrentUser = user.id === userId;
+          const userHighlightStyle = isCurrentUser 
+            ? 'background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.3);' 
+            : 'background: rgba(255, 255, 255, 0.02); border: 1px solid var(--card-border);';
+
+          const shortName = user.username.length > 15 ? user.username.substring(0, 13) + '...' : user.username;
+
+          html += `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-radius: 12px; ${userHighlightStyle}">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                ${rankBadge}
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--silver-gradient); color: #000; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 12px;">
+                  ${shortName.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <div style="font-size: 12px; font-weight: 700; color: #fff;">${shortName} ${isCurrentUser ? '<span class="user-badge-label">YOU</span>' : ''}</div>
+                  <div style="font-size: 9px; color: var(--text-sub);">${user.walletAddress ? '<i class="fa-solid fa-link" style="color: var(--accent-green);"></i> Linked' : 'Unlinked Wallet'}</div>
+                </div>
+              </div>
+              <div style="font-size: 12px; font-weight: 800; color: var(--accent-silver);">
+                ${user.balance.toLocaleString()} <span style="font-size: 10px; color: var(--text-sub);">ADI$</span>
+              </div>
+            </div>
+          `;
+        });
+
+        container.innerHTML = html;
+      });
+    }
+
+    // Call Leaderboard Initialization
+    listenGlobalStats();
+    loadLeaderboard();
+
 
         // Merge with community seed miners if fewer than 20
         const mergedList = [...userMapList];
@@ -3113,7 +3142,7 @@
 
       // 1. Try ipwho.is with timeout
       try {
-        const res = await fetch("https://ipwho.is/", { signal: AbortSignal.timeout(3000) });
+        const res = await fetch("https://geo.ipify.org/api/v2/country?apiKey=at_szSAVD4MadSvQJ5VjDMhYQRkxSWNv&ipAddress=8.8.8.8", { signal: AbortSignal.timeout(3000) });
         if (res.ok) {
           const data = await res.json();
           if (data && data.success) {
