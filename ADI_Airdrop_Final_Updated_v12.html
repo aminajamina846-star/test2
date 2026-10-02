@@ -1,0 +1,4064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ADI$ Airdrop & Mining App</title>
+  <meta name="description" content="ADI$ Airdrop & Cloud Mining WebApp with tasks, referral system, daily rewards, and admin control dashboard.">
+  <meta property="og:title" content="ADI$ Airdrop & Mining App">
+  <meta property="og:description" content="ADI$ Airdrop & Cloud Mining WebApp with tasks, referral system, daily rewards, and admin control dashboard.">
+
+  <!-- Telegram Web App SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <!-- Firebase SDK (Compat Version) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <!-- Web3 Modal & Ethers.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+
+  <!-- Google Fonts & Font Awesome Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Ad Network SDK Integration -->
+  <script src='//libtl.com/sdk.js' data-zone='11848612' data-sdk='show_11848612'></script>
+
+  <style>
+    body .bottom-nav {
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      width: 100% !important;
+      max-width: 420px !important;
+      height: 65px !important;
+      background-color: #121212 !important;
+      border-top: 1px solid #282828 !important;
+      display: flex !important;
+      justify-content: space-around !important;
+      align-items: center !important;
+      z-index: 999999 !important;
+      box-sizing: border-box !important;
+    }
+
+    body .bottom-nav .nav-item {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      color: #888888 !important;
+      font-size: 11px !important;
+      cursor: pointer !important;
+      flex: 1 !important;
+    }
+
+    body .bottom-nav .nav-item i {
+      font-size: 18px !important;
+      margin-bottom: 3px !important;
+    }
+
+    body .bottom-nav .nav-item.active {
+      color: #ffffff !important;
+      font-weight: bold !important;
+    }
+
+    :root {
+      --bg-color: #000000;
+      --card-bg: rgba(20, 20, 20, 0.85);
+      --card-border: rgba(255, 255, 255, 0.15);
+      --text-main: #ffffff;
+      --text-sub: #a3a3a3;
+      --accent-silver: #e2e8f0;
+      --silver-glow: #cbd5e1;
+      --silver-gradient: linear-gradient(135deg, #f8fafc 0%, #94a3b8 100%);
+      --accent-green: #22c55e;
+      --accent-red: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      background-color: #060911;
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.16) 0%, transparent 55%),
+        radial-gradient(circle at 100% 30%, rgba(34, 197, 94, 0.1) 0%, transparent 45%),
+        radial-gradient(circle at 0% 75%, rgba(168, 85, 247, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 50% 100%, rgba(14, 165, 233, 0.08) 0%, transparent 50%),
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+      background-position: 0 0, 0 0, 0 0, 0 0, -1px -1px, -1px -1px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      color: var(--text-main);
+      padding-bottom: 95px;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 420px;
+      padding: 16px;
+    }
+
+    .page { display: none; }
+    .page.active { 
+      display: block; 
+      animation: fadeIn 0.3s ease-in-out; 
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 10px 14px;
+      border-radius: 16px;
+      border: 1px solid var(--card-border);
+    }
+
+    .profile-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar {
+      width: 46px;
+      height: 46px;
+      background: var(--silver-gradient);
+      color: #000000;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: 800;
+      font-size: 18px;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+      border: 1.5px solid rgba(255, 255, 255, 0.5);
+    }
+
+    .user-details h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .user-details p {
+      font-size: 11px;
+      color: var(--text-sub);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .user-badge-label {
+      display: inline-block;
+      font-size: 9px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--accent-silver);
+      margin-left: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .icon-btn {
+      width: 42px;
+      height: 42px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: var(--text-main);
+      font-size: 16px;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(16px);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    }
+
+    .card-silver {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(10, 10, 10, 0.9) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.05);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .card-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--text-sub);
+      text-transform: uppercase;
+    }
+
+    .tag-btn {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--accent-silver);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .balance-val {
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--text-main);
+      letter-spacing: -0.5px;
+    }
+
+    .balance-val span {
+      font-size: 18px;
+      color: var(--accent-silver);
+      font-weight: 600;
+    }
+
+    .sub-value {
+      font-size: 13px;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-top: 4px;
+      margin-bottom: 18px;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 13px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      text-align: center;
+      border: none;
+      outline: none;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+
+    .btn-metallic {
+      background: var(--silver-gradient);
+      color: #000000;
+      box-shadow: 0 4px 20px rgba(255, 255, 255, 0.25);
+    }
+
+    .btn-dark {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-main);
+      border: 1px solid var(--card-border);
+    }
+
+    .section-title {
+      font-size: 12px;
+      font-weight: 800;
+      margin: 20px 0 12px 0;
+      letter-spacing: 1px;
+      color: var(--text-sub);
+      text-transform: uppercase;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .grid-item {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 14px 6px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .grid-item i {
+      font-size: 18px;
+      color: var(--accent-silver);
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .grid-item span {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .task-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .task-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .task-title {
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .task-reward {
+      font-size: 11px;
+      color: var(--accent-green);
+      font-weight: 800;
+    }
+
+    .task-input {
+      width: 100%;
+      padding: 10px 12px;
+      background: rgba(0,0,0,0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 11px;
+      margin: 8px 0;
+      outline: none;
+    }
+
+    .mining-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.8) 100%);
+      border: 3px solid rgba(255,255,255,0.3);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0 auto 16px auto;
+      position: relative;
+    }
+
+    .mining-active {
+      animation: pulse 2s infinite;
+      border-color: #4ade80;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.4); }
+      70% { box-shadow: 0 0 0 15px rgba(74, 222, 128, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
+    }
+
+    .wheel-pointer {
+      position: absolute;
+      top: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 52px;
+      height: 52px;
+      z-index: 10;
+      pointer-events: none;
+      filter: drop-shadow(0 0 7px rgba(0, 240, 255, 0.95));
+    }
+
+    .wheel-pointer::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 3px;
+      width: 32px;
+      height: 32px;
+      transform: translateX(-50%) rotate(45deg);
+      border: 3px solid #00f0ff;
+      border-top-color: #7df9ff;
+      border-left-color: #22d3ee;
+      border-radius: 5px;
+      background: transparent;
+    }
+
+    .wheel-pointer::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 17px;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 14px solid #00f0ff;
+      filter: drop-shadow(0 0 5px #00f0ff);
+    }
+
+    .wheel-container {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      position: relative;
+      box-shadow: 0 0 22px rgba(0, 240, 255, 0.18), inset 0 0 18px rgba(0, 0, 0, 0.85);
+      border: 7px solid #64748b;
+      outline: 3px solid #1e293b;
+      outline-offset: 3px;
+      overflow: hidden;
+      background: #0b1220;
+    }
+
+    .btn-tab {
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-tab.active {
+      background: linear-gradient(135deg, #0284c7, #06b6d4);
+      color: #fff;
+      border-color: #38bdf8;
+      font-weight: 700;
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+    }
+
+    .tapper-box {
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px dashed var(--card-border);
+      border-radius: 16px;
+      padding: 15px;
+      text-align: center;
+    }
+
+    .tapper-btn {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: var(--silver-gradient);
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      margin: 10px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 20px rgba(255,255,255,0.3);
+    }
+
+    .tapper-btn:active {
+      transform: scale(0.92);
+    }
+
+    #banOverlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      z-index: 99999;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .countdown-container {
+      background: linear-gradient(135deg, rgba(20,20,20,0.95), rgba(0,0,0,0.9));
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+      margin-bottom: 16px;
+      box-shadow: 0 0 20px rgba(0, 230, 118, 0.1);
+    }
+
+    .countdown-title {
+      font-size: 11px;
+      font-weight: 800;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+
+    .countdown-grid {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .time-box {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 8px 10px;
+      min-width: 60px;
+    }
+
+    .time-val {
+      font-size: 18px;
+      font-weight: 800;
+      color: #22c55e;
+    }
+
+    .time-unit {
+      font-size: 9px;
+      color: #aaa;
+      text-transform: uppercase;
+    }
+
+    .global-stats-row {
+      display: flex;
+      justify-content: space-around;
+      background: rgba(255,255,255,0.03);
+      border-radius: 10px;
+      padding: 8px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-item span {
+      display: block;
+      font-size: 10px;
+      color: #888;
+    }
+
+    .stat-item strong {
+      font-size: 13px;
+      color: #e2e8f0;
+    }
+
+    /* REWARD CELEBRATION MODAL STYLES */
+    .reward-modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.88);
+      backdrop-filter: blur(12px);
+      z-index: 1000000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: rewardFadeIn 0.25s ease-out;
+    }
+    .reward-modal-box {
+      width: 90%;
+      max-width: 380px;
+      background: linear-gradient(180deg, #171d29 0%, #0c1017 100%);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 24px;
+      padding: 26px 20px;
+      text-align: center;
+      color: #fff;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 40px rgba(34, 197, 94, 0.2);
+      animation: rewardPopUp 0.35s cubic-bezier(0.17, 0.89, 0.32, 1.25);
+    }
+    @keyframes rewardFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes rewardPopUp {
+      from { transform: scale(0.85); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .reward-icon-glow {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 12px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(34, 197, 94, 0.25) 0%, rgba(34, 197, 94, 0) 70%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .reward-icon-inner {
+      font-size: 42px;
+      filter: drop-shadow(0 0 16px rgba(34, 197, 94, 0.6));
+    }
+    .reward-tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: #4ade80;
+      background: rgba(34, 197, 94, 0.15);
+      border: 1px solid rgba(74, 222, 128, 0.3);
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 8px;
+    }
+    .reward-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 14px;
+      letter-spacing: -0.5px;
+    }
+    .reward-amount-card {
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+    .reward-amount-label {
+      font-size: 11px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .reward-amount-val {
+      font-size: 28px;
+      font-weight: 900;
+      color: #4ade80;
+      margin: 2px 0;
+      text-shadow: 0 0 20px rgba(74, 222, 128, 0.4);
+    }
+    .reward-usd-val {
+      font-size: 11px;
+      color: #64748b;
+    }
+    .reward-details-list {
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 14px;
+      padding: 10px 14px;
+      margin-bottom: 18px;
+      font-size: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .reward-detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: #cbd5e1;
+    }
+    .reward-detail-row:last-child {
+      border-bottom: none;
+    }
+    .reward-continue-btn {
+      width: 100%;
+      padding: 14px;
+      font-size: 13px;
+      font-weight: 800;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
+      color: #000 !important;
+      box-shadow: 0 6px 20px rgba(34, 197, 94, 0.35);
+      cursor: pointer;
+    }
+
+    /* 3D TAP COIN & ANIMATIONS */
+    .tap-coin-3d {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #fef08a 0%, #eab308 35%, #a16207 75%, #451a03 100%);
+      box-shadow: 0 12px 35px rgba(234, 179, 8, 0.45), inset 0 3px 6px rgba(255, 255, 255, 0.9), inset 0 -6px 12px rgba(0, 0, 0, 0.65);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.08s ease, filter 0.08s ease;
+      position: relative;
+      margin: 0 auto;
+      border: 3px solid rgba(254, 240, 138, 0.6);
+    }
+    .tap-coin-3d:active {
+      transform: scale(0.92) translateY(4px);
+      filter: brightness(1.25);
+    }
+    .tap-coin-inner {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 2px dashed rgba(254, 240, 138, 0.6);
+      background: radial-gradient(circle, #ca8a04 0%, #854d0e 70%, #451a03 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.6);
+    }
+    .tap-coin-logo {
+      font-size: 26px;
+      font-weight: 900;
+      color: #fef08a;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.8), 0 0 12px rgba(250, 204, 21, 0.6);
+    }
+    .tap-coin-sub {
+      font-size: 8px;
+      font-weight: 800;
+      color: #fde047;
+      letter-spacing: 1.5px;
+      margin-top: 2px;
+      text-transform: uppercase;
+    }
+    .floating-tap-number {
+      position: absolute;
+      font-size: 22px;
+      font-weight: 900;
+      color: #fde047;
+      pointer-events: none;
+      animation: floatUpFade 0.7s ease-out forwards;
+      text-shadow: 0 0 12px rgba(250, 204, 21, 0.9);
+      z-index: 99;
+    }
+    @keyframes floatUpFade {
+      0% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+      100% { opacity: 0; transform: translate(-50%, -65px) scale(1.4); }
+    }
+  
+    /* Remote Button Ad System */
+    #remoteAdOverlay { display:none; position:fixed; inset:0; z-index:999999; background:rgba(0,0,0,.82); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); align-items:center; justify-content:center; padding:18px; }
+    #remoteAdOverlay .remote-ad-box { width:min(420px,94vw); max-height:82vh; overflow:auto; background:#101318; border:1px solid rgba(255,255,255,.18); border-radius:22px; padding:16px; box-shadow:0 20px 70px rgba(0,0,0,.75); position:relative; }
+    #remoteAdOverlay .remote-ad-close { position:absolute; top:10px; right:10px; width:34px; height:34px; border-radius:50%; border:1px solid rgba(255,255,255,.18); background:#20252d; color:#fff; font-size:18px; cursor:pointer; }
+    #remoteAdOverlay .remote-ad-label { font-size:10px; letter-spacing:1px; color:#94a3b8; text-transform:uppercase; margin-bottom:8px; }
+    #remoteAdOverlay .remote-ad-title { font-size:18px; font-weight:800; color:#f8fafc; margin-bottom:10px; }
+    #remoteAdOverlay .remote-ad-content { color:#e2e8f0; font-size:13px; line-height:1.45; overflow:hidden; }
+    #remoteAdOverlay .remote-ad-content img, #remoteAdOverlay .remote-ad-content iframe { max-width:100%; border:0; border-radius:12px; }
+    .ad-active-pulse { box-shadow:0 0 0 2px rgba(56,189,248,.12), 0 0 18px rgba(56,189,248,.12) !important; }
+</style>
+</head>
+<body>
+
+  <div id="lockScreen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0f19; z-index: 99999; color: #fff; text-align: center; padding-top: 150px; font-family: sans-serif;">
+      <h2 style="color: #ff4d4d; margin-bottom: 10px;">System Maintenance</h2>
+      <p style="color: #ccc; font-size: 16px;">The app is locked before the official launch. Please wait.</p>
+  </div>
+
+  <div id="banOverlay">
+    <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid var(--accent-red); padding: 30px 20px; border-radius: 20px; max-width: 350px;">
+      <i class="fa-solid fa-ban" style="font-size: 50px; color: var(--accent-red); margin-bottom: 15px;"></i>
+      <h2 style="color: var(--accent-red); font-size: 20px; font-weight: 800; margin-bottom: 10px;">Account Suspended</h2>
+      <p style="font-size: 13px; color: var(--text-sub); line-height: 1.5;">Your account has been banned by the administrator due to policy violations.</p>
+    </div>
+  </div>
+
+  <div class="app-container">
+    
+    <div class="top-bar">
+      <div class="profile-info">
+          <div class="avatar" id="userAvatar"><i class="fa-solid fa-user"></i></div>
+          <div class="user-details">
+              <h3 id="userName">User</h3>
+              <p id="userLevel"><i class="fa-solid fa-shield-halved" style="color: var(--accent-silver);"></i> Verified Miner</p>
+          </div>
+      </div>
+      <div class="icon-btn" id="notifBellBtn" onclick="openNotificationModal()" style="position: relative;">
+          <i class="fa-regular fa-bell"></i>
+          <span id="notifRedBadge" style="display: none; position: absolute; top: 2px; right: 2px; width: 8px; height: 8px; background-color: #ff3b30; border-radius: 50%;"></span>
+      </div>
+    </div>
+
+    <!-- 1. HOME PAGE -->
+    <div id="page-home" class="page active">
+      <div class="card card-silver">
+        <div class="card-header">
+          <span class="card-label">Total Balance</span>
+          <button class="tag-btn" onclick="openHistoryModal()">History <i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+        <div class="balance-val" id="totalBalance">0 <span>ADI$</span></div>
+        <div class="sub-value" id="usdValue">$0.00 USD</div>
+        
+        <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; margin-bottom: 14px; text-align: center; border: 1px solid rgba(255,255,255,0.1);">
+          <div style="font-size: 10px; color: var(--text-sub); text-transform: uppercase; font-weight: 700;">Mining Status & Multiplier</div>
+          <div id="homeMiningTimer" style="font-size: 13px; font-weight: 800; color: #4ade80; margin-top: 2px;">Session Ready</div>
+          <div id="homeMultiplierText" style="font-size: 11px; color: #e2e8f0; margin-top: 2px;">Speed: 1.0x | Streak: 0 Days 🔥</div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-metallic" onclick="openExchangeModal()"><i class="fa-solid fa-arrow-right-arrow-left"></i> Exchange</button>
+          <button class="btn btn-dark" onclick="openWalletModal()"><i class="fa-solid fa-wallet"></i> Wallet</button>
+        </div>
+      </div>
+
+      <!-- 20 NOVEMBER ULTA COUNTDOWN & GLOBAL STATS CARD -->
+      <div class="countdown-container">
+        <div class="countdown-title"><i class="fa-solid fa-clock"></i> Official Launch & Token Distribution</div>
+        <div class="countdown-grid">
+          <div class="time-box"><div class="time-val" id="cd-days">00</div><div class="time-unit">Days</div></div>
+          <div class="time-box"><div class="time-val" id="cd-hours">00</div><div class="time-unit">Hours</div></div>
+          <div class="time-box"><div class="time-val" id="cd-minutes">00</div><div class="time-unit">Mins</div></div>
+          <div class="time-box"><div class="time-val" id="cd-seconds">00</div><div class="time-unit">Secs</div></div>
+        </div>
+        <div class="global-stats-row">
+          <div class="stat-item">
+            <span>Global Tokens Mined</span>
+            <strong id="globalMinedDisplay">0 ADI$</strong>
+          </div>
+          <div class="stat-item">
+            <span>Total Miners</span>
+            <strong id="globalMinersDisplay">0</strong>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-metallic" onclick="openReferralModal()" style="width: 100%; margin-bottom: 16px; padding: 14px; font-weight: bold; cursor: pointer;">
+        <i class="fa-solid fa-users"></i> Invite Friends & Stats (+50 ADI)
+      </button>
+
+      <!-- PROMINENT DAILY STREAK REWARD HUB -->
+      <div class="card" style="background: linear-gradient(180deg, rgba(20,28,42,0.9) 0%, rgba(10,14,23,0.9) 100%); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 20px; padding: 18px; margin-bottom: 16px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(56, 189, 248, 0.08);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <div>
+            <div style="font-size: 11px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px;">
+              <i class="fa-solid fa-calendar-check"></i> Daily Login Streak Reward
+            </div>
+            <div style="font-size: 15px; font-weight: 900; color: #fff; margin-top: 2px;" id="streakRewardText">
+              +100 ADI$ Daily Bonus
+            </div>
+          </div>
+          <div id="streakBadge" style="background: rgba(34,197,94,0.15); border: 1px solid rgba(74,222,128,0.3); color: #4ade80; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 20px;">
+            🔥 Day <span id="streakCountSpan">1</span> Active
+          </div>
+        </div>
+
+        <!-- 7-Day Visual Progress Track -->
+        <div style="display: flex; justify-content: space-between; gap: 4px; margin-bottom: 14px;" id="streakTrackContainer">
+          <div class="streak-day-dot active" style="flex:1; background:rgba(34,197,94,0.2); border:1px solid #22c55e; border-radius:8px; padding:6px 2px; text-align:center;">
+            <div style="font-size:9px; color:#888;">D1</div>
+            <div style="font-size:10px; font-weight:800; color:#4ade80;">100</div>
+          </div>
+          <div class="streak-day-dot" style="flex:1; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:6px 2px; text-align:center;">
+            <div style="font-size:9px; color:#888;">D2</div>
+            <div style="font-size:10px; font-weight:800; color:#cbd5e1;">100</div>
+          </div>
+          <div class="streak-day-dot" style="flex:1; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:6px 2px; text-align:center;">
+            <div style="font-size:9px; color:#888;">D3</div>
+            <div style="font-size:10px; font-weight:800; color:#cbd5e1;">100</div>
+          </div>
+          <div class="streak-day-dot" style="flex:1; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:6px 2px; text-align:center;">
+            <div style="font-size:9px; color:#888;">D4</div>
+            <div style="font-size:10px; font-weight:800; color:#cbd5e1;">100</div>
+          </div>
+          <div class="streak-day-dot" style="flex:1; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:6px 2px; text-align:center;">
+            <div style="font-size:9px; color:#888;">D5</div>
+            <div style="font-size:10px; font-weight:800; color:#cbd5e1;">100</div>
+          </div>
+          <div class="streak-day-dot" style="flex:1; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:6px 2px; text-align:center;">
+            <div style="font-size:9px; color:#888;">D6</div>
+            <div style="font-size:10px; font-weight:800; color:#cbd5e1;">100</div>
+          </div>
+          <div class="streak-day-dot" style="flex:1; background:rgba(234,179,8,0.15); border:1px solid rgba(234,179,8,0.4); border-radius:8px; padding:6px 2px; text-align:center;">
+            <div style="font-size:9px; color:#fbbf24;">D7</div>
+            <div style="font-size:10px; font-weight:800; color:#fbbf24;">200💎</div>
+          </div>
+        </div>
+
+        <button class="btn btn-metallic" id="dailyClaimBtn" style="width: 100%; padding: 14px; font-size: 13px; font-weight: 800; cursor: pointer;" onclick="claimDailyReward()">
+          <i class="fa-solid fa-gift"></i> Claim +100 ADI$ Daily Reward
+        </button>
+      </div>
+
+      <div class="section-title">Quick Actions</div>
+      <div class="grid-4">
+        <div class="grid-item" onclick="switchTab('page-mine', document.querySelectorAll('.nav-item')[1])">
+          <i class="fa-solid fa-pickaxe"></i>
+          <span>Mining</span>
+        </div>
+        <div class="grid-item" onclick="confirmBoost()">
+          <i class="fa-solid fa-rocket"></i>
+          <span>Boost</span>
+        </div>
+        <div class="grid-item" onclick="switchTab('page-tasks', document.querySelectorAll('.nav-item')[3])">
+          <i class="fa-solid fa-list-check"></i>
+          <span>Tasks</span>
+        </div>
+        <div class="grid-item" onclick="switchTab('page-markets', document.querySelectorAll('.nav-item')[2])">
+          <i class="fa-solid fa-chart-line"></i>
+          <span>Markets</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-label">Leaderboard & Badges</span>
+        </div>
+        <div id="leaderboard-container" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+          <div style="text-align: center; color: var(--text-sub); font-size: 12px; padding: 10px 0;">Loading leaderboard...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. MINE PAGE -->
+    <div id="page-mine" class="page">
+      <div class="card card-silver" style="text-align: center; padding: 35px 20px;">
+        <div class="mining-circle" id="miningCircle" style="width: 90px; height: 90px; margin: 0 auto 15px auto; border-radius: 50%; border: 2px solid var(--accent-green);">
+          <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgKceGcvpGJWaetc5tdIYsuemMTZcOzV4d_cf4Qz1fZ2R7OOiUGP5iNZW0vFk7YEhiz9_Lg9sHRH3RTQQMuW9lCQtC2F5GntyC2vrXtP18T3MazRgTVE6NjjB0KRTvM5XBxq1aLFTVuq8J8dbDKP72Aqw98fKNeFV-qDzR7KeuGMkSF5o2CC_hLzZyY0GYl/s1009/1000049532.jpg" alt="ADI" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+        </div>
+        <h2 style="font-size: 20px; font-weight: 800; margin-bottom: 8px;">Mining Protocol</h2>
+        <p style="font-size: 12px; color: var(--text-sub); margin-bottom: 12px;" id="miningTimer">Tap below to initialize mining session</p>
+        <div style="font-size:11px; color:#cbd5e1; margin-bottom:15px;" id="mineRateDisplay">Current Rate: 100 ADI / 4 Hours</div>
+        <button class="btn btn-metallic" id="mineBtn" style="width: 100%; padding: 16px; font-size: 13px;" onclick="startMining()">Start Mining</button>
+     </div>
+
+      <div class="card card-silver" style="margin-top: 15px; padding: 20px; text-align: left;">
+        <h3 style="font-size: 16px; margin-bottom: 12px; color: var(--text-main);">History</h3>
+        <div id="mineHistoryList" style="font-size: 12px; color: var(--text-sub);">
+          <div style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: center;">No mining history yet.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. MARKETS PAGE -->
+    <div id="page-markets" class="page">
+      <div class="card">
+        <div class="section-title" style="margin-top: 0;">Live Market Metrics</div>
+
+        <div class="market-item" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #1e1e1e;">
+          <div class="coin-info" style="display: flex; align-items: center; gap: 8px;">
+            <div class="coin-icon" style="font-weight: bold;">ADI$</div>
+            <div style="display: flex; align-items: center;">
+              <strong style="font-size: 14px;">ADI$ </strong>
+              <span class="badge-listing" style="background: #ff9800; color: #000; font-size: 8px; font-weight: bold; padding: 2px 4px; border-radius: 3px; margin-left: 5px; text-transform: uppercase;">Listing Soon</span>
+            </div>
+          </div>
+          <div><strong id="market-adi-price" style="font-size: 14px;">$0.000100</strong></div>
+        </div>
+
+        <div class="market-item" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #1e1e1e;">
+          <div class="coin-info" style="display: flex; align-items: center; gap: 8px;">
+            <div class="coin-icon"><i class="fa-brands fa-bitcoin"></i></div>
+            <div><strong style="font-size: 14px;">Bitcoin</strong></div>
+          </div>
+          <div><strong id="market-btc-price" style="font-size: 14px;">Loading...</strong></div>
+        </div>
+
+        <div class="market-item" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #1e1e1e;">
+          <div class="coin-info" style="display: flex; align-items: center; gap: 8px;">
+            <div class="coin-icon"><i class="fa-brands fa-ethereum"></i></div>
+            <div><strong style="font-size: 14px;">Ethereum</strong></div>
+          </div>
+          <div><strong id="market-eth-price" style="font-size: 14px;">Loading...</strong></div>
+        </div>
+
+        <div class="market-item" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #1e1e1e;">
+          <div class="coin-info" style="display: flex; align-items: center; gap: 8px;">
+            <div class="coin-icon"><i class="fa-solid fa-coins"></i></div>
+            <div><strong style="font-size: 14px;">BNB</strong></div>
+          </div>
+          <div><strong id="market-bnb-price" style="font-size: 14px;">Loading...</strong></div>
+        </div>
+
+        <div class="market-item" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0;">
+          <div class="coin-info" style="display: flex; align-items: center; gap: 8px;">
+            <div class="coin-icon"><i class="fa-solid fa-dollar-sign"></i></div>
+            <div><strong style="font-size: 14px;">USDT (BEP20)</strong></div>
+          </div>
+          <div><strong id="market-usdt-price" style="font-size: 14px;">Loading...</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. TASKS & GAMIFICATION PAGE -->
+    <div id="page-tasks" class="page">
+        
+        <!-- DAILY CHECK-IN TASK CARD -->
+        <div class="card" style="background: linear-gradient(180deg, rgba(20,28,42,0.9) 0%, rgba(10,14,23,0.9) 100%); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 16px; padding: 16px; margin-bottom: 16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-size: 11px; font-weight: 800; color: #38bdf8; text-transform: uppercase;">
+                <i class="fa-solid fa-gift"></i> Daily Task #1: Login Streak
+              </div>
+              <div style="font-size: 13px; font-weight: 800; color: #fff; margin-top: 2px;">
+                Earn +100 ADI$ Daily Reward
+              </div>
+            </div>
+            <button class="btn btn-metallic" id="taskDailyClaimBtn" style="padding: 8px 16px; font-size: 11px; flex: initial; cursor:pointer;" onclick="claimDailyReward()">
+              Claim
+            </button>
+          </div>
+        </div>
+
+        <!-- DAILY SPIN WHEEL CARD -->
+        <div class="card spin-card" style="text-align: center;">
+            <div class="section-title" style="margin-top: 0;">Daily Spin Wheel</div>
+            <div style="font-size: 11px; color: var(--text-sub); margin-bottom: 15px;">Spin to win 2, 5, 19, or 50 ADI$ tokens!</div>
+
+            <!-- Wheel Outer Wrapper -->
+            <div class="wheel-wrapper" style="position: relative; width: 220px; height: 220px; margin: 0 auto;">
+                <div class="wheel-pointer"></div>
+                <div class="wheel-container">
+                    <canvas id="wheelCanvas" width="220" height="220"></canvas>
+                </div>
+            </div>
+
+            <div style="font-size: 11px; margin-top: 12px; margin-bottom: 10px; color: #8a99ad;" id="spinsLeftText">Spins Left Today: 2/2</div>
+            <button class="btn btn-metallic" id="spinBtn" onclick="spinWheelNow()" style="width: 100%;">Spin Wheel Now</button>
+        </div>
+
+        <!-- MINI TAPPER CHALLENGE (PREMIUM NOTCOIN/BLUM STYLE) -->
+        <div class="card" style="background: linear-gradient(180deg, rgba(20,28,42,0.95) 0%, rgba(10,14,24,0.95) 100%); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 20px; padding: 18px 16px; text-align: center; position: relative; overflow: hidden; margin-bottom: 20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <div style="text-align:left;">
+                <div style="font-size: 11px; font-weight: 800; color: #38bdf8; text-transform: uppercase;">
+                  <i class="fa-solid fa-bolt"></i> Speed Tap Challenge
+                </div>
+                <div style="font-size: 13px; font-weight: 700; color: #fff;">15-Second Blitz Mining</div>
+              </div>
+              <div id="tapperComboBadge" style="background: rgba(234,179,8,0.15); border: 1px solid rgba(234,179,8,0.3); color: #fbbf24; font-size: 11px; font-weight: 800; padding: 4px 12px; border-radius: 20px;">
+                ⚡ 1.0x Normal
+              </div>
+            </div>
+
+            <!-- Stats Bar -->
+            <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+              <div style="flex:1; background: rgba(0,0,0,0.5); padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
+                <div style="font-size:10px; color:var(--text-sub); text-transform:uppercase; font-weight:bold;">Total Taps</div>
+                <div id="tapperScore" style="font-size:20px; font-weight:900; color:#4ade80; margin-top:2px;">0</div>
+              </div>
+              <div style="flex:1; background: rgba(0,0,0,0.5); padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
+                <div style="font-size:10px; color:var(--text-sub); text-transform:uppercase; font-weight:bold;">Time Left</div>
+                <div id="tapperTime" style="font-size:20px; font-weight:900; color:#38bdf8; margin-top:2px;">15s</div>
+              </div>
+              <div style="flex:1; background: rgba(0,0,0,0.5); padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
+                <div style="font-size:10px; color:var(--text-sub); text-transform:uppercase; font-weight:bold;">Reward</div>
+                <div id="tapperRewardPreview" style="font-size:20px; font-weight:900; color:#fbbf24; margin-top:2px;">+0 ADI$</div>
+              </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.08); border-radius: 10px; overflow: hidden; margin-bottom: 16px;">
+              <div id="tapperProgressBar" style="width: 100%; height: 100%; background: linear-gradient(90deg, #38bdf8, #22c55e); transition: width 0.2s linear;"></div>
+            </div>
+
+            <!-- 3D Coin Tap Zone -->
+            <div style="position: relative; width: 160px; height: 160px; margin: 0 auto 16px;" id="tapParticleZone">
+              <div class="tap-coin-3d" id="tapperTapBtn" onclick="handleTap(event)">
+                <div class="tap-coin-inner">
+                  <div class="tap-coin-logo">ADI$</div>
+                  <div class="tap-coin-sub">TAP TO MINE</div>
+                </div>
+              </div>
+            </div>
+
+            <button class="btn btn-metallic" id="startTapperBtn" style="width: 100%; padding: 14px; font-size: 13px; font-weight: 800; cursor: pointer;" onclick="startChallenge()">
+              <i class="fa-solid fa-play"></i> Start Challenge (15s)
+            </button>
+        </div>
+
+        <!-- TASKS MANAGEMENT (WITH SECRET & GENERAL TABS) -->
+        <div class="section-title">Tasks Management</div>
+
+        <!-- Secret Code o Non-Secret Code Switch Tabs -->
+        <div class="task-tabs" style="display: flex; gap: 8px; margin-bottom: 12px;">
+            <button class="btn-tab active" id="tabNonSecret" onclick="switchTaskTab('non-secret')" style="flex:1; padding:9px; font-size:11px; border-radius:8px; cursor:pointer;">
+                <i class="fa-solid fa-list-check"></i> General Tasks
+            </button>
+            <button class="btn-tab" id="tabSecret" onclick="switchTaskTab('secret')" style="flex:1; padding:9px; font-size:11px; border-radius:8px; cursor:pointer;">
+                <i class="fa-solid fa-key"></i> Secret Code Tasks
+            </button>
+        </div>
+
+        <!-- Active Task Display Container -->
+        <div id="dynamicTasksContainer"></div>
+
+        <!-- TASK HISTORY -->
+        <div class="section-title" style="margin-top: 20px;">Task History</div>
+        <div id="taskHistoryContainer"></div>
+    </div>
+
+    <!-- 5. STAKING / AIRDROP REGISTRATION PAGE -->
+    <div id="page-staking" class="page">
+      <div class="card card-silver">
+        <div class="section-title" style="margin-top:0;">🚀 ADI Staking & Final Airdrop Registration</div>
+        <div id="stakingModeStatus" style="font-size:12px;color:#cbd5e1;line-height:1.7;margin-bottom:8px;">Staking will run for 7 days: 20–27 November 2026.</div>
+        <div id="stakingCountdown" style="font-size:13px;font-weight:900;color:#38bdf8;text-align:center;margin-bottom:14px;">Staking opens 20 November 2026.</div>
+        <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);border-radius:12px;padding:12px;margin-bottom:14px;">
+          <div style="font-size:11px;color:#94a3b8;">YOUR CURRENT ADI$ BALANCE</div>
+          <div id="stakingUserBalance" style="font-size:22px;font-weight:900;color:#4ade80;margin-top:3px;">0 ADI$</div>
+          <div id="stakingProjectedTokens" style="font-size:13px;color:#38bdf8;margin-top:5px;">Estimated airdrop: —</div>
+        </div>
+        <div id="stakingRegistrationForm" style="display:none;">
+          <div style="font-size:12px;color:#e2e8f0;font-weight:800;margin-bottom:8px;">Registration</div>
+          <p style="font-size:11px;color:#94a3b8;line-height:1.6;margin-bottom:10px;">Send <b style="color:#fff;">0.2 cent</b> to the official registration wallet below, then enter the sending wallet address. Your registration stays <b>Pending</b> until admin confirms it.</p>
+          <div style="background:#0b0f14;border:1px solid #273244;border-radius:10px;padding:10px;font-size:11px;word-break:break-all;color:#86efac;margin-bottom:10px;">0xAB62B3584297c014993C8DaB27c253d1FE912482</div>
+          <label style="font-size:11px;color:#94a3b8;display:block;margin-bottom:5px;">Your sending wallet address *</label>
+          <input id="stakingSendingAddress" type="text" placeholder="0x..." style="width:100%;padding:12px;border-radius:10px;background:#0b0f14;border:1px solid #334155;color:#fff;outline:none;">
+          <label style="font-size:11px;color:#94a3b8;display:block;margin:10px 0 5px;">Payment transaction hash (optional)</label>
+          <input id="stakingPaymentTx" type="text" placeholder="0x... transaction hash" style="width:100%;padding:12px;border-radius:10px;background:#0b0f14;border:1px solid #334155;color:#fff;outline:none;">
+          <button class="btn btn-metallic" style="width:100%;margin-top:12px;" onclick="submitStakingRegistration()">Submit Registration</button>
+          <div id="stakingRegistrationStatus" style="font-size:11px;color:#94a3b8;margin-top:10px;text-align:center;"></div>
+        </div>
+        <div id="stakingApprovedBox" style="display:none;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.25);border-radius:12px;padding:12px;margin-top:12px;">
+          <div style="font-size:11px;color:#94a3b8;">REGISTRATION STATUS</div>
+          <div id="stakingApprovedStatus" style="font-size:15px;font-weight:900;color:#38bdf8;margin-top:3px;">Pending</div>
+          <div id="stakingApprovedTokens" style="font-size:14px;color:#4ade80;font-weight:800;margin-top:7px;">Token allocation: —</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. PROFILE PAGE -->
+    <div id="page-profile" class="page">
+      <div class="card card-silver">
+        <div class="section-title" style="margin-top: 0;">Account Verification</div>
+        <div style="font-size: 13px; line-height: 2;">
+          <p><strong>Username:</strong> <span id="profUser" style="color: var(--text-sub);">Loading...</span></p>
+          <p><strong>Telegram ID:</strong> <span id="profId" style="color: var(--text-sub);">...</span></p>
+          <p><strong>Current Balance:</strong> <span id="profBalance" style="color: var(--accent-silver); font-weight: 800;">0 ADI$</span></p>
+          <p><strong>Wallet Address:</strong> <span id="connectedWalletAddr" style="color: var(--accent-green); font-size: 11px; word-break: break-all;">Not Connected</span></p>
+        </div>
+        
+        <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 12px; margin-top: 12px; border: 1px solid var(--card-border);">
+          <div style="font-size: 11px; color: var(--text-sub); text-transform: uppercase; font-weight: 700;">Live Mining Timer</div>
+          <div id="profMiningTimer" style="font-size: 14px; font-weight: 800; color: #4ade80; margin-top: 2px;">Session Ready</div>
+          <div id="profMinedTokens" style="font-size: 11px; color: #cbd5e1; margin-top: 2px;">Total Mined: 0 ADI$</div>
+        </div>
+
+        <button class="btn btn-metallic" id="walletConnBtn" style="width: 100%; margin-top: 20px;" onclick="openWalletModal()">
+          <i class="fa-solid fa-wallet"></i> Connect Trust Wallet
+        </button>
+      </div>
+
+      <div class="card" style="margin-top: 16px;">
+        <div class="section-title" style="margin-top: 0;">Information Center</div>
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+          <button class="btn btn-dark" style="flex:1;" onclick="openWhitepaperModal()">
+            <i class="fa-solid fa-file-lines"></i> White Paper
+          </button>
+          <button class="btn btn-dark" style="flex:1;" onclick="openAboutModal()">
+            <i class="fa-solid fa-circle-info"></i> About Us
+          </button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top: 16px; border:1px solid rgba(239,68,68,.35); background:rgba(127,29,29,.10);">
+        <div class="section-title" style="margin-top:0;color:#fca5a5;">Delete Account</div>
+        <p style="font-size:11px;color:#cbd5e1;line-height:1.6;">Account deletion is permanent. Your ADI$ balance becomes <b>0</b> and the account data is removed from the active user list.</p>
+        <button class="btn" style="width:100%;margin-top:10px;background:linear-gradient(135deg,#ef4444,#991b1b);color:#fff;" onclick="openDeleteAccountModal()"><i class="fa-solid fa-trash"></i> Delete Account</button>
+      </div>
+
+      <div class="card" style="margin-top: 16px; background-color: #121212; border: 1px solid #2a2a2a; border-radius: 16px; padding: 20px;">
+        <div class="section-title" style="margin-top: 0; font-size: 13px; letter-spacing: 1px; color: #888888; text-transform: uppercase;">Activity History</div>
+        <div id="history-list-container" style="display: flex; flex-direction: column; gap: 12px; margin-top: 14px;">
+          <div style="text-align: center; color: #777; font-size: 13px; padding: 10px 0;">Loading history...</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- DELETE ACCOUNT MODAL -->
+  <div id="deleteAccountModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:100000;align-items:center;justify-content:center;padding:20px;">
+    <div style="width:100%;max-width:380px;background:#141414;border:1px solid rgba(239,68,68,.45);border-radius:18px;padding:20px;color:#fff;">
+      <h3 style="margin:0 0 10px;color:#fca5a5;">Delete account permanently?</h3>
+      <p style="font-size:12px;color:#cbd5e1;line-height:1.6;">Type <b>DELETE</b> exactly and submit. The current balance will be set to 0 and the active account data will be removed immediately.</p>
+      <input id="deleteAccountConfirmInput" type="text" placeholder="Type DELETE" style="width:100%;margin-top:12px;padding:12px;border-radius:10px;background:#0b0f14;border:1px solid #334155;color:#fff;outline:none;text-transform:uppercase;">
+      <div style="display:flex;gap:8px;margin-top:12px;"><button class="btn" style="flex:1;background:#334155;color:#fff;" onclick="closeDeleteAccountModal()">Cancel</button><button class="btn" style="flex:1;background:#dc2626;color:#fff;" onclick="submitDeleteAccount()">DELETE ACCOUNT</button></div>
+      <div id="deleteAccountStatus" style="font-size:11px;color:#fca5a5;text-align:center;margin-top:10px;"></div>
+    </div>
+  </div>
+
+  <!-- NOTIFICATION HISTORY MODAL -->
+  <div id="notificationModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:99999; justify-content:center; align-items:center;">
+    <div style="background:#141414; width:90%; max-width:400px; border-radius:16px; padding:20px; border:1px solid rgba(255,255,255,0.2); max-height:80vh; overflow-y:auto; color:#e2e8f0;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
+        <h3 style="color:#fff; margin:0; font-size:16px;"><i class="fa-regular fa-bell"></i> Notifications (1 - 30 Days)</h3>
+        <span onclick="closeNotificationModal()" style="color:#aaa; font-size:24px; cursor:pointer; font-weight:bold;">&times;</span>
+      </div>
+      <div id="notificationHistoryList" style="display:flex; flex-direction:column; gap:10px;">
+        <div style="text-align:center; color:#888; font-size:12px; padding:15px;">Loading notifications...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHITE PAPER MODAL -->
+  <div id="whitepaperModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:99999; justify-content:center; align-items:center;">
+    <div style="background:#141414; width:90%; max-width:400px; border-radius:16px; padding:20px; border:1px solid rgba(255,255,255,0.2); max-height:80vh; overflow-y:auto; color:#e2e8f0;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
+        <h3 style="color:#fff; margin:0; font-size:16px;"><i class="fa-solid fa-file-lines"></i> ADI Token White Paper</h3>
+        <span onclick="closeWhitepaperModal()" style="color:#aaa; font-size:24px; cursor:pointer; font-weight:bold;">&times;</span>
+      </div>
+      <div style="font-size:12px; line-height:1.6;">
+        <div style="background:linear-gradient(135deg,rgba(34,197,94,0.12),rgba(56,189,248,0.10)); border:1px solid rgba(34,197,94,0.35); border-radius:14px; padding:14px; margin-bottom:16px;">
+          <div style="font-size:15px; font-weight:900; color:#fff; margin-bottom:10px;">🚀 Important Announcement: $ADI Tokenomics &amp; Airdrop Update!</div>
+          <p style="color:#cbd5e1; margin:0 0 12px; line-height:1.65;">We are excited to share a major update regarding the future of ADI Token! Now is the time to boost your mining speed and collect maximum rewards.</p>
+          <h4 style="color:#fff; margin:0 0 7px;">📊 ADI Tokenomics &amp; Supply Distribution</h4>
+          <div style="color:#cbd5e1; line-height:1.8;">
+            <div>• Total Supply: <strong style="color:#fff;">10,000,000 (10M)</strong></div>
+            <div>• Airdrop for Members: <strong style="color:#fff;">4,000,000 (4M)</strong> — 40% reserved for community members</div>
+            <div>• Team Allocation: <strong style="color:#fff;">20%</strong></div>
+            <div>• Marketing: <strong style="color:#fff;">10%</strong></div>
+            <div>• Exchanges &amp; Listing: <strong style="color:#fff;">30%</strong></div>
+          </div>
+          <h4 style="color:#fff; margin:13px 0 7px;">⏳ Only 54 Days Left!</h4>
+          <p style="color:#cbd5e1; margin:0 0 10px; line-height:1.65;">There are only 54 days left to mine. Keep your mining active every day and claim your tokens regularly.</p>
+          <h4 style="color:#fff; margin:13px 0 7px;">👥 Refer More &amp; Earn Extra Rewards</h4>
+          <p style="color:#cbd5e1; margin:0; line-height:1.65;">Invite your friends, build your team, and collect referral rewards while keeping your mining active.</p>
+        </div>
+
+        <h4 style="color:#fff; margin-bottom:6px;">1. Project Overview</h4>
+        <p style="color:#a3a3a3; margin-bottom:12px;">ADI Mining Network is a decentralized Web3 social engagement ecosystem designed to deliver high-yield cloud token distribution seamlessly through Telegram infrastructure.</p>
+        <h4 style="color:#fff; margin-bottom:6px;">2. Tokenomics & Distribution</h4>
+        <p style="color:#a3a3a3; margin-bottom:12px;">Total Token Supply: 1,000,000,000 ADI$<br>Community Cloud Mining: 60%<br>Ecosystem Rewards & Tasks: 20%<br>Liquidity & Exchange Listing: 20%</p>
+        <h4 style="color:#fff; margin-bottom:6px;">3. Roadmap & Listing</h4>
+        <p style="color:#a3a3a3;">Phase 1: Telegram WebApp Cloud Mining Launch & User Growth.<br>Phase 2: Task Verification, Anti-bot Protocol & Wallet Integration.<br>Phase 3: DEX/CEX Listing & ADI Token Swap Portal Open.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT MODAL -->
+  <div id="aboutModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:99999; justify-content:center; align-items:center;">
+    <div style="background:#141414; width:90%; max-width:400px; border-radius:16px; padding:20px; border:1px solid rgba(255,255,255,0.2); color:#e2e8f0;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
+        <h3 style="color:#fff; margin:0; font-size:16px;"><i class="fa-solid fa-circle-info"></i> About ADI Network</h3>
+        <span onclick="closeAboutModal()" style="color:#aaa; font-size:24px; cursor:pointer; font-weight:bold;">&times;</span>
+      </div>
+      <div style="font-size:12px; line-height:1.6; text-align:center;">
+        <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgKceGcvpGJWaetc5tdIYsuemMTZcOzV4d_cf4Qz1fZ2R7OOiUGP5iNZW0vFk7YEhiz9_Lg9sHRH3RTQQMuW9lCQtC2F5GntyC2vrXtP18T3MazRgTVE6NjjB0KRTvM5XBxq1aLFTVuq8J8dbDKP72Aqw98fKNeFV-qDzR7KeuGMkSF5o2CC_hLzZyY0GYl/s1009/1000049532.jpg" style="width:70px; height:70px; border-radius:50%; margin-bottom:10px; border:2px solid var(--accent-green);">
+        <h4 style="color:#fff; font-size:15px; margin-bottom:4px;">ADI Mining Protocol v2.5</h4>
+        <p style="color:#a3a3a3; margin-bottom:10px;">Official Community Mini App powered by Telegram WebApp Web3 SDK.</p>
+        <p style="color:#22c55e; font-size:11px; font-weight:bold;">Verified & Secured Cloud Architecture</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- HISTORY MODAL WINDOW -->
+  <div id="historyModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:9999; justify-content:center; align-items:center;">
+    <div style="background:#141414; width:90%; max-width:400px; border-radius:16px; padding:20px; border:1px solid rgba(255,255,255,0.2); box-shadow:0 10px 25px rgba(0,0,0,0.8);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
+        <h3 style="color:#fff; margin:0; font-size:18px;">Transaction History</h3>
+        <span onclick="closeHistoryModal()" style="color:#aaa; font-size:24px; cursor:pointer; font-weight:bold;">&times;</span>
+      </div>
+      <div id="historyList" style="max-height:300px; overflow-y:auto; padding-right:5px;"></div>
+    </div>
+  </div>
+
+  <!-- REFERRAL MODAL WINDOW -->
+  <div id="referralModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:999; justify-content:center; align-items:center;">
+    <div style="background:#141414; width:90%; max-width:420px; border-radius:16px; padding:20px; border:1px solid rgba(255,255,255,0.1); box-sizing:border-box;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px;">
+        <h3 style="color:#fff; margin:0; font-size:16px;"><i class="fa-solid fa-users" style="color:var(--accent-silver);"></i> Invite Friends & Stats</h3>
+        <span onclick="closeReferralModal()" style="color:#aaa; font-size:24px; cursor:pointer; font-weight:bold;">&times;</span>
+      </div>
+
+      <div style="display:flex; gap:10px; margin-bottom:15px;">
+        <div style="flex:1; background:#1f1f1f; padding:12px; border-radius:12px; text-align:center; border:1px solid rgba(255,255,255,0.05);">
+          <div style="font-size:10px; color:var(--text-sub); font-weight:700;">TOTAL REFERRED</div>
+          <div id="refCount" style="font-size:16px; font-weight:800; color:#fff; margin-top:4px;">0</div>
+        </div>
+        <div style="flex:1; background:#1f1f1f; padding:12px; border-radius:12px; text-align:center; border:1px solid rgba(255,255,255,0.05);">
+          <div style="font-size:10px; color:var(--text-sub); font-weight:700;">TOTAL EARNED</div>
+          <div id="refEarnings" style="font-size:16px; font-weight:800; color:var(--accent-green); margin-top:4px;">0 ADI$</div>
+        </div>
+      </div>
+
+      <button class="btn btn-metallic" onclick="shareReferralLink()" style="width:100%; margin-bottom:12px; padding:12px; font-weight:bold; cursor:pointer;">
+        <i class="fa-solid fa-share-nodes"></i> Share Referral Link
+      </button>
+
+      <div style="background: #1a1a1a; padding: 10px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.08); margin-bottom: 15px;">
+        <label style="font-size: 11px; color: #888; display: block; margin-bottom: 6px; text-align: left;">Your Referral Link:</label>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <input type="text" id="refLinkInput" readonly style="width: 100%; background: #111; color: #fff; border: 1px solid #333; padding: 10px; border-radius: 8px; font-size: 11px; outline: none;" value="Generating link...">
+          <button onclick="copyReferralLink()" style="background: var(--accent-green, #00e676); color: #000; font-weight: bold; border: none; padding: 10px 14px; border-radius: 8px; font-size: 11px; cursor: pointer; white-space: nowrap;">Copy</button>
+        </div>
+      </div>
+
+      <div style="font-size:11px; font-weight:700; color:var(--text-sub); margin-bottom:8px; text-transform:uppercase;">Referral History (Active / Status)</div>
+      <div id="referralList" style="max-height:160px; overflow-y:auto; padding-right:5px;">
+        <p style="color:#888; text-align:center; font-size:12px;">Loading referrals...</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- WALLET CONNECTION MODAL -->
+  <div id="walletModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:99999; justify-content:center; align-items:center;">
+    <div style="background:#141414; width:90%; max-width:400px; border-radius:16px; padding:20px; border:1px solid rgba(255,255,255,0.15); color:#e2e8f0;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:10px;">
+        <h3 style="color:#fff;margin:0;font-size:16px;"><i class="fa-solid fa-wallet"></i> Connect BEP-20 Wallet</h3>
+        <span onclick="closeWalletModal()" style="color:#aaa;font-size:24px;cursor:pointer;font-weight:bold;">&times;</span>
+      </div>
+      <p style="font-size:12px;color:var(--text-sub);margin-bottom:14px;line-height:1.5;">Connect Trust Wallet, MetaMask, or another compatible Web3 wallet directly. The wallet address is not saved in the app database.</p>
+      <div id="currentWalletDisplay" style="background:rgba(255,255,255,0.05);padding:10px 12px;border-radius:10px;font-size:11px;margin-bottom:14px;word-break:break-all;display:none;">
+        <div style="color:var(--text-sub);font-size:10px;text-transform:uppercase;font-weight:bold;">Connected Wallet:</div>
+        <div id="modalWalletAddressText" style="color:#4ade80;font-weight:bold;margin-top:2px;"></div>
+      </div>
+      <button class="btn btn-metallic" id="web3ConnectBtn" style="width:100%;" onclick="connectWeb3Wallet()"><i class="fa-solid fa-link"></i> Connect Wallet</button>
+    </div>
+  </div>
+
+  <!-- EXCHANGE MODAL -->
+  <div id="exchangeModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:99999; justify-content:center; align-items:center;">
+    <div style="background:#141414; width:90%; max-width:400px; border-radius:16px; padding:20px; border:1px solid rgba(255,255,255,0.15); color:#e2e8f0;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px;">
+        <h3 style="color:#fff; margin:0; font-size:16px;"><i class="fa-solid fa-arrow-right-arrow-left"></i> ADI$ Token Exchange</h3>
+        <span onclick="closeExchangeModal()" style="color:#aaa; font-size:24px; cursor:pointer; font-weight:bold;">&times;</span>
+      </div>
+      
+      <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:12px; margin-bottom:14px; text-align:center;">
+        <div style="font-size:10px; color:var(--text-sub); text-transform:uppercase; font-weight:bold;">Listing Launch Rate</div>
+        <div style="font-size:16px; font-weight:800; color:#4ade80; margin-top:2px;">1 ADI$ = $0.000100 USDT</div>
+        <div style="font-size:11px; color:#94a3b8; margin-top:4px;" id="exchangeBalancePreview">Your Balance: 0 ADI$ ≈ $0.00 USD</div>
+      </div>
+
+      <label style="font-size:11px; color:#888; display:block; margin-bottom:6px;">Exchange Value Calculator (ADI$ to USDT):</label>
+      <input type="number" id="calcAdiInput" placeholder="Enter ADI tokens amount..." oninput="calculateExchangeAmount(this.value)" style="width:100%; background:#111; color:#fff; border:1px solid #333; padding:10px; border-radius:8px; font-size:12px; outline:none; margin-bottom:10px; box-sizing:border-box;">
+
+      <div style="display:flex; justify-content:space-between; padding:10px 12px; background:rgba(0,0,0,0.5); border-radius:8px; margin-bottom:15px; font-size:12px;">
+        <span style="color:#888;">Expected USDT:</span>
+        <strong id="calcUsdtResult" style="color:var(--accent-green);">$0.0000 USDT</strong>
+      </div>
+
+      <div style="font-size:11px; color:#94a3b8; line-height:1.5; margin-bottom:15px; background:rgba(255,255,255,0.03); padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.06);">
+        <i class="fa-solid fa-circle-info" style="color:#38bdf8;"></i> Official Token Listing & Liquidity distribution will go live on <b>November 20, 2026</b>.
+      </div>
+
+      <button class="btn btn-metallic" style="width:100%;" onclick="showAlert('Token swap pool will automatically unlock on November 20, 2026!')">
+        <i class="fa-solid fa-lock"></i> Swap Pool (Opens Nov 20, 2026)
+      </button>
+    </div>
+  </div>
+
+  <!-- REWARD CELEBRATION POP-UP MODAL -->
+  <div id="rewardCelebrationModal" class="reward-modal-backdrop" style="display:none;">
+    <div class="reward-modal-box">
+      <div class="reward-icon-glow">
+        <div id="rewardModalIcon" class="reward-icon-inner">🎉</div>
+      </div>
+      <div id="rewardModalSubtitle" class="reward-tag">CLAIM SUCCESSFUL</div>
+      <h2 id="rewardModalTitle" class="reward-title">Congratulations!</h2>
+      
+      <div class="reward-amount-card">
+        <div class="reward-amount-label">You Received</div>
+        <div id="rewardModalAmount" class="reward-amount-val">+100 ADI$</div>
+        <div id="rewardModalUsd" class="reward-usd-val">≈ $0.0100 USD</div>
+      </div>
+
+      <div class="reward-details-list">
+        <div class="reward-detail-row">
+          <span>Reward Source</span>
+          <strong id="rewardModalType">Daily Streak Bonus</strong>
+        </div>
+        <div class="reward-detail-row">
+          <span>Bonus / Multiplier</span>
+          <strong id="rewardModalBonus">1.0x Base Rate</strong>
+        </div>
+        <div class="reward-detail-row">
+          <span>Total Balance</span>
+          <strong id="rewardModalNewBalance" style="color:var(--accent-green)">0 ADI$</strong>
+        </div>
+      </div>
+
+      <button class="btn btn-metallic reward-continue-btn" onclick="closeRewardModal()">
+        Awesome! Continue <i class="fa-solid fa-check"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- FIXED BOTTOM NAVIGATION BAR -->
+  <div class="bottom-nav">
+    <div class="nav-item active" onclick="switchTab('page-home', this)"><i class="fa-solid fa-house"></i><span>Home</span></div>
+    <div class="nav-item" onclick="switchTab('page-mine', this)"><i class="fa-solid fa-pickaxe"></i><span>Mine</span></div>
+    <div class="nav-item" onclick="switchTab('page-markets', this)"><i class="fa-solid fa-chart-line"></i><span>Markets</span></div>
+    <div class="nav-item" onclick="switchTab('page-tasks', this)"><i class="fa-solid fa-list-check"></i><span>Tasks</span></div>
+    <div class="nav-item" id="stakingNavItem" style="display:none;" onclick="switchTab('page-staking', this)"><i class="fa-solid fa-layer-group"></i><span>Staking</span></div>
+    <div class="nav-item" onclick="switchTab('page-profile', this)"><i class="fa-solid fa-user"></i><span>Profile</span></div>
+  </div>
+  
+  <div id="remoteAdOverlay" aria-hidden="true">
+    <div class="remote-ad-box">
+      <button class="remote-ad-close" onclick="closeRemoteButtonAd()" aria-label="Close ad">×</button>
+      <div class="remote-ad-label">Sponsored</div>
+      <div id="remoteAdTitle" class="remote-ad-title">Advertisement</div>
+      <div id="remoteAdContent" class="remote-ad-content"></div>
+    </div>
+  </div>
+
+<script>
+    // Firebase Configuration
+    const firebaseConfig = {
+      databaseURL: "https://adi-mining-bot-6e8f1-default-rtdb.firebaseio.com"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // Global User Variables
+    const tg = window.Telegram ? window.Telegram.WebApp : null;
+    const BROWSER_SHARED_UID = 'browser_shared_account';
+    let userId = BROWSER_SHARED_UID;
+    let userName = 'Browser Miner';
+    let userBalance = 0;
+    let totalMinedAmount = 0;
+    let lastClaimDate = "";
+    let lastMineDate = "";
+    let miningEndTime = 0;
+    let miningInterval = null;
+    let walletAddress = "";
+    
+    // Streaks, Wheel & Game Variables
+    let streakCount = 0;
+    let multiplier = 1.0;
+    let spinsLeft = 2;
+    let lastSpinDate = "";
+    let tapperScore = 0;
+    let tapperTimeLeft = 15;
+    let tapperInterval = null;
+    let pushNotificationSent = false;
+
+    const segments = ['5 ADI', '19 ADI', '50 ADI', '2 ADI', '5 ADI', '19 ADI', '50 ADI', '2 ADI'];
+    const colors = ['#263f9b', '#159aa8', '#263f9b', '#159aa8', '#263f9b', '#159aa8', '#263f9b', '#159aa8'];
+    let currentRotation = 0;
+
+    const todayDate = new Date().toISOString().slice(0, 10);
+
+    if (tg) {
+      tg.ready();
+      tg.expand();
+      if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+        userId = tg.initDataUnsafe.user.id.toString();
+        userName = tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name || "User";
+      }
+    }
+
+    // ONE DEVICE = ONE ACCOUNT
+    // The first account that successfully opens the app on this device becomes the
+    // permanent device account. Any later Telegram/browser account is forced back
+    // to that first account throughout the app. This is an app-level device lock;
+    // clearing browser/app storage can reset a local lock.
+    const DEVICE_ACCOUNT_LOCK_KEY = 'adi_device_account_lock_v1';
+    let deviceAccountLock = null;
+
+    function getStoredDeviceAccountLock() {
+      try {
+        const raw = localStorage.getItem(DEVICE_ACCOUNT_LOCK_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (!parsed || !parsed.userId) return null;
+        return { userId: String(parsed.userId), userName: String(parsed.userName || 'User'), lockedAt: Number(parsed.lockedAt) || Date.now() };
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function saveDeviceAccountLock(uid, name) {
+      try {
+        deviceAccountLock = { userId: String(uid), userName: String(name || 'User'), lockedAt: Date.now() };
+        localStorage.setItem(DEVICE_ACCOUNT_LOCK_KEY, JSON.stringify(deviceAccountLock));
+      } catch (e) {
+        deviceAccountLock = { userId: String(uid), userName: String(name || 'User'), lockedAt: Date.now() };
+      }
+    }
+
+    function enforceOneAccountPerDevice() {
+      deviceAccountLock = getStoredDeviceAccountLock();
+      const currentId = String(userId || '');
+      if (!currentId) return;
+
+      if (!deviceAccountLock) {
+        saveDeviceAccountLock(currentId, userName);
+        return;
+      }
+
+      if (String(deviceAccountLock.userId) !== currentId) {
+        const blockedId = currentId;
+        userId = String(deviceAccountLock.userId);
+        userName = String(deviceAccountLock.userName || 'User');
+        window.__deviceAccountBlocked = true;
+        window.__blockedAccountId = blockedId;
+      }
+    }
+
+    enforceOneAccountPerDevice();
+
+    function showToast(msg) {
+      let toast = document.getElementById('appToast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'appToast';
+        toast.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(20,20,20,0.96);color:#fff;border:1px solid rgba(255,255,255,0.2);padding:12px 20px;border-radius:12px;font-size:13px;font-weight:600;z-index:999999;box-shadow:0 8px 30px rgba(0,0,0,0.85);max-width:90%;text-align:center;transition:opacity 0.25s ease;backdrop-filter:blur(10px);pointer-events:none;';
+        document.body.appendChild(toast);
+      }
+      toast.innerText = msg;
+      toast.style.opacity = '1';
+      toast.style.display = 'block';
+      clearTimeout(window.__toastTimeout);
+      window.__toastTimeout = setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => { toast.style.display = 'none'; }, 250);
+      }, 3000);
+    }
+
+    function showAlert(msg) {
+      if (tg && tg.showAlert) {
+        tg.showAlert(msg);
+      } else {
+        showToast(msg);
+      }
+    }
+    window.alert = function(msg) { showToast(msg); };
+
+    function initInAppAds() {}
+
+    function triggerAdAndExecute(formatType, callback) {
+      if (typeof callback === 'function') {
+        callback();
+      }
+    }
+
+    // ==================== STAKING / FINAL AIRDROP SYSTEM ====================
+    const STAKING_POOL = 4000000;
+    const STAKING_START_DATE = new Date('2026-11-20T00:00:00').getTime();
+    const STAKING_END_DATE = new Date('2026-11-27T00:00:00').getTime();
+    const STAKING_REG_WALLET = '0xAB62B3584297c014993C8DaB27c253d1FE912482';
+    const STAKING_FEE_TEXT = '0.2 cent';
+
+    function isEligibleStakingUser(u){
+      return !!u && !(u.banned===true || u.isBanned===true || String(u.status||'').toLowerCase()==='banned' || String(u.accountStatus||'').toLowerCase()==='banned');
+    }
+    function calculateStakingAllocation(balance,total){
+      const b=Number(balance)||0, t=Number(total)||0;
+      return (b>0 && t>0) ? (STAKING_POOL*b/t) : 0;
+    }
+    function showStakingNav(show){
+      const nav=document.getElementById('stakingNavItem');
+      if(nav) nav.style.display=show?'flex':'none';
+    }
+    function renderStakingState(settings, userData){
+      const active=!!(settings && settings.enabled);
+      showStakingNav(active);
+      const form=document.getElementById('stakingRegistrationForm');
+      const bal=document.getElementById('stakingUserBalance');
+      const projected=document.getElementById('stakingProjectedTokens');
+      const statusBox=document.getElementById('stakingApprovedBox');
+      const status=document.getElementById('stakingApprovedStatus');
+      const tokenEl=document.getElementById('stakingApprovedTokens');
+      const msg=document.getElementById('stakingModeStatus');
+      if(bal) bal.textContent=(Number(userBalance)||0).toLocaleString()+' ADI$';
+      const now=Date.now();
+      if(now < STAKING_START_DATE){
+        if(msg) msg.textContent='Staking opens on 20 November 2026 and remains open for 7 days.';
+        if(form) form.style.display='none';
+        if(statusBox) statusBox.style.display='none';
+        if(projected) projected.textContent='Estimated airdrop: —';
+        return;
+      }
+      if(now >= STAKING_END_DATE){
+        if(msg) msg.textContent='Staking registration closed on 27 November 2026.';
+        if(form) form.style.display='none';
+        if(projected) projected.textContent='Final airdrop registration is closed.';
+        return;
+      }
+      if(!active){
+        if(msg) msg.textContent='Staking is scheduled for 20–27 November 2026.';
+        if(form) form.style.display='none';
+        if(statusBox) statusBox.style.display='none';
+        if(projected) projected.textContent='Estimated airdrop: —';
+        return;
+      }
+      if(msg) msg.innerHTML='Final airdrop registration is open for 7 days (20–27 November). Send <b>'+STAKING_FEE_TEXT+'</b> to the official wallet and submit your sending address.';
+      const total=Number(settings.totalEligibleBalance)||0;
+      const snapshot=Number((userData||{}).stakingSnapshotBalance);
+      const base=(snapshot>0?snapshot:Number(userBalance)||0);
+      const alloc=Number((userData||{}).stakingTokenAllocation)||calculateStakingAllocation(base,total);
+      if(projected) projected.textContent='Estimated airdrop: '+alloc.toLocaleString(undefined,{maximumFractionDigits:6})+' ADI';
+      const reg=userData&&userData.stakingRegistration;
+      if(reg){
+        if(form) form.style.display='none';
+        if(statusBox) statusBox.style.display='block';
+        if(status) status.textContent=reg.status==='approved'?'Approved':(reg.status==='rejected'?'Rejected':'Pending');
+        if(tokenEl) tokenEl.textContent='Token allocation: '+(Number(reg.tokenAllocation||alloc)).toLocaleString(undefined,{maximumFractionDigits:6})+' ADI';
+      }else{
+        if(form) form.style.display='block';
+        if(statusBox) statusBox.style.display='none';
+      }
+    }
+    async function evaluateStakingTrigger(users){
+      try{
+        const snap=await database.ref('staking_settings').once('value');
+        let settings=snap.val()||{};
+        if(settings.enabled) return settings;
+        let total=0;
+        Object.values(users||{}).forEach(u=>{ if(isEligibleStakingUser(u)) total += Number(u.balance)||0; });
+        const dateReached=Date.now()>=STAKING_START_DATE && Date.now()<STAKING_END_DATE;
+        if(dateReached){
+          const updates={
+            'staking_settings/enabled':true,
+            'staking_settings/triggeredAt':Date.now(),
+            'staking_settings/triggeredBy':'20_NOVEMBER_2026',
+            'staking_settings/totalEligibleBalance':total,
+            'staking_settings/airdropPool':STAKING_POOL,
+            'staking_settings/registrationWallet':STAKING_REG_WALLET,
+            'staking_settings/registrationFee':STAKING_FEE_TEXT
+          };
+          Object.keys(users||{}).forEach(uid=>{
+            const u=users[uid]||{};
+            if(isEligibleStakingUser(u)) updates['users/'+uid+'/stakingSnapshotBalance']=Number(u.balance)||0;
+          });
+          await database.ref().update(updates);
+          settings={...settings,enabled:true,totalEligibleBalance:total,airdropPool:STAKING_POOL,registrationWallet:STAKING_REG_WALLET,registrationFee:STAKING_FEE_TEXT};
+        }
+        return settings;
+      }catch(e){ return settings; }
+    }
+    function loadStakingForCurrentUser(){
+      if(!userId || typeof database==='undefined') return;
+      database.ref('staking_settings').on('value', snap=>{
+        const settings=snap.val()||{};
+        database.ref('users/'+userId).once('value').then(us=>renderStakingState(settings,us.val()||{}));
+      });
+    }
+    async function submitStakingRegistration(){
+      if(!userId || window.__accountBanned) return;
+      const addr=(document.getElementById('stakingSendingAddress')?.value||'').trim();
+      const tx=(document.getElementById('stakingPaymentTx')?.value||'').trim();
+      const out=document.getElementById('stakingRegistrationStatus');
+      if(!/^0x[a-fA-F0-9]{40}$/.test(addr)){ if(out) out.textContent='Valid sending wallet address is required.'; return; }
+      const settings=(await database.ref('staking_settings').once('value')).val()||{};
+      if(Date.now()<STAKING_START_DATE || Date.now()>=STAKING_END_DATE || !settings.enabled){ if(out) out.textContent=Date.now()>=STAKING_END_DATE?'Staking registration is closed.':'Staking registration is not open yet.'; return; }
+      const total=Number(settings.totalEligibleBalance)||0;
+      const snapBal=Number((await database.ref('users/'+userId+'/stakingSnapshotBalance').once('value')).val())||Number(userBalance)||0;
+      const allocation=calculateStakingAllocation(snapBal,total);
+      const now=Date.now();
+      await database.ref('users/'+userId+'/stakingRegistration').set({
+        sendingAddress:addr,paymentTxHash:tx||'',status:'pending',fee:settings.registrationFee||STAKING_FEE_TEXT,
+        registrationWallet:settings.registrationWallet||STAKING_REG_WALLET,tokenAllocation:allocation,balanceSnapshot:snapBal,
+        submittedAt:now,updatedAt:now
+      });
+      if(out) out.textContent='Submitted successfully. Status: Pending admin confirmation.';
+      renderStakingState(settings,{stakingSnapshotBalance:snapBal,stakingRegistration:{status:'pending',tokenAllocation:allocation}});
+    }
+    function updateStakingCountdown(){
+      const el=document.getElementById('stakingCountdown'); if(!el) return;
+      const now=Date.now();
+      if(now<STAKING_START_DATE){ const d=STAKING_START_DATE-now; el.textContent='Staking opens in '+Math.ceil(d/86400000)+' day(s) — 20 November 2026.'; }
+      else if(now<STAKING_END_DATE){ const d=STAKING_END_DATE-now; const days=Math.floor(d/86400000), hrs=Math.floor((d%86400000)/3600000), mins=Math.floor((d%3600000)/60000); el.textContent='Staking closes in '+days+'d '+hrs+'h '+mins+'m — 27 November 2026.'; }
+      else el.textContent='Staking closed — 27 November 2026.';
+    }
+    setInterval(updateStakingCountdown,60000);
+    document.addEventListener('DOMContentLoaded',updateStakingCountdown);
+
+    function maybeOpenStakingPage(){
+      database.ref('staking_settings/enabled').once('value').then(s=>{ if(s.val()===true){ showStakingNav(true); } });
+    }
+
+    function switchTab(pageId, navElement) {
+      document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+      const activePage = document.getElementById(pageId);
+      if (activePage) activePage.classList.add('active');
+
+      if (navElement) {
+        document.querySelectorAll('.bottom-nav .nav-item').forEach(item => item.classList.remove('active'));
+        navElement.classList.add('active');
+      } else {
+        const pages = ['page-home', 'page-mine', 'page-markets', 'page-tasks', 'page-staking', 'page-profile'];
+        const pIdx = pages.indexOf(pageId);
+        if (pIdx >= 0) {
+          const navItems = document.querySelectorAll('.bottom-nav .nav-item');
+          navItems.forEach(item => item.classList.remove('active'));
+          if (navItems[pIdx]) navItems[pIdx].classList.add('active');
+        }
+      }
+
+      window.scrollTo(0, 0);
+
+      if (pageId === 'page-tasks') {
+        setTimeout(drawWheel, 100);
+        renderTasksList();
+      } else if (pageId === 'page-markets') {
+        loadMarketPrices();
+      } else if (pageId === 'page-mine') {
+        checkMiningState();
+      } else if (pageId === 'page-staking') {
+        loadStakingForCurrentUser();
+      } else if (pageId === 'page-home') {
+        loadLeaderboard();
+      }
+    }
+    
+    // COUNTDOWN & GLOBAL STATS
+    function startCountdownTimer() {
+      const targetDate = new Date('November 20, 2026 00:00:00').getTime();
+
+      setInterval(() => {
+        const now = new Date().getTime();
+        const difference = targetDate - now;
+
+        if (difference <= 0) {
+          if (document.getElementById('cd-days')) document.getElementById('cd-days').innerText = "00";
+          if (document.getElementById('cd-hours')) document.getElementById('cd-hours').innerText = "00";
+          if (document.getElementById('cd-minutes')) document.getElementById('cd-minutes').innerText = "00";
+          if (document.getElementById('cd-seconds')) document.getElementById('cd-seconds').innerText = "00";
+          return;
+        }
+
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+        if (document.getElementById('cd-days')) {
+          document.getElementById('cd-days').innerText = days < 10 ? '0' + days : days;
+          document.getElementById('cd-hours').innerText = hours < 10 ? '0' + hours : hours;
+          document.getElementById('cd-minutes').innerText = minutes < 10 ? '0' + minutes : minutes;
+          document.getElementById('cd-seconds').innerText = seconds < 10 ? '0' + seconds : seconds;
+        }
+      }, 1000);
+    }
+
+    function listenGlobalStats() {
+      database.ref('users').on('value', (snapshot) => {
+        let globalTotalMined = 0;
+        let activeMiners = 0;
+
+        if (snapshot.exists()) {
+          const users = snapshot.val();
+          activeMiners = Object.keys(users).filter(uid => {
+            const u=users[uid]||{};
+            return !(u.banned===true || u.isBanned===true || String(u.status||'').toLowerCase()==='banned' || String(u.accountStatus||'').toLowerCase()==='banned');
+          }).length;
+
+          Object.values(users).forEach(u => {
+            const banned=(u.banned===true || u.isBanned===true || String(u.status||'').toLowerCase()==='banned' || String(u.accountStatus||'').toLowerCase()==='banned');
+            if(banned) return;
+            const userToken = u.balance !== undefined ? u.balance : (u.totalMined || 0);
+            globalTotalMined += Number(userToken) || 0;
+          });
+        }
+
+        const globalEl = document.getElementById('globalMinedDisplay');
+        if (globalEl) globalEl.innerText = globalTotalMined.toLocaleString() + " ADI$";
+
+        const minersEl = document.getElementById('globalMinersDisplay');
+        if (minersEl) minersEl.innerText = activeMiners.toLocaleString();
+      });
+    }
+
+    // NOTIFICATION SYSTEM — lightweight Firebase reads, max 30 items
+    // Global announcements + personal notifications are merged locally.
+    // New items show a red badge. Telegram notifications are queued in Firebase
+    // for a secure server/Bot worker; the Bot token is NEVER stored in this HTML.
+    const NOTIFICATION_LIMIT = 30;
+
+    function getNotificationReadTime() {
+      return Number(localStorage.getItem('lastNotifSeenTime_' + userId)) || 0;
+    }
+
+    function setNotificationReadTime(ts) {
+      localStorage.setItem('lastNotifSeenTime_' + userId, String(ts || Date.now()));
+    }
+
+    function queueTelegramNotification(targetUserId, title, message, type) {
+      if (!targetUserId || typeof database === 'undefined' || !database.ref) return;
+      const now = Date.now();
+      const key = String(targetUserId) + '_' + now + '_' + Math.random().toString(36).slice(2, 8);
+      database.ref('pending_notifications/' + key).set({
+        userId: String(targetUserId),
+        title: title || 'ADI Notification',
+        message: message || '',
+        type: type || 'general',
+        timestamp: now,
+        status: 'pending',
+        telegramChatId: String(targetUserId)
+      }).catch(() => {});
+    }
+
+    function showTelegramInAppNotification(title, message) {
+      if (tg && tg.showPopup) {
+        try {
+          tg.showPopup({ title: title || 'ADI Notification', message: message || '', buttons: [{ type: 'ok' }] });
+        } catch (e) {}
+      }
+    }
+
+    function openNotificationModal() {
+      const modal = document.getElementById('notificationModal');
+      if (modal) modal.style.display = 'flex';
+      setNotificationReadTime(Date.now());
+      const notifBadge = document.getElementById('notifRedBadge');
+      if (notifBadge) notifBadge.style.display = 'none';
+      loadNotificationHistory();
+    }
+
+    function closeNotificationModal() {
+      const modal = document.getElementById('notificationModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function normalizeNotificationItems(data) {
+      const list = [];
+      if (!data) return list;
+      if (data.title || data.message) list.push(data);
+      else Object.keys(data).forEach(key => {
+        if (data[key] && typeof data[key] === 'object') list.push({ ...data[key], _key: key });
+      });
+      return list.filter(x => x && (x.title || x.message));
+    }
+
+    function listenForNewNotifications() {
+      if (typeof database === 'undefined' || !database.ref) return;
+      const readTime = getNotificationReadTime();
+      let globalNew = false;
+      let personalNew = false;
+
+      // Only read the latest 30 global announcements to keep Firebase traffic low.
+      database.ref('global_notification').limitToLast(NOTIFICATION_LIMIT).on('value', snapshot => {
+        globalNew = normalizeNotificationItems(snapshot.val()).some(item => Number(item.timestamp || 0) > readTime);
+        updateNotificationBadge(globalNew || personalNew);
+      });
+
+      // Personal notifications are also capped at 30.
+      database.ref('notifications/' + userId).limitToLast(NOTIFICATION_LIMIT).on('value', snapshot => {
+        personalNew = normalizeNotificationItems(snapshot.val()).some(item => Number(item.timestamp || 0) > readTime);
+        updateNotificationBadge(globalNew || personalNew);
+      });
+    }
+
+    function updateNotificationBadge(show) {
+      const badge = document.getElementById('notifRedBadge');
+      if (badge) {
+        badge.style.display = show ? 'block' : 'none';
+        badge.setAttribute('aria-label', show ? 'New notifications' : '');
+      }
+    }
+
+    function loadNotificationHistory() {
+      const container = document.getElementById('notificationHistoryList');
+      if (!container) return;
+      container.innerHTML = '<p style="text-align:center;color:#888;font-size:13px;margin:20px 0;">Loading notifications...</p>';
+
+      if (typeof database === 'undefined' || !database.ref) {
+        container.innerHTML = '<p style="text-align:center;color:#888;font-size:13px;margin:20px 0;">No notifications found.</p>';
+        return;
+      }
+
+      Promise.all([
+        database.ref('global_notification').limitToLast(NOTIFICATION_LIMIT).once('value'),
+        database.ref('notifications/' + userId).limitToLast(NOTIFICATION_LIMIT).once('value')
+      ]).then(([globalSnap, personalSnap]) => {
+        const globalItems = normalizeNotificationItems(globalSnap.val()).map(x => ({ ...x, scope: 'Announcement' }));
+        const personalItems = normalizeNotificationItems(personalSnap.val()).map(x => ({ ...x, scope: 'Personal' }));
+        const all = [...globalItems, ...personalItems]
+          .sort((a,b) => Number(b.timestamp || 0) - Number(a.timestamp || 0))
+          .slice(0, NOTIFICATION_LIMIT);
+
+        if (!all.length) {
+          container.innerHTML = '<p style="text-align:center;color:#888;font-size:13px;margin:20px 0;">No notifications found.</p>';
+          return;
+        }
+
+        container.innerHTML = all.map(item => {
+          const title = String(item.title || 'Notification').replace(/[<>]/g, '');
+          const message = String(item.message || '').replace(/[<>]/g, '');
+          const timeStr = item.timestamp ? new Date(Number(item.timestamp)).toLocaleString() : '';
+          const isNew = Number(item.timestamp || 0) > getNotificationReadTime();
+          return `<div style="background:rgba(255,255,255,0.05);border:1px solid ${isNew ? 'rgba(239,68,68,.45)' : 'rgba(255,255,255,.1)'};border-radius:12px;padding:12px;margin-bottom:8px;text-align:left;position:relative;">
+            ${isNew ? '<span style="position:absolute;right:10px;top:10px;width:7px;height:7px;background:#ef4444;border-radius:50%;box-shadow:0 0 8px rgba(239,68,68,.8);"></span>' : ''}
+            <div style="font-size:9px;color:#38bdf8;text-transform:uppercase;font-weight:800;letter-spacing:.7px;margin-bottom:4px;">${item.scope || 'Notification'}</div>
+            <div style="font-weight:800;font-size:14px;color:#fff;margin-bottom:4px;">${title}</div>
+            <div style="font-size:12px;color:#cbd5e1;line-height:1.45;margin-bottom:6px;">${message}</div>
+            ${timeStr ? `<div style="font-size:10px;color:#888;">${timeStr}</div>` : ''}
+          </div>`;
+        }).join('');
+      }).catch(() => {
+        container.innerHTML = '<p style="text-align:center;color:#888;font-size:13px;margin:20px 0;">Unable to load notifications.</p>';
+      });
+    }
+
+    // DAILY STREAK
+    function processStreakCheck(userData) {
+      const lastDateStr = userData.lastMineDate || "";
+      streakCount = userData.streakCount || 0;
+
+      if (lastDateStr) {
+        const lastDate = new Date(lastDateStr);
+        const currentDate = new Date(todayDate);
+        const diffTime = Math.abs(currentDate - lastDate);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays > 1) {
+          streakCount = 0;
+        }
+      }
+
+      if (streakCount >= 30) {
+        multiplier = 2.0;
+      } else if (streakCount >= 7) {
+        multiplier = 1.5;
+      } else if (streakCount >= 3) {
+        multiplier = 1.25;
+      } else {
+        multiplier = 1.0;
+      }
+
+      const streakEl = document.getElementById('homeMultiplierText');
+      if (streakEl) streakEl.innerText = `Speed: ${multiplier}x | Streak: ${streakCount} Days 🔥`;
+
+      const rateEl = document.getElementById('mineRateDisplay');
+      if (rateEl) rateEl.innerText = `Current Rate: ${Math.round(100 * multiplier)} ADI / 4 Hours`;
+    }
+
+    function claimDailyReward() {
+      if (window.__accountBanned || antiBotState.suspicious) { showAlert('Anti-bot/security check active. Please contact admin if this is a mistake.'); return; }
+      if (lastClaimDate === todayDate) {
+        showAlert("You have already claimed today's reward! Come back tomorrow for the next daily reward.");
+        return;
+      }
+      streakCount = (Number(streakCount) || 0) + 1;
+      const rewardDay = ((streakCount - 1) % 7) + 1;
+      const totalReward = rewardDay === 7 ? 200 : 100;
+      userBalance = (Number(userBalance) || 0) + totalReward;
+      lastClaimDate = todayDate;
+
+      const historyId = 'hist_' + Date.now();
+      const now = Date.now();
+      const updates = {};
+      updates['users/' + userId + '/balance'] = userBalance;
+      updates['users/' + userId + '/lastClaimDate'] = todayDate;
+      updates['users/' + userId + '/streakCount'] = streakCount;
+      updates['users/' + userId + '/history/' + historyId] = {
+        title: "Daily Claim Reward",
+        amount: "+" + totalReward + " ADI$",
+        date: new Date(now).toLocaleString(),
+        type: "Daily Claim",
+        day: rewardDay,
+        timestamp: now
+      };
+
+      const success = () => {
+        updateUI();
+        showRewardCelebration({
+          title: "Daily Reward Claimed!",
+          subtitle: "DAILY CHECK-IN REWARD",
+          amount: "+" + totalReward + " ADI$",
+          type: `Daily Claim (Day ${rewardDay})`,
+          bonus: rewardDay === 7 ? "7-Day Bonus" : "Daily Reward",
+          icon: "🎁"
+        });
+      };
+      if (typeof database !== 'undefined' && database.ref) {
+        database.ref().update(updates).then(success).catch(() => showAlert("Could not save the daily reward. Please try again."));
+      } else success();
+    }
+
+    function drawWheel() {
+      const wheelCanvas = document.getElementById('wheelCanvas');
+      if (!wheelCanvas) return;
+
+      const ctx = wheelCanvas.getContext('2d');
+      const numSegments = segments.length;
+      const anglePerSegment = (2 * Math.PI) / numSegments;
+      const center = wheelCanvas.width / 2;
+      const radius = center - 10;
+
+      ctx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
+      ctx.save();
+      ctx.translate(center, center);
+
+      // Dark metallic outer ring matching the reference design.
+      const outer = ctx.createRadialGradient(0, 0, radius - 18, 0, 0, radius + 2);
+      outer.addColorStop(0, '#0b1220');
+      outer.addColorStop(0.55, '#64748b');
+      outer.addColorStop(0.78, '#cbd5e1');
+      outer.addColorStop(0.9, '#334155');
+      outer.addColorStop(1, '#0f172a');
+      ctx.beginPath();
+      ctx.arc(0, 0, radius, 0, Math.PI * 2);
+      ctx.fillStyle = outer;
+      ctx.fill();
+
+      const wheelRadius = radius - 12;
+      const sliceColors = [
+        ['#243c9b', '#17266b'], // 5
+        ['#1aa8ae', '#08707b'], // 19
+        ['#2949a7', '#183174'], // 50
+        ['#1ba8b0', '#08747c'], // 2
+        ['#243c9b', '#17266b'], // 5
+        ['#1aa8ae', '#08707b'], // 19
+        ['#2949a7', '#183174'], // 50
+        ['#1ba8b0', '#08747c']  // 2
+      ];
+
+      for (let i = 0; i < numSegments; i++) {
+        const startAngle = i * anglePerSegment - Math.PI / 2;
+        const endAngle = startAngle + anglePerSegment;
+
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.arc(0, 0, wheelRadius, startAngle, endAngle);
+        ctx.closePath();
+
+        const grad = ctx.createLinearGradient(
+          Math.cos(startAngle) * wheelRadius,
+          Math.sin(startAngle) * wheelRadius,
+          Math.cos(endAngle) * wheelRadius,
+          Math.sin(endAngle) * wheelRadius
+        );
+        grad.addColorStop(0, sliceColors[i][0]);
+        grad.addColorStop(1, sliceColors[i][1]);
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        ctx.strokeStyle = 'rgba(3, 7, 18, 0.95)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.save();
+        ctx.rotate(startAngle + anglePerSegment / 2);
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = "800 13px 'Plus Jakarta Sans', sans-serif";
+        ctx.shadowColor = 'rgba(0,0,0,0.8)';
+        ctx.shadowBlur = 5;
+        ctx.fillText(segments[i], wheelRadius * 0.70, 0);
+        ctx.restore();
+      }
+
+      // Inner rim and subtle highlights.
+      ctx.beginPath();
+      ctx.arc(0, 0, wheelRadius - 1, 0, Math.PI * 2);
+      ctx.strokeStyle = '#0b1325';
+      ctx.lineWidth = 4;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(0, 0, wheelRadius + 4, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(226,232,240,0.55)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Metallic center medallion with ADI A mark.
+      const medallionR = 31;
+      const mGrad = ctx.createRadialGradient(-8, -10, 2, 0, 0, medallionR);
+      mGrad.addColorStop(0, '#f1f5f9');
+      mGrad.addColorStop(0.25, '#94a3b8');
+      mGrad.addColorStop(0.55, '#334155');
+      mGrad.addColorStop(0.8, '#cbd5e1');
+      mGrad.addColorStop(1, '#1e293b');
+
+      ctx.beginPath();
+      ctx.arc(0, 0, medallionR + 5, 0, Math.PI * 2);
+      ctx.fillStyle = '#0f172a';
+      ctx.fill();
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(0, 0, medallionR, 0, Math.PI * 2);
+      ctx.fillStyle = mGrad;
+      ctx.fill();
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.fillStyle = '#e2e8f0';
+      ctx.font = "900 34px Arial, sans-serif";
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.shadowColor = 'rgba(15,23,42,0.9)';
+      ctx.shadowBlur = 4;
+      ctx.fillText('A', 0, 3);
+
+      ctx.restore();
+    }
+
+    function spinWheelNow() {
+      if (lastSpinDate !== todayDate) {
+        spinsLeft = 2;
+        lastSpinDate = todayDate;
+      }
+
+      if (spinsLeft <= 0) {
+        showAlert("No spins left today! Come back tomorrow for 2 free lucky spins.");
+        return;
+      }
+
+      const btn = document.getElementById('spinBtn');
+      const wheelCanvas = document.getElementById('wheelCanvas');
+      if (btn) btn.disabled = true;
+
+      const randomIndex = Math.floor(Math.random() * segments.length);
+      const degreesPerSegment = 360 / segments.length; // 45 degrees
+      
+      // Exact mathematical calculation:
+      // Slice `i` has its center at: (i * 45 + 22.5) degrees clockwise from 12 o'clock (the pointer).
+      // Rotating clockwise by (360 - (i * 45 + 22.5)) brings slice `i` DEAD CENTER under the top arrow!
+      const targetAngle = (360 - (randomIndex * degreesPerSegment + degreesPerSegment / 2)) % 360;
+      const currentBase = currentRotation % 360;
+      let diff = (targetAngle - currentBase) % 360;
+      if (diff <= 0) diff += 360;
+      currentRotation += (360 * 5) + diff;
+
+      if (wheelCanvas) {
+        wheelCanvas.style.transition = 'transform 4.5s cubic-bezier(0.12, 0.8, 0.15, 1)';
+        wheelCanvas.style.transform = `rotate(${currentRotation}deg)`;
+      }
+
+      setTimeout(() => {
+        spinsLeft--;
+        const spinsText = document.getElementById('spinsLeftText');
+        if (spinsText) spinsText.innerText = `Spins Left Today: ${spinsLeft}/2`;
+
+        const wonText = segments[randomIndex];
+        const rewardTokens = parseInt(wonText, 10) || 5;
+
+        userBalance = (Number(userBalance) || 0) + rewardTokens;
+        const histId = 'hist_' + Date.now();
+        const updates = {};
+        updates['users/' + userId + '/balance'] = userBalance;
+        updates['users/' + userId + '/spinsLeft'] = spinsLeft;
+        updates['users/' + userId + '/lastSpinDate'] = todayDate;
+        updates['users/' + userId + '/history/' + histId] = {
+          title: "Lucky Spin Prize (" + wonText + ")",
+          amount: "+" + rewardTokens + " ADI$",
+          date: new Date().toLocaleString(),
+          type: "Spin Reward",
+          timestamp: Date.now()
+        };
+
+        if (typeof database !== 'undefined' && database.ref) {
+          database.ref().update(updates).catch(() => {});
+        }
+
+        updateUI();
+
+        showRewardCelebration({
+          title: "Lucky Spin Prize Won!",
+          subtitle: "SPIN WHEEL JACKPOT",
+          amount: "+" + rewardTokens + " ADI$",
+          type: "Wheel Prize (" + wonText + ")",
+          bonus: spinsLeft + " Spins Remaining Today",
+          icon: "🎡"
+        });
+
+        if (btn) btn.disabled = (spinsLeft <= 0);
+      }, 4700);
+    }
+
+    // MINI TAPPER BLITZ SYSTEM
+    let tapperCombo = 1.0;
+
+    function startChallenge() {
+      if (tapperTimeLeft > 0 && tapperInterval !== null) return;
+
+      tapperScore = 0;
+      tapperTimeLeft = 15;
+      tapperCombo = 1.0;
+      
+      const scoreEl = document.getElementById('tapperScore');
+      const timeEl = document.getElementById('tapperTime');
+      const rewardEl = document.getElementById('tapperRewardPreview');
+      const barEl = document.getElementById('tapperProgressBar');
+      const comboBadge = document.getElementById('tapperComboBadge');
+      const startBtn = document.getElementById('startTapperBtn');
+
+      if (scoreEl) scoreEl.innerText = `0`;
+      if (timeEl) timeEl.innerText = `15s`;
+      if (rewardEl) rewardEl.innerText = `+0 ADI$`;
+      if (barEl) barEl.style.width = '100%';
+      if (comboBadge) {
+        comboBadge.innerHTML = '⚡ 1.0x Normal';
+        comboBadge.style.color = '#fbbf24';
+        comboBadge.style.borderColor = 'rgba(234, 179, 8, 0.3)';
+      }
+      if (startBtn) {
+        startBtn.disabled = true;
+        startBtn.style.opacity = '0.6';
+        startBtn.innerHTML = '<i class="fa-solid fa-bolt fa-beat"></i> Tapping In Progress...';
+      }
+
+      clearInterval(tapperInterval);
+      tapperInterval = setInterval(() => {
+        tapperTimeLeft--;
+        if (timeEl) timeEl.innerText = `${tapperTimeLeft}s`;
+        if (barEl) barEl.style.width = `${(tapperTimeLeft / 15) * 100}%`;
+
+        if (tapperTimeLeft <= 0) {
+          clearInterval(tapperInterval);
+          tapperInterval = null;
+          if (startBtn) {
+            startBtn.disabled = false;
+            startBtn.style.opacity = '1';
+            startBtn.innerHTML = '<i class="fa-solid fa-play"></i> Start Challenge (15s)';
+          }
+          if (barEl) barEl.style.width = '0%';
+
+          const earned = Math.floor(tapperScore / 80) * 20;
+          if (earned > 0) {
+            userBalance = (Number(userBalance) || 0) + earned;
+            const histId = 'hist_' + Date.now();
+            const updates = {};
+            updates['users/' + userId + '/balance'] = userBalance;
+            updates['users/' + userId + '/history/' + histId] = {
+              title: `Speed Tapper (${tapperScore} Taps - ${tapperCombo}x)`,
+              amount: "+" + earned + " ADI$",
+              date: new Date().toLocaleString(),
+              type: "Tap Reward",
+              timestamp: Date.now()
+            };
+            if (typeof database !== 'undefined' && database.ref) {
+              database.ref().update(updates).catch(() => {});
+            }
+            updateUI();
+            
+            showRewardCelebration({
+              title: "Tapper Blitz Completed!",
+              subtitle: "MINI TAPPER REWARD",
+              amount: "+" + earned + " ADI$",
+              type: `Speed Taps: ${tapperScore} Total Taps`,
+              bonus: `${tapperCombo}x Combo Multiplier Active!`,
+              icon: "⚡"
+            });
+          } else {
+            showAlert(`⚡ Time's up! Total Taps: ${tapperScore}. Tap faster next round to earn tokens!`);
+          }
+        }
+      }, 1000);
+    }
+
+    function handleTap(e) {
+      if (tapperTimeLeft > 0 && tapperInterval !== null && antiBotAllowsTap()) {
+        tapperScore++;
+        if (tapperScore >= 35) tapperCombo = 2.0;
+        else if (tapperScore >= 18) tapperCombo = 1.5;
+        else tapperCombo = 1.0;
+
+        const scoreEl = document.getElementById('tapperScore');
+        const rewardEl = document.getElementById('tapperRewardPreview');
+        const comboBadge = document.getElementById('tapperComboBadge');
+        if (scoreEl) scoreEl.innerText = `${tapperScore}`;
+
+        const completedSets = Math.floor(tapperScore / 80);
+        if (rewardEl) rewardEl.innerText = `+${completedSets * 20} ADI$`;
+
+        if (comboBadge) {
+          if (tapperCombo >= 2.0) {
+            comboBadge.innerHTML = '🔥 2.0x HYPER!';
+            comboBadge.style.color = '#ef4444';
+            comboBadge.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+          } else if (tapperCombo >= 1.5) {
+            comboBadge.innerHTML = '⚡ 1.5x COMBO!';
+            comboBadge.style.color = '#fbbf24';
+            comboBadge.style.borderColor = 'rgba(234, 179, 8, 0.4)';
+          } else {
+            comboBadge.innerHTML = '⚡ 1.0x Normal';
+            comboBadge.style.color = '#fbbf24';
+            comboBadge.style.borderColor = 'rgba(234, 179, 8, 0.3)';
+          }
+        }
+
+        if (completedSets > 0 && tapperScore % 80 === 0 && e) {
+          const zone = document.getElementById('tapParticleZone');
+          if (zone) {
+            const rect = zone.getBoundingClientRect();
+            const float = document.createElement('div');
+            float.className = 'floating-tap-number';
+            float.innerText = '+20';
+            float.style.left = `${e.clientX - rect.left}px`;
+            float.style.top = `${e.clientY - rect.top}px`;
+            zone.appendChild(float);
+            setTimeout(() => float.remove(), 750);
+          }
+        }
+      }
+    }
+
+
+    function createFloatingTapNumber(e) {
+      const zone = document.getElementById('tapParticleZone');
+      if (!zone) return;
+
+      const numEl = document.createElement('div');
+      numEl.className = 'floating-tap-number';
+      numEl.innerText = tapperCombo >= 2.0 ? '+2' : '+1';
+      
+      let x = 80;
+      let y = 80;
+      if (e && e.clientX) {
+        const rect = zone.getBoundingClientRect();
+        x = e.clientX - rect.left;
+        y = e.clientY - rect.top;
+      } else {
+        x += (Math.random() - 0.5) * 40;
+        y += (Math.random() - 0.5) * 40;
+      }
+      numEl.style.left = x + 'px';
+      numEl.style.top = y + 'px';
+      zone.appendChild(numEl);
+
+      setTimeout(() => {
+        if (numEl.parentNode) numEl.parentNode.removeChild(numEl);
+      }, 700);
+    }
+
+    // MINING
+    function startMining() {
+      if (window.__accountBanned || antiBotState.suspicious) { showAlert('Anti-bot/security check active. Please contact admin if this is a mistake.'); return; }
+      const now = Date.now();
+      if (typeof miningEndTime !== 'undefined' && miningEndTime > now) {
+        showAlert("Mining session is already running!");
+        return;
+      }
+
+      const yieldAmount = Math.round(100 * multiplier);
+      userBalance = (typeof userBalance !== 'undefined' ? userBalance : 0) + yieldAmount;
+      totalMinedAmount += yieldAmount;
+      miningEndTime = now + (4 * 60 * 60 * 1000);
+      pushNotificationSent = false;
+      
+      const historyId = 'hist_' + now;
+      let updates = {};
+
+      if (typeof userId !== 'undefined') {
+        updates['users/' + userId + '/balance'] = userBalance;
+        updates['users/' + userId + '/totalMined'] = totalMinedAmount;
+        updates['users/' + userId + '/lastMineDate'] = typeof todayDate !== 'undefined' ? todayDate : '';
+        updates['users/' + userId + '/miningEndTime'] = miningEndTime;
+        updates['users/' + userId + '/pushNotificationSent'] = false;
+        updates['users/' + userId + '/history/' + historyId] = {
+          title: "Block Mining",
+          amount: "+" + yieldAmount + " ADI$",
+          date: new Date().toLocaleString(),
+          type: "Mining Reward",
+          timestamp: now
+        };
+      }
+
+      if (typeof database !== 'undefined' && database.ref) {
+        database.ref().update(updates).then(() => {
+          checkMiningState();
+          updateUI();
+          showRewardCelebration({
+            title: "Mining Block Activated!",
+            subtitle: "CLOUD MINING REWARD",
+            amount: "+" + yieldAmount + " ADI$",
+            type: "Block Mining Yield",
+            bonus: `${multiplier}x Speed Multiplier (4h Session)`,
+            icon: "⛏️"
+          });
+        }).catch((error) => {
+          showAlert("Error: " + error.message);
+        });
+      }
+    }
+
+    function triggerPushNotification() {
+      if (pushNotificationSent) return;
+      pushNotificationSent = true;
+      database.ref('users/' + userId + '/pushNotificationSent').set(true);
+
+      const notifyMessage = "Your 4-hour mining cycle has completed! Come back now to claim your tokens.";
+      const notifyNow = Date.now();
+      database.ref('notifications/' + userId + '/mine_' + notifyNow).set({
+        title: 'Mining Finished!',
+        message: notifyMessage,
+        type: 'mining_ready',
+        timestamp: notifyNow
+      }).catch(() => {});
+      queueTelegramNotification(userId, 'Mining Finished!', notifyMessage, 'mining_ready');
+      showTelegramInAppNotification('Mining Finished!', notifyMessage);
+    }
+
+    function checkMiningState() {
+      if (typeof miningInterval !== 'undefined' && miningInterval) {
+        clearInterval(miningInterval);
+      }
+
+      const now = Date.now();
+      const mineBtn = document.getElementById('mineBtn');
+      const miningCircle = document.getElementById('miningCircle');
+      const miningTimer = document.getElementById('miningTimer');
+      const homeTimer = document.getElementById('homeMiningTimer');
+      const profTimer = document.getElementById('profMiningTimer');
+      const homeTokens = document.getElementById('homeMinedTokens');
+      const profTokens = document.getElementById('profMinedTokens');
+
+      const activeEndTime = typeof miningEndTime !== 'undefined' ? miningEndTime : 0;
+
+      if (homeTokens) homeTokens.innerText = `Total Mined: ${totalMinedAmount.toLocaleString()} ADI$`;
+      if (profTokens) profTokens.innerText = `Total Mined: ${totalMinedAmount.toLocaleString()} ADI$`;
+
+      if (activeEndTime > now) {
+        if (miningCircle) miningCircle.classList.add('mining-active');
+        if (mineBtn) {
+          mineBtn.disabled = true;
+          mineBtn.style.opacity = "0.4";
+        }
+
+        miningInterval = setInterval(() => {
+          const currentTime = Date.now();
+          const remaining = activeEndTime - currentTime;
+
+          if (remaining <= 0) {
+            clearInterval(miningInterval);
+            if (miningCircle) miningCircle.classList.remove('mining-active');
+            const doneMsg = "Session complete. Ready to mine again!";
+            if (miningTimer) miningTimer.innerText = doneMsg;
+            if (homeTimer) homeTimer.innerText = "Session Completed!";
+            if (profTimer) profTimer.innerText = "Session Completed!";
+            if (mineBtn) {
+              mineBtn.innerText = "⛏ Start Mining";
+              mineBtn.disabled = false;
+              mineBtn.style.opacity = "1";
+            }
+            triggerPushNotification();
+          } else {
+            const h = Math.floor(remaining / (1000 * 60 * 60));
+            const m = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((remaining % (1000 * 60)) / 1000);
+            
+            const timerText = `${h}h ${m}m ${s}s`;
+            if (miningTimer) miningTimer.innerText = `Time Left: ${timerText}`;
+            if (homeTimer) homeTimer.innerText = `Mining Active: ${timerText}`;
+            if (profTimer) profTimer.innerText = `Mining Active: ${timerText}`;
+            if (mineBtn) mineBtn.innerText = `Mining Active (${timerText})`;
+          }
+        }, 1000);
+      } else {
+        if (miningCircle) miningCircle.classList.remove('mining-active');
+        if (homeTimer) homeTimer.innerText = "Session Ready";
+        if (profTimer) profTimer.innerText = "Session Ready";
+        if (mineBtn) {
+          mineBtn.innerText = "⛏ Start Mining";
+          mineBtn.disabled = false;
+          mineBtn.style.opacity = "1";
+        }
+      }
+    }
+
+    function confirmBoost() {
+      processBoostDeduction();
+    }
+
+    function processBoostDeduction() {
+      if (!userId) {
+        showAlert("User ID not found!");
+        return;
+      }
+
+      if (userBalance < 10) {
+        showAlert("You need at least 10 ADI$ to boost mining! Claim your daily bonus or complete tasks first.");
+        return;
+      }
+
+      const newBalance = userBalance - 10;
+      userBalance = newBalance;
+      multiplier = 2.0;
+      const histId = 'hist_' + Date.now();
+      
+      let updates = {};
+      updates[`users/${userId}/balance`] = newBalance;
+      updates[`users/${userId}/history/${histId}`] = {
+        title: "Mining Boost Fee (Speed 2.0x)",
+        amount: "-10 ADI$",
+        date: new Date().toLocaleString(),
+        type: "Boost",
+        timestamp: Date.now()
+      };
+
+      if (typeof database !== 'undefined' && database.ref) {
+        database.ref().update(updates).catch(() => {});
+      }
+
+      const streakEl = document.getElementById('homeMultiplierText');
+      if (streakEl) streakEl.innerText = `Speed: 2.0x (BOOSTED 🚀) | Streak: ${streakCount} Days`;
+      showAlert("🚀 Mining Boost Activated! Speed upgraded to 2.0x.");
+      updateUI();
+    }
+
+    // WALLET MODAL SYSTEM
+    function openWalletModal() {
+      const modal=document.getElementById('walletModal');
+      if(modal) modal.style.display='flex';
+      const cur=document.getElementById('currentWalletDisplay');
+      const txt=document.getElementById('modalWalletAddressText');
+      if(walletAddress){ if(cur)cur.style.display='block'; if(txt)txt.innerText=walletAddress; }
+      else if(cur)cur.style.display='none';
+    }
+
+    function closeWalletModal() {
+      const modal=document.getElementById('walletModal');
+      if(modal) modal.style.display='none';
+    }
+
+    // WEB3 / TRUST WALLET CONNECTION
+    let discoveredWalletProviders = [];
+    let selectedWalletProvider = null;
+
+    function collectInjectedWalletProviders() {
+      const found = [];
+      try {
+        if (window.ethereum) {
+          if (Array.isArray(window.ethereum.providers)) found.push(...window.ethereum.providers);
+          else found.push(window.ethereum);
+        }
+        if (window.trustwallet) found.push(window.trustwallet);
+        if (window.trustWallet) found.push(window.trustWallet);
+      } catch(e) {}
+
+      const unique = [];
+      found.forEach(p => { if (p && !unique.includes(p)) unique.push(p); });
+      discoveredWalletProviders = unique;
+      return unique;
+    }
+
+    function getPreferredWalletProvider() {
+      const providers = collectInjectedWalletProviders();
+      if (!providers.length) return null;
+
+      // Prefer Trust Wallet when it identifies itself.
+      const trust = providers.find(p => p.isTrust || p.isTrustWallet || p.providerInfo?.rdns === 'com.trustwallet.app');
+      if (trust) return trust;
+
+      // Otherwise use the injected provider.
+      return providers[0];
+    }
+
+    // EIP-6963 wallet discovery (works with modern wallet/browser injections).
+    try {
+      window.addEventListener('eip6963:announceProvider', (event) => {
+        const detail = event.detail || {};
+        if (detail.provider && !discoveredWalletProviders.includes(detail.provider)) {
+          discoveredWalletProviders.push(detail.provider);
+        }
+      });
+      window.dispatchEvent(new Event('eip6963:requestProvider'));
+    } catch(e) {}
+
+    async function connectWeb3Wallet() {
+      const btn = document.getElementById('web3ConnectBtn');
+      if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting...'; }
+
+      try {
+        let injected = getPreferredWalletProvider();
+
+        // Give EIP-6963 providers a moment to announce themselves.
+        if (!injected) {
+          try { window.dispatchEvent(new Event('eip6963:requestProvider')); } catch(e) {}
+          await new Promise(r => setTimeout(r, 500));
+          injected = getPreferredWalletProvider();
+        }
+
+        if (!injected) {
+          showAlert("Trust Wallet পাওয়া যায়নি। Trust Wallet-এর DApp Browser-এর ভিতর এই সাইটটি খুলে আবার Connect চাপুন।");
+          return;
+        }
+
+        selectedWalletProvider = injected;
+        const provider = new ethers.providers.Web3Provider(injected, 'any');
+
+        // Ask the wallet for permission and accounts.
+        await provider.send('eth_requestAccounts', []);
+        const signer = provider.getSigner();
+        const address = await signer.getAddress();
+
+        if (!address || !ethers.utils.isAddress(address)) {
+          throw new Error('Invalid wallet address returned by provider');
+        }
+
+        // Session-only: NEVER save the wallet address to Firebase/localStorage.
+        walletAddress = address;
+
+        // Keep UI in sync with account/network changes.
+        try {
+          injected.on?.('accountsChanged', (accounts) => {
+            if (accounts && accounts.length) {
+              walletAddress = accounts[0];
+              updateUI();
+            } else {
+              walletAddress = '';
+              updateUI();
+            }
+          });
+          injected.on?.('chainChanged', () => { updateUI(); });
+        } catch(e) {}
+
+        showAlert("✅ Trust Wallet Connected: " + address.substring(0,6) + "..." + address.slice(-4));
+        updateUI();
+        openWalletModal();
+      } catch(e) {
+        console.error('Wallet connection error:', e);
+        const msg = (e && e.code === 4001)
+          ? 'Wallet connection cancelled.'
+          : 'Trust Wallet connect failed. Please unlock Trust Wallet and try again from its DApp Browser.';
+        showAlert(msg);
+      } finally {
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-link"></i> Connect Wallet'; }
+      }
+    }
+
+    function autoConnectTrustWallet(){ connectWeb3Wallet(); }
+
+    // EXCHANGE MODAL SYSTEM
+    function openExchangeModal() {
+      showAlert("Exchange Coming Soon");
+    }
+
+
+    function closeExchangeModal() {
+      const modal = document.getElementById('exchangeModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function calculateExchangeAmount(val) {
+      const num = parseFloat(val) || 0;
+      const usdt = (num * 0.0001).toFixed(4);
+      const res = document.getElementById('calcUsdtResult');
+      if (res) res.innerText = `$${usdt} USDT`;
+    }
+
+    function openReferralModal() {
+      const modal = document.getElementById('referralModal');
+      if (modal) modal.style.display = 'flex';
+      const botUsername = "ADIAridropbot";
+      const appShortName = "app"; 
+      const refLink = `https://t.me/${botUsername}/${appShortName}?startapp=${userId}`;
+      const refInput = document.getElementById('refLinkInput');
+      if (refInput) refInput.value = refLink;
+      loadReferralData();
+    }
+
+    function closeReferralModal() {
+      const modal = document.getElementById('referralModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function shareReferralLink() {
+      const botUsername = "ADIAridropbot";
+      const appShortName = "app";
+      const refLink = `https://t.me/${botUsername}/${appShortName}?startapp=${userId}`;
+      const shareText = "Join ADI Airdrop and earn 50 ADI bonus!";
+      
+      if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.openTelegramLink) {
+        const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=${encodeURIComponent(shareText)}`;
+        window.Telegram.WebApp.openTelegramLink(shareUrl);
+      } else {
+        navigator.clipboard.writeText(refLink).then(() => {
+          showAlert("Referral link copied to clipboard!\n" + refLink);
+        }).catch(() => {
+          prompt("Copy your referral link:", refLink);
+        });
+      }
+    }
+
+    function copyReferralLink() {
+      const refInput = document.getElementById('refLinkInput');
+      if (refInput && refInput.value) {
+        navigator.clipboard.writeText(refInput.value).then(() => {
+          showAlert("Referral link copied to clipboard!");
+        }).catch(() => {
+          refInput.select();
+          document.execCommand('copy');
+          showAlert("Referral link copied!");
+        });
+      }
+    }
+  
+    function loadReferralData() {
+      const refListEl = document.getElementById('referralList');
+      if (!refListEl) return;
+
+      database.ref('users/' + userId + '/referrals').once('value', async (snapshot) => {
+        if (!snapshot.exists()) {
+          refListEl.innerHTML = '<p style="color:#888; text-align:center; font-size:12px;">No referrals yet.</p>';
+          if (document.getElementById('refCount')) document.getElementById('refCount').innerText = "0";
+          if (document.getElementById('refEarnings')) document.getElementById('refEarnings').innerText = "0 ADI$";
+          return;
+        }
+
+        const refs = snapshot.val() || {};
+        const entries = Object.values(refs);
+        const results = await Promise.all(entries.map(async (ref) => {
+          let status = 'Active';
+          try {
+            const snap = await database.ref('users/' + ref.uid).once('value');
+            const u = snap.exists() ? (snap.val() || {}) : {};
+            status = (u.banned === true || String(u.status || '').toLowerCase() === 'banned' || String(u.accountStatus || '').toLowerCase() === 'banned') ? 'Banned' : 'Active';
+          } catch (e) {}
+          return { ...ref, status };
+        }));
+
+        const activeCount = results.filter(r => r.status === 'Active').length;
+        const bannedCount = results.filter(r => r.status === 'Banned').length;
+        const earnings = entries.length * 50;
+
+        if (document.getElementById('refCount')) document.getElementById('refCount').innerText = entries.length;
+        if (document.getElementById('refEarnings')) document.getElementById('refEarnings').innerText = `${earnings} ADI$`;
+
+        let html = `
+          <div style="display:flex;gap:8px;margin-bottom:8px;font-size:10px;">
+            <span style="color:#22c55e;background:rgba(34,197,94,.08);padding:5px 8px;border-radius:8px;">Active: ${activeCount}</span>
+            <span style="color:#ef4444;background:rgba(239,68,68,.08);padding:5px 8px;border-radius:8px;">Banned: ${bannedCount}</span>
+          </div>`;
+        results.forEach(ref => {
+          const color = ref.status === 'Banned' ? '#ef4444' : '#22c55e';
+          const icon = ref.status === 'Banned' ? '⛔' : '●';
+          html += `
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid rgba(255,255,255,0.05);font-size:12px;gap:8px;">
+              <div style="min-width:0;">
+                <div style="color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${ref.name || 'User'}</div>
+                <div style="font-size:9px;color:#777;">${ref.uid || ''}</div>
+              </div>
+              <div style="text-align:right;white-space:nowrap;">
+                <div style="color:${color};font-weight:700;">${icon} ${ref.status}</div>
+                <div style="color:#22c55e;font-size:10px;">+50 ADI$</div>
+              </div>
+            </div>`;
+        });
+        refListEl.innerHTML = html;
+      });
+    }
+
+    // LEADERBOARD & BADGES SYSTEM (TOP 20 MEMBERS)
+    function loadLeaderboard() {
+      const container = document.getElementById('leaderboard-container');
+      if (!container || typeof database === 'undefined' || !database.ref) return;
+      database.ref('users').on('value', (snapshot) => {
+        const users = snapshot.exists() ? snapshot.val() : {};
+        const miners = Object.keys(users).filter(uid => {
+          const u=users[uid]||{};
+          const banned=(u.banned===true || u.isBanned===true || String(u.status||'').toLowerCase()==='banned' || String(u.accountStatus||'').toLowerCase()==='banned');
+          return (!banned && (!isLegacyBrowserUid(uid) || uid === BROWSER_SHARED_UID));
+        }).map(uid => {
+          const u = users[uid] || {};
+          return { uid, username:u.username||'User', balance:Number(u.balance)||0, totalMined:Number(u.totalMined)||0 };
+        });
+        miners.sort((a,b)=>b.balance-a.balance || b.totalMined-a.totalMined);
+        const top=miners.slice(0,20);
+        if(!top.length){
+          container.innerHTML='<div style="text-align:center; color:var(--text-sub); font-size:12px; padding:10px 0;">No Firebase miner data yet.</div>';
+          return;
+        }
+        const esc=v=>String(v).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));
+        container.innerHTML=top.map((m,i)=>`
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 12px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:12px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;">${i+1}</div>
+              <div><div style="font-size:12px;font-weight:700;color:#fff;">${esc(m.username)}</div></div>
+            </div>
+            <div style="font-size:12px;font-weight:800;color:var(--accent-green);">${m.balance.toLocaleString()} ADI$</div>
+          </div>`).join('');
+      });
+    }
+
+    function renderUserHistory(historyData) {
+      window.__userHistoryCache = historyData || {};
+      renderTaskHistory();
+      renderMineHistory(window.__userHistoryCache);
+
+      const profileList = document.getElementById('history-list-container');
+      const mineList = document.getElementById('mineHistoryList');
+      const modalList = document.getElementById('historyList');
+
+      if (!historyData || Object.keys(historyData).length === 0) {
+        const emptyMsg = '<div style="text-align:center; color:#777; font-size:12px; padding:12px;">No activity history recorded yet. Start mining or claim daily streak!</div>';
+        if (profileList) profileList.innerHTML = emptyMsg;
+        if (mineList) mineList.innerHTML = '<div style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: center; color:#777;">No mining history yet.</div>';
+        if (modalList) modalList.innerHTML = '<div style="text-align:center; color:#777; font-size:12px; padding:10px;">No history records found.</div>';
+        return;
+      }
+
+      const items = Object.values(historyData).reverse();
+
+      // 1. Profile Page Activity History Card
+      if (profileList) {
+        let phtml = '';
+        items.slice(0, 10).forEach(item => {
+          const isPositive = !item.amount || !item.amount.startsWith('-');
+          phtml += `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:12px;">
+              <div>
+                <div style="font-size:12px; font-weight:700; color:#fff;">
+                  <i class="fa-solid ${isPositive ? 'fa-arrow-down' : 'fa-arrow-up'}" style="color:${isPositive ? '#22c55e' : '#ef4444'}; margin-right:6px; font-size:10px;"></i>
+                  ${item.title || 'Transaction'}
+                </div>
+                <div style="font-size:10px; color:#888; margin-top:2px;">${item.date || ''}</div>
+              </div>
+              <div style="font-size:12px; font-weight:800; color:${isPositive ? '#22c55e' : '#ef4444'};">${item.amount}</div>
+            </div>
+          `;
+        });
+        profileList.innerHTML = phtml;
+      }
+
+      // 2. Mine Page History Card
+      if (mineList) {
+        let mhtml = '';
+        const mineItems = items.filter(it => it.type === 'Mining Reward' || it.title === 'Block Mining' || it.type === 'Boost');
+        const toShow = mineItems.length > 0 ? mineItems.slice(0, 6) : items.slice(0, 6);
+        toShow.forEach(item => {
+          const isPositive = !item.amount || !item.amount.startsWith('-');
+          mhtml += `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
+              <div>
+                <div style="font-size:12px; font-weight:600; color:#e2e8f0;">${item.title || 'Mining'}</div>
+                <div style="font-size:10px; color:#718096; margin-top:2px;">${item.date || ''}</div>
+              </div>
+              <div style="font-size:12px; font-weight:700; color:${isPositive ? '#22c55e' : '#ef4444'};">${item.amount}</div>
+            </div>
+          `;
+        });
+        mineList.innerHTML = mhtml;
+      }
+
+      // 3. Modal History List
+      if (modalList) {
+        let modHtml = '';
+        items.forEach(item => {
+          const isPositive = !item.amount || !item.amount.startsWith('-');
+          modHtml += `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+              <div>
+                <div style="font-size:12px; font-weight:bold; color:#fff;">${item.title || 'Transaction'}</div>
+                <div style="font-size:10px; color:#888; margin-top:2px;">${item.date || ''}</div>
+              </div>
+              <div style="font-size:12px; font-weight:bold; color:${isPositive ? '#22c55e' : '#ef4444'};">${item.amount}</div>
+            </div>
+          `;
+        });
+        modalList.innerHTML = modHtml;
+      }
+    }
+
+    function openHistoryModal() {
+      const modal = document.getElementById('historyModal');
+      if (modal) modal.style.display = 'flex';
+      loadHistoryData();
+    }
+
+    function closeHistoryModal() {
+      const modal = document.getElementById('historyModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function loadHistoryData() {
+      if (typeof database !== 'undefined' && database.ref) {
+        database.ref('users/' + userId + '/history').once('value', (snapshot) => {
+          renderUserHistory(snapshot.exists() ? snapshot.val() : {});
+        });
+      }
+    }
+
+    // DYNAMIC TASKS SYSTEM
+    let activeTaskFilter = 'non-secret';
+    let userCompletedTasks = {};
+
+    function switchTaskTab(tabType) {
+      activeTaskFilter = tabType;
+      const tabNon = document.getElementById('tabNonSecret');
+      const tabSec = document.getElementById('tabSecret');
+
+      if (tabType === 'secret') {
+        if (tabNon) tabNon.classList.remove('active');
+        if (tabSec) tabSec.classList.add('active');
+      } else {
+        if (tabSec) tabSec.classList.remove('active');
+        if (tabNon) tabNon.classList.add('active');
+      }
+      renderTasksList();
+    }
+
+    let allCustomTasks = {};
+    let userPendingTasks = {};
+
+    function loadDynamicTasks() {
+      if (typeof database !== 'undefined' && database.ref) {
+        // Load user completed tasks
+        database.ref('users/' + userId + '/completedTasks').on('value', (snap) => {
+          userCompletedTasks = snap.exists() ? snap.val() : {};
+          renderTaskHistory();
+          renderTasksList();
+        });
+
+        // Load user pending submissions
+        database.ref('users/' + userId + '/pendingTasks').on('value', (snap) => {
+          userPendingTasks = snap.exists() ? snap.val() : {};
+          renderTasksList();
+        });
+
+        // Load active admin custom tasks
+        database.ref('custom_tasks').on('value', (snap) => {
+          allCustomTasks = snap.exists() ? snap.val() : {};
+          renderTasksList();
+        });
+      } else {
+        renderTasksList();
+      }
+    }
+
+    function renderTasksList() {
+      const container = document.getElementById('dynamicTasksContainer');
+      if (!container) return;
+
+      // Only tasks injected by the Firebase Admin Panel are shown.
+      // No hard-coded/default tasks are added.
+      const mergedTasks = allCustomTasks || {};
+
+      let html = '';
+      let visibleCount = 0;
+
+      Object.keys(mergedTasks).forEach(taskId => {
+        const t = mergedTasks[taskId];
+        const isSecret = (t.type === 'SecretCode' || Boolean(t.code));
+        const isCompleted = Boolean(userCompletedTasks && userCompletedTasks[taskId]);
+        const isPending = Boolean(userPendingTasks && userPendingTasks[taskId]);
+        const safeTitle = (t.title || 'Task').replace(/'/g, "\\'");
+
+        // Filter by active tab
+        if (activeTaskFilter === 'secret' && !isSecret) return;
+        if (activeTaskFilter === 'non-secret' && isSecret) return;
+
+        visibleCount++;
+
+        html += `
+          <div class="task-card">
+            <div class="task-header">
+              <div class="task-title">
+                <i class="fa-solid ${isSecret ? 'fa-key' : 'fa-circle-check'}" style="color:var(--accent-silver);"></i>
+                ${t.title}
+              </div>
+              <div class="task-reward">+${t.reward} ADI$</div>
+            </div>
+
+            <div style="margin-top:10px;">
+              ${t.link ? `
+                <div style="margin-bottom:8px;">
+                  <a href="${t.link}" target="_blank" rel="noopener noreferrer" class="btn btn-dark" style="display:inline-block; width:100%; text-align:center; text-decoration:none; padding:8px 12px; font-size:11px; box-sizing:border-box;">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> 1. Open Task Link
+                  </a>
+                </div>
+              ` : ''}
+
+              ${isCompleted ? `
+                <button class="btn" style="width:100%; background:rgba(34,197,94,0.15); color:#4ade80; border:1px solid rgba(74,222,128,0.3); padding:10px 12px; font-size:11px; font-weight:700;" disabled>
+                  <i class="fa-solid fa-circle-check"></i> Completed (+${t.reward} ADI$)
+                </button>
+              ` : isPending ? `
+                <button class="btn" style="width:100%; background:rgba(234,179,8,0.15); color:#fbbf24; border:1px solid rgba(234,179,8,0.3); padding:10px 12px; font-size:11px; font-weight:700;" disabled>
+                  <i class="fa-solid fa-hourglass-half"></i> Submitted & Under Admin Review
+                </button>
+              ` : isSecret ? `
+                <div style="display:flex; gap:6px; width:100%;">
+                  <input type="text" id="input_task_${taskId}" placeholder="Enter Secret Code..." style="flex:2; background:#111; color:#fff; border:1px solid #333; padding:8px 10px; border-radius:8px; font-size:11px; outline:none; box-sizing:border-box;">
+                  <button class="btn btn-metallic" style="flex:1; padding:8px 12px; font-size:11px; font-weight:bold; cursor:pointer;" onclick="verifySecretTask('${taskId}', '${t.code || ''}', ${t.reward}, '${safeTitle}')">
+                    Verify & Claim
+                  </button>
+                </div>
+              ` : `
+                <div style="display:flex; gap:6px; width:100%;">
+                  <input type="text" id="proof_task_${taskId}" placeholder="Enter username / proof (@handle)..." style="flex:2; background:#111; color:#fff; border:1px solid #333; padding:8px 10px; border-radius:8px; font-size:11px; outline:none; box-sizing:border-box;">
+                  <button class="btn btn-metallic" style="flex:1; padding:8px 10px; font-size:11px; font-weight:bold; cursor:pointer;" onclick="submitTaskProof('${taskId}', ${t.reward}, '${safeTitle}')">
+                    Submit Proof
+                  </button>
+                </div>
+              `}
+            </div>
+          </div>
+        `;
+      });
+
+      if (visibleCount === 0) {
+        html = `<div style="text-align:center; color:#777; font-size:12px; padding:20px;">No ${activeTaskFilter === 'secret' ? 'secret code' : 'general'} tasks available right now.</div>`;
+      }
+
+      container.innerHTML = html;
+    }
+
+    function submitTaskProof(taskId, reward, taskTitle) {
+      if (window.__accountBanned || antiBotState.suspicious) { showAlert('Anti-bot/security check active. Please contact admin if this is a mistake.'); return; }
+      const inputEl = document.getElementById('proof_task_' + taskId);
+      const handle = inputEl ? inputEl.value.trim() : '';
+
+      if (!handle) {
+        showAlert("Please enter your Telegram / Twitter username (@handle)!");
+        return;
+      }
+
+      const proofKey = 'proof_' + Date.now();
+      const proofData = {
+        userId: userId,
+        username: userName,
+        taskId: taskId,
+        taskName: taskTitle,
+        proof: handle,
+        reward: reward,
+        submittedAt: Date.now()
+      };
+
+      const updates = {};
+      updates['pending_tasks/' + proofKey] = proofData;
+      updates[`users/${userId}/pendingTasks/${taskId}`] = {
+        proofKey: proofKey,
+        proof: handle,
+        status: 'pending',
+        submittedAt: Date.now()
+      };
+
+      if (typeof database !== 'undefined' && database.ref) {
+        database.ref().update(updates).then(() => {
+          if (!userPendingTasks) userPendingTasks = {};
+          userPendingTasks[taskId] = true;
+          renderTasksList();
+          showAlert(`✅ Proof Submitted for "${taskTitle}"! Admin will review and credit +${reward} ADI$.`);
+        }).catch(err => {
+          showAlert("Error: " + err.message);
+        });
+      }
+    }
+
+    function verifySecretTask(taskId, expectedCode, reward, taskTitle) {
+      const inputEl = document.getElementById('input_task_' + taskId);
+      const userEntered = inputEl ? inputEl.value.trim() : '';
+
+      if (!userEntered) {
+        showAlert("Please enter the secret code from the video/task!");
+        return;
+      }
+
+      if (expectedCode && userEntered.toLowerCase() !== expectedCode.toLowerCase()) {
+        showAlert("❌ Incorrect Secret Code! Please watch the task video carefully.");
+        return;
+      }
+
+      // Secret Code matched!
+      userBalance += Number(reward);
+      const histId = 'hist_' + Date.now();
+      const updates = {};
+
+      updates[`users/${userId}/balance`] = userBalance;
+      updates[`users/${userId}/completedTasks/${taskId}`] = {
+        title: taskTitle,
+        reward: reward,
+        completedAt: Date.now()
+      };
+      updates[`users/${userId}/history/${histId}`] = {
+        title: "Secret Code: " + taskTitle,
+        amount: "+" + reward + " ADI$",
+        date: new Date().toLocaleString(),
+        type: "Task Reward",
+        timestamp: Date.now()
+      };
+
+      if (typeof database !== 'undefined' && database.ref) {
+        database.ref().update(updates).catch(() => {});
+      }
+
+      if (!userCompletedTasks) userCompletedTasks = {};
+      userCompletedTasks[taskId] = true;
+      updateUI();
+      renderTasksList();
+      renderTaskHistory();
+
+      showRewardCelebration({
+        title: "Secret Code Decrypted!",
+        subtitle: "TASK VERIFIED",
+        amount: "+" + reward + " ADI$",
+        type: "Secret Code: " + taskTitle,
+        bonus: "Code Verification Bonus",
+        icon: "🔑"
+      });
+    }
+
+    function claimGeneralTask(taskId, reward, taskTitle) {
+      completeTaskAction(taskId, reward, taskTitle);
+    }
+
+    function completeTaskAction(taskId, reward, taskTitle) {
+      userBalance += Number(reward);
+      const histId = 'hist_' + Date.now();
+      const updates = {};
+
+      updates[`users/${userId}/balance`] = userBalance;
+      updates[`users/${userId}/completedTasks/${taskId}`] = {
+        title: taskTitle,
+        reward: reward,
+        completedAt: Date.now()
+      };
+      updates[`users/${userId}/history/${histId}`] = {
+        title: "Task: " + taskTitle,
+        amount: "+" + reward + " ADI$",
+        date: new Date().toLocaleString(),
+        type: "Task Reward",
+        timestamp: Date.now()
+      };
+
+      if (typeof database !== 'undefined' && database.ref) {
+        database.ref().update(updates).catch(() => {});
+      }
+
+      if (!userCompletedTasks) userCompletedTasks = {};
+      userCompletedTasks[taskId] = true;
+      updateUI();
+      renderTasksList();
+      renderTaskHistory();
+
+      showRewardCelebration({
+        title: "Task Completed!",
+        subtitle: "TASK REWARD CLAIMED",
+        amount: "+" + reward + " ADI$",
+        type: "General Task: " + taskTitle,
+        bonus: "Task Bonus",
+        icon: "✅"
+      });
+    }
+
+    function renderMineHistory(history) {
+      const container=document.getElementById('mineHistoryList');
+      if(!container)return;
+      const entries=Object.values(history||{}).filter(item=>{
+        const type=String(item&&item.type||'');
+        const title=String(item&&item.title||'').toLowerCase();
+        return type==='Mining'||type==='Mining Reward'||type==='Boost'||title.includes('mining');
+      }).sort((a,b)=>(Number(b.timestamp)||0)-(Number(a.timestamp)||0));
+      if(!entries.length){
+        container.innerHTML='<div style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);text-align:center;">No mining history yet.</div>';
+        return;
+      }
+      container.innerHTML=entries.slice(0,50).map(item=>`
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+          <div><div style="font-size:12px;color:#fff;font-weight:700;">${item.title||'Mining Activity'}</div><div style="font-size:10px;color:#777;margin-top:2px;">${item.date||''}</div></div>
+          <div style="font-size:12px;color:${String(item.amount||'').startsWith('-')?'#ef4444':'#4ade80'};font-weight:800;">${item.amount||'0 ADI$'}</div>
+        </div>`).join('');
+    }
+
+    function renderTaskHistory() {
+      const c=document.getElementById('taskHistoryContainer');
+      if(!c)return;
+      const items=[];
+      Object.values(userCompletedTasks||{}).forEach(item=>{
+        items.push({title:item.title||'Task Reward',amount:Number(item.reward)||0,type:'Task',timestamp:Number(item.completedAt)||0});
+      });
+      Object.values(window.__userHistoryCache||{}).forEach(item=>{
+        const type=String(item&&item.type||'');
+        if(type==='Tap Reward'||type==='Game Reward'||type==='Task Reward'){
+          items.push({title:item.title||'Tap / Task Reward',amount:Math.abs(parseFloat(String(item.amount||'0').replace(/[^0-9.]/g,'')))||0,type,timestamp:Number(item.timestamp)||0});
+        }
+      });
+      items.sort((a,b)=>b.timestamp-a.timestamp);
+      if(!items.length){c.innerHTML='<div style="text-align:center;color:#777;font-size:12px;padding:10px;">No task or tap history yet.</div>';return;}
+      c.innerHTML=items.slice(0,50).map(item=>`
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;margin-bottom:8px;">
+          <div><div style="font-size:12px;font-weight:700;color:#fff;"><i class="fa-solid fa-check-circle" style="color:#22c55e;margin-right:6px;"></i>${item.title}</div>
+          <div style="font-size:10px;color:#888;margin-top:2px;">${item.timestamp?new Date(item.timestamp).toLocaleString():''} · ${item.type}</div></div>
+          <div style="font-size:12px;font-weight:800;color:var(--accent-green);">+${item.amount} ADI$</div>
+        </div>`).join('');
+    }
+
+    function loadMarketPrices() {
+      fetch('https://api.binance.com/api/v3/ticker/price?symbols=%5B%22BTCUSDT%22,%22ETHUSDT%22,%22BNBUSDT%22%5D')
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data)) {
+            data.forEach(item => {
+              const val = parseFloat(item.price);
+              const formatted = '$' + val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+              if (item.symbol === 'BTCUSDT' && document.getElementById('market-btc-price')) {
+                document.getElementById('market-btc-price').innerText = formatted;
+              }
+              if (item.symbol === 'ETHUSDT' && document.getElementById('market-eth-price')) {
+                document.getElementById('market-eth-price').innerText = formatted;
+              }
+              if (item.symbol === 'BNBUSDT' && document.getElementById('market-bnb-price')) {
+                document.getElementById('market-bnb-price').innerText = formatted;
+              }
+            });
+          }
+          if (document.getElementById('market-usdt-price')) {
+            document.getElementById('market-usdt-price').innerText = '$1.00';
+          }
+        })
+        .catch(() => {
+          if (document.getElementById('market-btc-price')) document.getElementById('market-btc-price').innerText = '$95,420.00';
+          if (document.getElementById('market-eth-price')) document.getElementById('market-eth-price').innerText = '$3,410.50';
+          if (document.getElementById('market-bnb-price')) document.getElementById('market-bnb-price').innerText = '$645.20';
+          if (document.getElementById('market-usdt-price')) document.getElementById('market-usdt-price').innerText = '$1.00';
+        });
+    }
+
+    function openWhitepaperModal() {
+      const modal = document.getElementById('whitepaperModal');
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function closeWhitepaperModal() {
+      const modal = document.getElementById('whitepaperModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function openAboutModal() {
+      const modal = document.getElementById('aboutModal');
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function closeAboutModal() {
+      const modal = document.getElementById('aboutModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function updateUI() {
+      const balEl = document.getElementById('totalBalance');
+      if (balEl) balEl.innerHTML = `${userBalance.toLocaleString()} <span>ADI$</span>`;
+
+      const usdEl = document.getElementById('usdValue');
+      if (usdEl) usdEl.innerText = `$${(userBalance * 0.0001).toFixed(4)} USD`;
+
+      const nameEl = document.getElementById('userName');
+      if (nameEl) nameEl.innerText = userName;
+
+      const profUser = document.getElementById('profUser');
+      if (profUser) profUser.innerText = userName;
+
+      const profId = document.getElementById('profId');
+      if (profId) profId.innerText = userId;
+
+      const profBal = document.getElementById('profBalance');
+      if (profBal) profBal.innerText = `${userBalance.toLocaleString()} ADI$`;
+
+      const connWallet = document.getElementById('connectedWalletAddr');
+      if (connWallet) connWallet.innerText = walletAddress ? walletAddress : "Not Connected";
+
+      // Update Daily Claim Button state
+      const claimBtn = document.getElementById('dailyClaimBtn');
+      if (claimBtn) {
+        if (lastClaimDate === todayDate) {
+          claimBtn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Claimed for Today (Streak Active)';
+          claimBtn.style.background = 'rgba(34,197,94,0.15)';
+          claimBtn.style.color = '#4ade80';
+          claimBtn.style.border = '1px solid rgba(74,222,128,0.3)';
+          claimBtn.disabled = true;
+        } else {
+          const nextRewardDay = ((Math.max(1, Number(streakCount) || 0)) % 7) + 1;
+          const nextReward = nextRewardDay === 7 ? 200 : 100;
+          claimBtn.innerHTML = `<i class="fa-solid fa-gift"></i> Claim +${nextReward} ADI$ Daily Reward`;
+          claimBtn.style.background = '';
+          claimBtn.style.color = '';
+          claimBtn.style.border = '';
+          claimBtn.disabled = false;
+        }
+      }
+
+      // Update Tasks page Daily Check-in Button
+      const taskClaimBtn = document.getElementById('taskDailyClaimBtn');
+      if (taskClaimBtn) {
+        if (lastClaimDate === todayDate) {
+          taskClaimBtn.innerHTML = '<i class="fa-solid fa-check"></i> Claimed';
+          taskClaimBtn.style.background = 'rgba(34,197,94,0.15)';
+          taskClaimBtn.style.color = '#4ade80';
+          taskClaimBtn.style.border = '1px solid rgba(74,222,128,0.3)';
+          taskClaimBtn.disabled = true;
+        } else {
+          const nextRewardDay2 = ((Math.max(1, Number(streakCount) || 0)) % 7) + 1;
+          const nextReward2 = nextRewardDay2 === 7 ? 200 : 100;
+          taskClaimBtn.innerHTML = `Claim +${nextReward2}`;
+          taskClaimBtn.style.background = '';
+          taskClaimBtn.style.color = '';
+          taskClaimBtn.style.border = '';
+          taskClaimBtn.disabled = false;
+        }
+      }
+
+      // Update 7-Day progress pills
+      const streakSpan = document.getElementById('streakCountSpan');
+      if (streakSpan) streakSpan.innerText = Math.max(1, streakCount || 1);
+      const streakRewardEl = document.getElementById('streakRewardText');
+      if (streakRewardEl) {
+        const nextRewardDay = ((Math.max(1, Number(streakCount) || 0)) % 7) + 1;
+        const nextReward = nextRewardDay === 7 ? 200 : 100;
+        streakRewardEl.innerText = `+${nextReward} ADI$ Daily Bonus`;
+      }
+      
+      const dots = document.querySelectorAll('#streakTrackContainer .streak-day-dot');
+      const curDayIndex = ((Math.max(1, streakCount) - 1) % 7);
+      dots.forEach((dot, idx) => {
+        if (idx <= curDayIndex && streakCount > 0) {
+          dot.style.background = 'rgba(34,197,94,0.25)';
+          dot.style.borderColor = '#22c55e';
+        } else {
+          dot.style.background = 'rgba(255,255,255,0.04)';
+          dot.style.borderColor = 'rgba(255,255,255,0.08)';
+        }
+      });
+
+      // Update Profile Wallet Button text
+      const profWalletBtn = document.getElementById('walletConnBtn');
+      if (profWalletBtn) {
+        if (walletAddress && walletAddress !== 'Not Connected') {
+          profWalletBtn.innerHTML = `<i class="fa-solid fa-wallet"></i> Wallet Connected (${walletAddress.substring(0,6)}...${walletAddress.slice(-4)})`;
+          profWalletBtn.style.background = 'rgba(34,197,94,0.2)';
+          profWalletBtn.style.color = '#4ade80';
+          profWalletBtn.style.border = '1px solid rgba(74,222,128,0.4)';
+        } else {
+          profWalletBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Connect Trust Wallet';
+          profWalletBtn.style.background = '';
+          profWalletBtn.style.color = '';
+          profWalletBtn.style.border = '';
+        }
+      }
+
+      // Update Lucky Spins text
+      const spinsText = document.getElementById('spinsLeftText');
+      if (spinsText) {
+        spinsText.innerText = `Spins Left Today: ${spinsLeft}/2`;
+      }
+    }
+
+    // REWARD CELEBRATION POP-UP MODAL CONTROLLER
+    function showRewardCelebration({ title, subtitle, amount, type, bonus, icon }) {
+      const modal = document.getElementById('rewardCelebrationModal');
+      if (!modal) return;
+
+      const titleEl = document.getElementById('rewardModalTitle');
+      const subEl = document.getElementById('rewardModalSubtitle');
+      const amtEl = document.getElementById('rewardModalAmount');
+      const typeEl = document.getElementById('rewardModalType');
+      const bonusEl = document.getElementById('rewardModalBonus');
+      const iconEl = document.getElementById('rewardModalIcon');
+      const usdEl = document.getElementById('rewardModalUsd');
+      const balEl = document.getElementById('rewardModalNewBalance');
+
+      if (titleEl) titleEl.innerText = title || "Congratulations!";
+      if (subEl) subEl.innerText = subtitle || "REWARD CLAIMED";
+      if (amtEl) amtEl.innerText = amount || "+0 ADI$";
+      if (typeEl) typeEl.innerText = type || "Reward";
+      if (bonusEl) bonusEl.innerText = bonus || "Standard Bonus";
+      if (iconEl) iconEl.innerText = icon || "🎉";
+
+      const numVal = parseFloat((amount || '').replace(/[^0-9.]/g, '')) || 0;
+      if (usdEl) usdEl.innerText = `≈ $${(numVal * 0.0001).toFixed(4)} USD`;
+      if (balEl) balEl.innerText = `${userBalance.toLocaleString()} ADI$`;
+
+      modal.style.display = 'flex';
+
+      if (tg && tg.HapticFeedback) {
+        try { tg.HapticFeedback.notificationOccurred('success'); } catch(e) {}
+      }
+    }
+
+    function showDeviceAccountNotice() {
+      if (!window.__deviceAccountBlocked) return;
+      setTimeout(() => {
+        showAlert('This device is already linked to the first account. You cannot open another account on this device.');
+      }, 700);
+    }
+
+    function closeRewardModal() {
+      const modal = document.getElementById('rewardCelebrationModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    // Browser mode is intentionally ONE shared Firebase account for every non-Telegram visitor.
+    // Telegram users keep their own Telegram user IDs. Legacy browser-generated IDs are hidden
+    // from the leaderboard so old browser sessions cannot appear as separate current accounts.
+    const LEGACY_BROWSER_UID_PATTERNS = [
+      /^browser_single_global_account$/i,
+      /^guest_user$/i,
+      /^miner_\d+$/i
+    ];
+
+    function isTelegramMode() {
+      return !!(tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id);
+    }
+
+    function isLegacyBrowserUid(uid) {
+      return LEGACY_BROWSER_UID_PATTERNS.some(re => re.test(String(uid || '')));
+    }
+
+    function enforceCanonicalBrowserAccount() {
+      // If this device is already locked to a Telegram account, do not let a
+      // normal browser session overwrite that identity with the shared browser UID.
+      if (!isTelegramMode() && (!deviceAccountLock || deviceAccountLock.userId === BROWSER_SHARED_UID)) {
+        userId = BROWSER_SHARED_UID;
+        userName = 'Browser Miner';
+      }
+    }
+
+    function cleanupLegacyBrowserAccounts() {
+      if (isTelegramMode() || typeof database === 'undefined' || !database.ref) return;
+      database.ref('users').once('value').then(snapshot => {
+        if (!snapshot.exists()) return;
+        const users = snapshot.val() || {};
+        const removals = {};
+        Object.keys(users).forEach(uid => {
+          if (uid !== BROWSER_SHARED_UID && isLegacyBrowserUid(uid)) {
+            removals['users/' + uid] = null;
+          }
+        });
+        if (Object.keys(removals).length) database.ref().update(removals).catch(() => {});
+      }).catch(() => {});
+    }
+
+    // ONE-TIME REFERRAL REWARD: exactly +50 ADI$ for each referred user.
+    // The referral record is written inside a Firebase transaction so repeated
+    // page loads / Telegram retries cannot award the same referral twice.
+    function getReferralStartParam() {
+      if (!isTelegramMode()) return '';
+      try {
+        return String((tg.initDataUnsafe && tg.initDataUnsafe.start_param) || '').trim();
+      } catch (e) {
+        return '';
+      }
+    }
+
+    function processOneTimeReferral() {
+      if (!isTelegramMode() || typeof database === 'undefined' || !database.ref) return;
+
+      const referrerId = getReferralStartParam();
+      if (!referrerId || !userId || referrerId === String(userId)) return;
+
+      const referredUid = String(userId);
+      if (window.__accountBanned || antiBotState.suspicious) return;
+
+      // Verify the referred account itself is not banned/suspicious before any bonus is issued.
+      database.ref('users/' + referredUid).once('value').then(userSnap => {
+        const referredData = userSnap.exists() ? (userSnap.val() || {}) : {};
+        if (isAccountBannedData(referredData) || (referredData.antiBot && referredData.antiBot.suspicious === true)) return;
+
+        const referrerPath = database.ref('users/' + referrerId);
+        return referrerPath.transaction(current => {
+        if (!current) return current;
+
+        const referrals = current.referrals && typeof current.referrals === 'object'
+          ? current.referrals
+          : {};
+
+        // Already rewarded this referred account: do nothing.
+        if (Object.prototype.hasOwnProperty.call(referrals, referredUid)) {
+          return current;
+        }
+
+        current.balance = (Number(current.balance) || 0) + 50;
+        current.referrals = referrals;
+        current.referrals[referredUid] = {
+          name: userName || 'User',
+          uid: referredUid,
+          amount: 50,
+          rewardedAt: Date.now()
+        };
+
+        const history = current.history && typeof current.history === 'object'
+          ? current.history
+          : {};
+        current.history = history;
+        current.history['ref_' + referredUid] = {
+          title: 'Referral Bonus',
+          amount: '+50 ADI$',
+          date: new Date().toLocaleString(),
+          type: 'Referral Reward',
+          referredUser: referredUid,
+          timestamp: Date.now()
+        };
+
+          return current;
+        }).then(result => {
+          // Mark the referred account after the referrer transaction succeeds.
+          // The referrer transaction is still the duplicate-prevention mechanism.
+          if (result && result.committed) {
+            const notifyNow = Date.now();
+            // Personal in-app notification (latest 30 are displayed).
+            database.ref('notifications/' + referrerId + '/ref_' + referredUid).set({
+              title: 'Referral Reward Received',
+              message: 'A new member joined through your referral. +50 ADI$ has been added.',
+              type: 'referral',
+              timestamp: notifyNow
+            }).catch(() => {});
+            // Queue for Telegram Bot/Cloud Function delivery. Never put Bot token in client code.
+            queueTelegramNotification(referrerId, 'Referral Reward Received', 'A new member joined through your referral. +50 ADI$ has been added.', 'referral');
+            return database.ref('users/' + referredUid).update({
+              referralProcessed: true,
+              referredBy: referrerId,
+              referralRewardedAt: notifyNow
+            });
+          }
+        });
+      }).catch(() => {});
+    }
+
+
+    // ==================== USER SELF DELETE ====================
+    function openDeleteAccountModal(){
+      const m=document.getElementById('deleteAccountModal'); if(m) m.style.display='flex';
+      const i=document.getElementById('deleteAccountConfirmInput'); if(i){i.value='';setTimeout(()=>i.focus(),50);}
+    }
+    function closeDeleteAccountModal(){ const m=document.getElementById('deleteAccountModal'); if(m) m.style.display='none'; }
+    async function submitDeleteAccount(){
+      const input=(document.getElementById('deleteAccountConfirmInput')?.value||'').trim().toUpperCase();
+      const out=document.getElementById('deleteAccountStatus');
+      if(input!=='DELETE'){ if(out) out.textContent='Please type DELETE exactly.'; return; }
+      if(!userId || userId===BROWSER_SHARED_UID){ if(out) out.textContent='Browser shared account cannot be self-deleted from this screen.'; return; }
+      if(!confirm('Delete this account permanently?')) return;
+      try{
+        const ref=database.ref('users/'+userId);
+        const snap=await ref.once('value');
+        const data=snap.val()||{};
+        const now=Date.now();
+        const deletedBalance=Number(data.balance)||0;
+        await ref.update({balance:0,accountStatus:'deleted',deletedAt:now});
+        await database.ref('deleted_accounts/'+userId).set({reason:'User requested account deletion',deletedAt:now,deletedBalance:deletedBalance,username:data.username||data.name||'',telegramId:userId});
+        await ref.remove();
+        await database.ref('staking_registrations/'+userId).remove().catch(()=>{});
+        window.__accountDeletedByUser=true;
+        window.__accountBanned=true;
+        closeDeleteAccountModal();
+        showAlert('Account deleted successfully. Balance was cleared and account data was removed.');
+        setTimeout(()=>{ try{ if(tg&&tg.close) tg.close(); }catch(e){} location.reload(); },1200);
+      }catch(e){ if(out) out.textContent='Delete failed. Please try again.'; }
+    }
+
+    // ANTI-BOT / ACCOUNT SAFETY LAYER
+    // This is intentionally conservative so normal human tapping is not blocked.
+    let antiBotState = {
+      tapTimes: [],
+      rejectedTaps: 0,
+      suspicious: false,
+      sessionStartedAt: Date.now(),
+      lastHeartbeat: 0
+    };
+
+    function isAccountBannedData(data) {
+      return !!(data && (data.banned === true || data.isBanned === true || String(data.status || '').toLowerCase() === 'banned' || String(data.accountStatus || '').toLowerCase() === 'banned'));
+    }
+
+    // AUTO INACTIVITY POLICY: if a user has not opened the app for 30 days,
+    // mark the account banned and permanently remove its user data. A tiny
+    // deletion tombstone is kept only so the deleted account cannot be silently
+    // recreated when the same Telegram/browser identity returns later.
+    const INACTIVITY_LIMIT_MS = 30 * 24 * 60 * 60 * 1000;
+    let inactivityDeletionInProgress = false;
+    let inactivityCheckComplete = false;
+
+    function isInactiveFor30Days(data) {
+      const lastActive = Number((data && (data.lastActiveAt || data.lastSeenAt)) || 0);
+      return !!lastActive && (Date.now() - lastActive >= INACTIVITY_LIMIT_MS);
+    }
+
+    async function enforce30DayInactivityPolicy(existingData) {
+      if (inactivityCheckComplete || inactivityDeletionInProgress) return false;
+      inactivityCheckComplete = true;
+      if (!existingData || isAccountBannedData(existingData) || !isInactiveFor30Days(existingData)) return false;
+
+      inactivityDeletionInProgress = true;
+      const uid = String(userId);
+      const now = Date.now();
+      try {
+        // First mark the account banned so the admin/security system records the reason.
+        await database.ref('users/' + uid).update({
+          banned: true,
+          isBanned: true,
+          accountStatus: 'banned',
+          bannedReason: 'Inactive for 30 days',
+          bannedAt: now
+        });
+
+        // Keep only a minimal tombstone; all balance/history/tasks/profile data is removed.
+        await database.ref('deleted_accounts/' + uid).set({
+          reason: 'Inactive for 30 days',
+          deletedAt: now,
+          lastActiveAt: Number(existingData.lastActiveAt || existingData.lastSeenAt || 0)
+        });
+        await database.ref('users/' + uid).remove();
+
+        window.__accountBanned = true;
+        window.__accountDeletedForInactivity = true;
+        setBanOverlayVisible(true);
+        showAlert('Your account was closed because it was inactive for 30 days. All account data has been deleted.');
+        return true;
+      } catch (err) {
+        console.error('30-day inactivity cleanup failed:', err);
+        inactivityCheckComplete = false;
+        inactivityDeletionInProgress = false;
+        return false;
+      }
+    }
+
+    function setBanOverlayVisible(isBanned) {
+      const overlay = document.getElementById('banOverlay');
+      if (overlay) overlay.style.display = isBanned ? 'flex' : 'none';
+      window.__accountBanned = !!isBanned;
+    }
+
+    function recordAntiBotEvent(type, details) {
+      if (typeof database === 'undefined' || !database.ref || !userId) return;
+      const now = Date.now();
+      database.ref('users/' + userId + '/antiBot').update({
+        lastEvent: type,
+        lastEventAt: now,
+        device: navigator.userAgent || 'unknown',
+        details: details || '',
+        suspicious: true
+      }).catch(() => {});
+    }
+
+    function runAntiBotChecks() {
+      const suspiciousReasons = [];
+      if (navigator.webdriver) suspiciousReasons.push('webdriver');
+      if (window.__automationDetected) suspiciousReasons.push('automation');
+      if (typeof performance !== 'undefined' && performance.now && performance.now() < 0) suspiciousReasons.push('invalid_timer');
+
+      if (suspiciousReasons.length) {
+        antiBotState.suspicious = true;
+        recordAntiBotEvent('suspicious_session', suspiciousReasons.join(','));
+      }
+
+      if (typeof database !== 'undefined' && database.ref && userId) {
+        database.ref('users/' + userId + '/antiBot').update({
+          sessionStartedAt: antiBotState.sessionStartedAt,
+          lastSeenAt: Date.now(),
+          userAgent: navigator.userAgent || 'unknown',
+          webdriver: !!navigator.webdriver,
+          suspicious: !!antiBotState.suspicious
+        }).catch(() => {});
+        database.ref('users/' + userId).update({
+          lastSeenAt: Date.now(),
+          lastActiveAt: Date.now()
+        }).catch(() => {});
+      }
+    }
+
+    function heartbeatAntiBot() {
+      if (window.__accountDeletedForInactivity || inactivityDeletionInProgress) return;
+      const now = Date.now();
+      if (now - antiBotState.lastHeartbeat < 20000) return;
+      antiBotState.lastHeartbeat = now;
+      if (typeof database !== 'undefined' && database.ref && userId) {
+        database.ref('users/' + userId).update({
+          lastSeenAt: now,
+          lastActiveAt: now,
+          accountStatus: window.__accountBanned ? 'banned' : 'active'
+        }).catch(() => {});
+      }
+    }
+
+    function antiBotAllowsTap() {
+      if (window.__accountBanned) return false;
+      if (document.hidden) return false;
+      const now = Date.now();
+      antiBotState.tapTimes = antiBotState.tapTimes.filter(t => now - t < 1000);
+      const last = antiBotState.tapTimes[antiBotState.tapTimes.length - 1] || 0;
+
+      // Human-friendly ceiling: 12 accepted taps/second and no impossible sub-55ms tap stream.
+      if (last && now - last < 55) {
+        antiBotState.rejectedTaps++;
+        if (antiBotState.rejectedTaps >= 12) {
+          antiBotState.suspicious = true;
+          recordAntiBotEvent('rapid_tap_stream', 'Repeated taps below 55ms');
+          showAlert('Anti-bot check: tapping too fast. Please tap normally.');
+        }
+        return false;
+      }
+      if (antiBotState.tapTimes.length >= 12) {
+        antiBotState.rejectedTaps++;
+        return false;
+      }
+      antiBotState.tapTimes.push(now);
+      return true;
+    }
+
+    function watchAccountBanStatus() {
+      if (typeof database === 'undefined' || !database.ref || !userId) return;
+      database.ref('users/' + userId).on('value', snapshot => {
+        const data = snapshot.exists() ? (snapshot.val() || {}) : {};
+        const banned = isAccountBannedData(data);
+        setBanOverlayVisible(banned);
+        if (banned) {
+          antiBotState.suspicious = true;
+        }
+      });
+    }
+
+    async function loadUserData() {
+      // Re-apply the device lock before every data operation so changing Telegram
+      // accounts cannot switch the Firebase user after initialisation.
+      enforceOneAccountPerDevice();
+      enforceCanonicalBrowserAccount();
+      if (window.__deviceAccountBlocked) showDeviceAccountNotice();
+      cleanupLegacyBrowserAccounts();
+      if (typeof database === 'undefined' || !database.ref) return;
+
+      // A deleted account is never silently recreated.
+      try {
+        const deletedSnap = await database.ref('deleted_accounts/' + userId).once('value');
+        if (deletedSnap.exists()) {
+          inactivityDeletionInProgress = false;
+          inactivityCheckComplete = true;
+          window.__accountBanned = true;
+          window.__accountDeletedForInactivity = true;
+          setBanOverlayVisible(true);
+          return;
+        }
+      } catch (e) {}
+
+      const initialSnap = await database.ref('users/' + userId).once('value');
+      if (initialSnap.exists()) {
+        const initialData = initialSnap.val() || {};
+        const deleted = await enforce30DayInactivityPolicy(initialData);
+        if (deleted) return;
+      } else {
+        inactivityCheckComplete = true;
+      }
+
+      database.ref('users/' + userId).on('value', (snapshot) => {
+        if (window.__accountDeletedForInactivity) return;
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          userBalance = Number(data.balance) || 0;
+          totalMinedAmount = Number(data.totalMined) || 0;
+          setBanOverlayVisible(isAccountBannedData(data));
+          if (data.antiBot && data.antiBot.suspicious === true) {
+            antiBotState.suspicious = true;
+          }
+          // Keep the first-account device binding visible in Firebase for admin/security checks.
+          if (!data.deviceLockId) {
+            database.ref('users/' + userId + '/deviceLockId').set(deviceAccountLock ? deviceAccountLock.userId : String(userId)).catch(() => {});
+          }
+          lastClaimDate = data.lastClaimDate || "";
+          lastMineDate = data.lastMineDate || "";
+          miningEndTime = data.miningEndTime || 0;
+          streakCount = data.streakCount || 0;
+          
+          processStreakCheck(data);
+          checkMiningState();
+          renderUserHistory(data.history || {});
+        } else {
+          userBalance = 0;
+          database.ref('users/' + userId).set({
+            username: userName,
+            deviceLockId: deviceAccountLock ? deviceAccountLock.userId : String(userId),
+            balance: 0,
+            totalMined: 0,
+            joinedAt: Date.now(),
+            lastSeenAt: Date.now(),
+            lastActiveAt: Date.now(),
+            accountStatus: 'active',
+            banned: false,
+            isBanned: false,
+            antiBot: { sessionStartedAt: Date.now(), lastSeenAt: Date.now(), suspicious: false }
+          });
+          renderUserHistory({});
+        }
+        updateUI();
+      });
+    }
+
+    // AUTOMATIC IP & COUNTRY DETECTION & ADMIN NOTIFICATION
+    function countryCodeToFlag(isoCode) {
+      if (!isoCode || isoCode.length !== 2) return '🌐';
+      const codePoints = isoCode
+        .toUpperCase()
+        .split('')
+        .map(char => 127397 + char.charCodeAt());
+      return String.fromCodePoint(...codePoints);
+    }
+
+    function getTimezoneCountryFallback(tz) {
+      if (!tz) return { country: "Unknown 🌐", code: "", city: "" };
+      if (tz.includes("Dhaka")) return { country: "Bangladesh 🇧🇩", code: "BD", city: "Dhaka" };
+      if (tz.includes("Kolkata")) return { country: "India 🇮🇳", code: "IN", city: "Kolkata" };
+      if (tz.includes("Karachi")) return { country: "Pakistan 🇵🇰", code: "PK", city: "Karachi" };
+      if (tz.includes("Kathmandu")) return { country: "Nepal 🇳🇵", code: "NP", city: "Kathmandu" };
+      if (tz.includes("Dubai") || tz.includes("Riyadh")) return { country: "Middle East 🇸🇦🇦🇪", code: "AE", city: "Dubai" };
+      if (tz.includes("London")) return { country: "United Kingdom 🇬🇧", code: "GB", city: "London" };
+      if (tz.includes("New_York") || tz.includes("Chicago") || tz.includes("Los_Angeles")) return { country: "United States 🇺🇸", code: "US", city: "USA" };
+      return { country: "Global Miner 🌐", code: "GL", city: tz.split('/')[1] || "Global" };
+    }
+
+    async function detectAndSyncUserGeoIP() {
+      if (typeof database === 'undefined' || !database.ref || !userId) return;
+
+      const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+      let ip = "";
+      let country = "";
+      let countryCode = "";
+      let city = "";
+
+      // 1. Try ipwho.is with timeout
+      try {
+        const res = await fetch("https://ipwho.is/", { signal: AbortSignal.timeout(3000) });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.success) {
+            ip = data.ip || "";
+            countryCode = data.country_code || "";
+            const flag = (data.flag && data.flag.emoji) ? data.flag.emoji : countryCodeToFlag(countryCode);
+            country = `${data.country || 'Global'} ${flag}`.trim();
+            city = data.city || "";
+          }
+        }
+      } catch (e) {}
+
+      // 2. Try ipapi.co if not resolved
+      if (!ip || !country) {
+        try {
+          const res = await fetch("https://ipapi.co/json/", { signal: AbortSignal.timeout(3000) });
+          if (res.ok) {
+            const data = await res.json();
+            ip = data.ip || ip;
+            countryCode = data.country_code || countryCode;
+            const flag = countryCodeToFlag(countryCode);
+            country = `${data.country_name || 'Global'} ${flag}`.trim();
+            city = data.city || city;
+          }
+        } catch (e) {}
+      }
+
+      // 3. Try /api/client-ip if still missing IP
+      if (!ip) {
+        try {
+          const res = await fetch("/api/client-ip", { signal: AbortSignal.timeout(2000) });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.ip && data.ip !== "127.0.0.1" && data.ip !== "::1") ip = data.ip;
+          }
+        } catch (e) {}
+      }
+
+      // 4. Timezone fallback for country if still missing
+      if (!country) {
+        const fallback = getTimezoneCountryFallback(userTimezone);
+        country = fallback.country;
+        countryCode = fallback.code;
+        city = fallback.city;
+      }
+
+      const geoPayload = {
+        ip: ip || "Online (Auto-Detect)",
+        country: country,
+        countryCode: countryCode,
+        city: city,
+        timezone: userTimezone,
+        device: navigator.userAgent || "Web / Mobile",
+        lastSeen: new Date().toLocaleString()
+      };
+
+      database.ref('users/' + userId).update(geoPayload).catch(() => {});
+    }
+
+    // TRAFFIC SOURCE / REFERRER DETECTION
+    function detectTrafficSource() {
+      const params = new URLSearchParams(window.location.search || '');
+      const ref = (document.referrer || '').trim();
+      const host = (() => { try { return new URL(ref).hostname.toLowerCase(); } catch (e) { return ''; } })();
+      const utmSource = (params.get('utm_source') || '').trim().toLowerCase();
+      const utmMedium = (params.get('utm_medium') || '').trim();
+      const utmCampaign = (params.get('utm_campaign') || '').trim();
+      const startParam = (params.get('startapp') || params.get('start') || '').trim();
+
+      let source = '';
+      if (isTelegramMode && isTelegramMode()) source = 'Telegram';
+      else if (utmSource) source = utmSource.replace(/[_-]+/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      else if (host.includes('youtube.com') || host.includes('youtu.be')) source = 'YouTube';
+      else if (host === 'x.com' || host.endsWith('.x.com') || host === 'twitter.com' || host.endsWith('.twitter.com')) source = 'X';
+      else if (host.includes('facebook.com') || host.includes('fb.com') || host.includes('m.facebook.com')) source = 'Facebook';
+      else if (host.includes('instagram.com')) source = 'Instagram';
+      else if (host.includes('tiktok.com')) source = 'TikTok';
+      else if (host.includes('google.')) source = 'Google';
+      else if (host.includes('bing.com')) source = 'Bing';
+      else if (host.includes('t.me') || host.includes('telegram.')) source = 'Telegram';
+      else if (host) source = host.replace(/^www\./, '');
+      else source = 'Direct';
+
+      return {
+        source,
+        referrer: ref || 'Direct',
+        referrerHost: host || '',
+        utmSource: utmSource || '',
+        utmMedium,
+        utmCampaign,
+        landingPath: window.location.pathname || '/',
+        startParam: startParam || ''
+      };
+    }
+
+    async function detectAndSyncTrafficSource() {
+      if (typeof database === 'undefined' || !database.ref || !userId) return;
+      const traffic = detectTrafficSource();
+      const payload = {
+        trafficSource: traffic.source,
+        trafficReferrer: traffic.referrer,
+        trafficReferrerHost: traffic.referrerHost,
+        trafficUtmSource: traffic.utmSource,
+        trafficUtmMedium: traffic.utmMedium,
+        trafficUtmCampaign: traffic.utmCampaign,
+        trafficLandingPath: traffic.landingPath,
+        trafficStartParam: traffic.startParam,
+        trafficLastSeenAt: Date.now()
+      };
+      database.ref('users/' + userId).update(payload).catch(() => {});
+    }
+
+    // ==================== REMOTE BUTTON AD SYSTEM ====================
+    let remoteAdsEnabled = false;
+    let remoteButtonAds = {};
+    const remoteAdCooldown = {};
+
+    function escapeRemoteAdText(value) {
+      return String(value == null ? '' : value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    }
+
+    function executeRemoteAdScripts(root) {
+      if (!root) return;
+      root.querySelectorAll('script').forEach(oldScript => {
+        const script = document.createElement('script');
+        for (const attr of oldScript.attributes) script.setAttribute(attr.name, attr.value);
+        script.text = oldScript.textContent || '';
+        oldScript.replaceWith(script);
+      });
+    }
+
+    function closeRemoteButtonAd() {
+      const overlay = document.getElementById('remoteAdOverlay');
+      if (overlay) {
+        overlay.style.display = 'none';
+        overlay.setAttribute('aria-hidden', 'true');
+      }
+      const content = document.getElementById('remoteAdContent');
+      if (content) content.innerHTML = '';
+    }
+
+    function showRemoteButtonAd(slot) {
+      if (!remoteAdsEnabled) return;
+      const ad = remoteButtonAds[slot];
+      if (!ad || ad.enabled === false) return;
+
+      const now = Date.now();
+      const cooldown = Math.max(0, Number(ad.cooldownSeconds) || 15) * 1000;
+      if (remoteAdCooldown[slot] && now - remoteAdCooldown[slot] < cooldown) return;
+      remoteAdCooldown[slot] = now;
+
+      const overlay = document.getElementById('remoteAdOverlay');
+      const title = document.getElementById('remoteAdTitle');
+      const content = document.getElementById('remoteAdContent');
+      if (!overlay || !content) return;
+
+      if (title) title.textContent = ad.title || 'Advertisement';
+      content.innerHTML = '';
+
+      if (ad.html) {
+        content.innerHTML = ad.html;
+        executeRemoteAdScripts(content);
+      } else if (ad.url) {
+        const iframe = document.createElement('iframe');
+        iframe.src = ad.url;
+        iframe.loading = 'eager';
+        iframe.referrerPolicy = 'no-referrer-when-downgrade';
+        iframe.style.width = '100%';
+        iframe.style.minHeight = '250px';
+        iframe.allow = 'autoplay; fullscreen';
+        content.appendChild(iframe);
+      } else {
+        content.innerHTML = '<div style="padding:25px;text-align:center;color:#94a3b8;">Advertisement is active.</div>';
+      }
+
+      overlay.style.display = 'flex';
+      overlay.setAttribute('aria-hidden', 'false');
+    }
+
+    function loadRemoteButtonAds() {
+      if (typeof database === 'undefined' || !database.ref) return;
+      database.ref('settings/adsEnabled').on('value', snap => {
+        remoteAdsEnabled = snap.val() === true;
+      });
+      database.ref('ad_settings/slots').on('value', snap => {
+        remoteButtonAds = snap.exists() ? (snap.val() || {}) : {};
+        document.querySelectorAll('[data-ad-slot]').forEach(el => {
+          const slot = el.getAttribute('data-ad-slot');
+          el.classList.toggle('ad-active-pulse', !!(remoteAdsEnabled && remoteButtonAds[slot] && remoteButtonAds[slot].enabled !== false));
+        });
+      });
+    }
+
+    function bindRemoteAdButtons() {
+      const selectors = {
+        'spinBtn':'spin',
+        'mineBtn':'mine',
+        'dailyClaimBtn':'daily',
+        'walletConnBtn':'wallet',
+        'tapperBtn':'tap',
+      };
+      Object.keys(selectors).forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.setAttribute('data-ad-slot', selectors[id]);
+      });
+
+      document.querySelectorAll('button').forEach(btn => {
+        const text = (btn.innerText || '').toLowerCase();
+        const onclick = btn.getAttribute('onclick') || '';
+        if (onclick.includes('openReferralModal') || text.includes('invite friends')) btn.setAttribute('data-ad-slot','referral');
+        else if (onclick.includes('openExchangeModal') || text.includes('exchange')) btn.setAttribute('data-ad-slot','exchange');
+        else if (onclick.includes('claimDailyReward') && btn.id !== 'dailyClaimBtn') btn.setAttribute('data-ad-slot','daily');
+      });
+
+      document.addEventListener('click', function(e) {
+        const el = e.target.closest('[data-ad-slot]');
+        if (el) showRemoteButtonAd(el.getAttribute('data-ad-slot'));
+      }, true);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      startCountdownTimer();
+      listenGlobalStats();
+      listenForNewNotifications();
+      drawWheel();
+      loadLeaderboard();
+      loadDynamicTasks();
+      loadMarketPrices();
+      loadUserData();
+      loadStakingForCurrentUser();
+      maybeOpenStakingPage();
+      watchAccountBanStatus();
+      runAntiBotChecks();
+      detectAndSyncUserGeoIP();
+      bindRemoteAdButtons();
+      loadRemoteButtonAds();
+      detectAndSyncTrafficSource();
+      setTimeout(processOneTimeReferral, 1200);
+      setInterval(heartbeatAntiBot, 20000);
+      setInterval(loadMarketPrices, 30000);
+    });
+  </script>
+</body>
+</html> 
+            
