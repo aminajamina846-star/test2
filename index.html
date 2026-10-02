@@ -4,9 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>ADI$ Airdrop & Mining App</title>
-  <meta name="description" content="ADI$ Airdrop & Cloud Mining WebApp with tasks, referral system, daily rewards, and admin control dashboard.">
-  <meta property="og:title" content="ADI$ Airdrop & Mining App">
-  <meta property="og:description" content="ADI$ Airdrop & Cloud Mining WebApp with tasks, referral system, daily rewards, and admin control dashboard.">
 
   <!-- Telegram Web App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -21,9 +18,6 @@
   <!-- Google Fonts & Font Awesome Icons -->
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-  <!-- Ad Network SDK Integration -->
-  <script src='//libtl.com/sdk.js' data-zone='11848612' data-sdk='show_11848612'></script>
 
   <style>
     body .bottom-nav {
@@ -165,17 +159,6 @@
       color: var(--text-sub);
       font-weight: 600;
       margin-top: 2px;
-    }
-
-    .user-badge-label {
-      display: inline-block;
-      font-size: 9px;
-      padding: 2px 6px;
-      border-radius: 4px;
-      background: rgba(255, 255, 255, 0.1);
-      color: var(--accent-silver);
-      margin-left: 4px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .icon-btn {
@@ -384,17 +367,6 @@
       position: relative;
     }
 
-    .mining-active {
-      animation: pulse 2s infinite;
-      border-color: #4ade80;
-    }
-
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.4); }
-      70% { box-shadow: 0 0 0 15px rgba(74, 222, 128, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
-    }
-
     .wheel-pointer {
       position: absolute;
       top: -10px;
@@ -422,6 +394,9 @@
     .btn-tab {
       cursor: pointer;
       transition: all 0.3s ease;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--card-border);
+      color: #aaa;
     }
 
     .btn-tab.active {
@@ -432,48 +407,6 @@
       box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
     }
 
-    .tapper-box {
-      background: rgba(0, 0, 0, 0.6);
-      border: 1px dashed var(--card-border);
-      border-radius: 16px;
-      padding: 15px;
-      text-align: center;
-    }
-
-    .tapper-btn {
-      width: 90px;
-      height: 90px;
-      border-radius: 50%;
-      background: var(--silver-gradient);
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
-      margin: 10px auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 0 20px rgba(255,255,255,0.3);
-    }
-
-    .tapper-btn:active {
-      transform: scale(0.92);
-    }
-
-    #banOverlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #000;
-      z-index: 99999;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 20px;
-    }
-
     .countdown-container {
       background: linear-gradient(135deg, rgba(20,20,20,0.95), rgba(0,0,0,0.9));
       border: 1px solid rgba(255, 255, 255, 0.2);
@@ -481,7 +414,6 @@
       padding: 16px;
       text-align: center;
       margin-bottom: 16px;
-      box-shadow: 0 0 20px rgba(0, 230, 118, 0.1);
     }
 
     .countdown-title {
@@ -529,35 +461,20 @@
       border: 1px solid rgba(255,255,255,0.05);
     }
 
-    .stat-item {
-      text-align: center;
-    }
+    .stat-item { text-align: center; }
+    .stat-item span { display: block; font-size: 10px; color: #888; }
+    .stat-item strong { font-size: 13px; color: #e2e8f0; }
 
-    .stat-item span {
-      display: block;
-      font-size: 10px;
-      color: #888;
-    }
-
-    .stat-item strong {
-      font-size: 13px;
-      color: #e2e8f0;
-    }
-
-    /* REWARD CELEBRATION MODAL STYLES */
+    /* REWARD POP-UP MODAL */
     .reward-modal-backdrop {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0, 0, 0, 0.88);
       backdrop-filter: blur(12px);
       z-index: 1000000;
       display: flex;
       justify-content: center;
       align-items: center;
-      animation: rewardFadeIn 0.25s ease-out;
     }
     .reward-modal-box {
       width: 90%;
@@ -568,182 +485,70 @@
       padding: 26px 20px;
       text-align: center;
       color: #fff;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 40px rgba(34, 197, 94, 0.2);
-      animation: rewardPopUp 0.35s cubic-bezier(0.17, 0.89, 0.32, 1.25);
-    }
-    @keyframes rewardFadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    @keyframes rewardPopUp {
-      from { transform: scale(0.85); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);
     }
     .reward-icon-glow {
-      width: 80px;
-      height: 80px;
+      width: 80px; height: 80px;
       margin: 0 auto 12px;
       border-radius: 50%;
       background: radial-gradient(circle, rgba(34, 197, 94, 0.25) 0%, rgba(34, 197, 94, 0) 70%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
     }
-    .reward-icon-inner {
-      font-size: 42px;
-      filter: drop-shadow(0 0 16px rgba(34, 197, 94, 0.6));
-    }
+    .reward-icon-inner { font-size: 42px; }
     .reward-tag {
-      display: inline-block;
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 1px;
-      color: #4ade80;
-      background: rgba(34, 197, 94, 0.15);
-      border: 1px solid rgba(74, 222, 128, 0.3);
-      padding: 4px 12px;
-      border-radius: 20px;
-      margin-bottom: 8px;
+      display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: 1px;
+      color: #4ade80; background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(74, 222, 128, 0.3);
+      padding: 4px 12px; border-radius: 20px; margin-bottom: 8px;
     }
-    .reward-title {
-      font-size: 20px;
-      font-weight: 800;
-      color: #ffffff;
-      margin-bottom: 14px;
-      letter-spacing: -0.5px;
-    }
+    .reward-title { font-size: 20px; font-weight: 800; margin-bottom: 14px; }
     .reward-amount-card {
-      background: rgba(0, 0, 0, 0.45);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
-      padding: 14px;
-      margin-bottom: 14px;
+      background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px; padding: 14px; margin-bottom: 14px;
     }
-    .reward-amount-label {
-      font-size: 11px;
-      color: #94a3b8;
-      text-transform: uppercase;
-      font-weight: 700;
-    }
-    .reward-amount-val {
-      font-size: 28px;
-      font-weight: 900;
-      color: #4ade80;
-      margin: 2px 0;
-      text-shadow: 0 0 20px rgba(74, 222, 128, 0.4);
-    }
-    .reward-usd-val {
-      font-size: 11px;
-      color: #64748b;
-    }
+    .reward-amount-label { font-size: 11px; color: #94a3b8; text-transform: uppercase; font-weight: 700; }
+    .reward-amount-val { font-size: 28px; font-weight: 900; color: #4ade80; margin: 2px 0; }
+    .reward-usd-val { font-size: 11px; color: #64748b; }
     .reward-details-list {
-      background: rgba(255, 255, 255, 0.03);
-      border-radius: 14px;
-      padding: 10px 14px;
-      margin-bottom: 18px;
-      font-size: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.03); border-radius: 14px; padding: 10px 14px;
+      margin-bottom: 18px; font-size: 12px; border: 1px solid rgba(255, 255, 255, 0.06);
     }
     .reward-detail-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 6px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-      color: #cbd5e1;
+      display: flex; justify-content: space-between; padding: 6px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04); color: #cbd5e1;
     }
-    .reward-detail-row:last-child {
-      border-bottom: none;
-    }
-    .reward-continue-btn {
-      width: 100%;
-      padding: 14px;
-      font-size: 13px;
-      font-weight: 800;
-      border-radius: 14px;
-      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
-      color: #000 !important;
-      box-shadow: 0 6px 20px rgba(34, 197, 94, 0.35);
-      cursor: pointer;
-    }
+    .reward-detail-row:last-child { border-bottom: none; }
 
-    /* 3D TAP COIN & ANIMATIONS */
+    /* 3D TAP COIN */
     .tap-coin-3d {
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
+      width: 140px; height: 140px; border-radius: 50%;
       background: radial-gradient(circle at 35% 30%, #fef08a 0%, #eab308 35%, #a16207 75%, #451a03 100%);
-      box-shadow: 0 12px 35px rgba(234, 179, 8, 0.45), inset 0 3px 6px rgba(255, 255, 255, 0.9), inset 0 -6px 12px rgba(0, 0, 0, 0.65);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      user-select: none;
-      transition: transform 0.08s ease, filter 0.08s ease;
-      position: relative;
-      margin: 0 auto;
-      border: 3px solid rgba(254, 240, 138, 0.6);
+      box-shadow: 0 12px 35px rgba(234, 179, 8, 0.45);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; margin: 0 auto; border: 3px solid rgba(254, 240, 138, 0.6);
     }
-    .tap-coin-3d:active {
-      transform: scale(0.92) translateY(4px);
-      filter: brightness(1.25);
-    }
+    .tap-coin-3d:active { transform: scale(0.92); }
     .tap-coin-inner {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
+      width: 110px; height: 110px; border-radius: 50%;
       border: 2px dashed rgba(254, 240, 138, 0.6);
       background: radial-gradient(circle, #ca8a04 0%, #854d0e 70%, #451a03 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .tap-coin-logo { font-size: 24px; font-weight: 900; color: #fef08a; }
+    .tap-coin-sub { font-size: 8px; font-weight: 800; color: #fde047; margin-top: 2px; }
+
+    .history-item-box {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
       display: flex;
-      flex-direction: column;
+      justify-content: space-between;
       align-items: center;
-      justify-content: center;
-      box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.6);
-    }
-    .tap-coin-logo {
-      font-size: 26px;
-      font-weight: 900;
-      color: #fef08a;
-      letter-spacing: 1px;
-      text-shadow: 0 2px 6px rgba(0,0,0,0.8), 0 0 12px rgba(250, 204, 21, 0.6);
-    }
-    .tap-coin-sub {
-      font-size: 8px;
-      font-weight: 800;
-      color: #fde047;
-      letter-spacing: 1.5px;
-      margin-top: 2px;
-      text-transform: uppercase;
-    }
-    .floating-tap-number {
-      position: absolute;
-      font-size: 22px;
-      font-weight: 900;
-      color: #fde047;
-      pointer-events: none;
-      animation: floatUpFade 0.7s ease-out forwards;
-      text-shadow: 0 0 12px rgba(250, 204, 21, 0.9);
-      z-index: 99;
-    }
-    @keyframes floatUpFade {
-      0% { opacity: 1; transform: translate(-50%, 0) scale(1); }
-      100% { opacity: 0; transform: translate(-50%, -65px) scale(1.4); }
     }
   </style>
 </head>
 <body>
-
-  <div id="lockScreen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0f19; z-index: 99999; color: #fff; text-align: center; padding-top: 150px; font-family: sans-serif;">
-      <h2 style="color: #ff4d4d; margin-bottom: 10px;">System Maintenance</h2>
-      <p style="color: #ccc; font-size: 16px;">The app is locked before the official launch. Please wait.</p>
-  </div>
-
-  <div id="banOverlay">
-    <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid var(--accent-red); padding: 30px 20px; border-radius: 20px; max-width: 350px;">
-      <i class="fa-solid fa-ban" style="font-size: 50px; color: var(--accent-red); margin-bottom: 15px;"></i>
-      <h2 style="color: var(--accent-red); font-size: 20px; font-weight: 800; margin-bottom: 10px;">Account Suspended</h2>
-      <p style="font-size: 13px; color: var(--text-sub); line-height: 1.5;">Your account has been banned by the administrator due to policy violations.</p>
-    </div>
-  </div>
 
   <div class="app-container">
     
@@ -755,7 +560,7 @@
               <p id="userLevel"><i class="fa-solid fa-shield-halved" style="color: var(--accent-silver);"></i> Verified Miner</p>
           </div>
       </div>
-      <div class="icon-btn" id="notifBellBtn" onclick="openNotificationModal()" style="position: relative;">
+      <div class="icon-btn" id="notifBellBtn" onclick="openNotificationModal()">
           <i class="fa-regular fa-bell"></i>
           <span id="notifRedBadge" style="display: none; position: absolute; top: 2px; right: 2px; width: 8px; height: 8px; background-color: #ff3b30; border-radius: 50%;"></span>
       </div>
@@ -779,11 +584,11 @@
 
         <div class="btn-row">
           <button class="btn btn-metallic" onclick="openExchangeModal()"><i class="fa-solid fa-arrow-right-arrow-left"></i> Exchange</button>
-          <button class="btn btn-dark" onclick="openWalletModal()"><i class="fa-solid fa-wallet"></i> Wallet</button>
+          <button class="btn btn-dark" onclick="directConnectWallet()"><i class="fa-solid fa-wallet"></i> Wallet</button>
         </div>
       </div>
 
-      <!-- 20 NOVEMBER ULTA COUNTDOWN & GLOBAL STATS CARD -->
+      <!-- COUNTDOWN & GLOBAL STATS CARD -->
       <div class="countdown-container">
         <div class="countdown-title"><i class="fa-solid fa-clock"></i> Official Launch & Token Distribution</div>
         <div class="countdown-grid">
@@ -808,11 +613,11 @@
         <i class="fa-solid fa-users"></i> Invite Friends & Stats (+50 ADI)
       </button>
 
-      <!-- PROMINENT DAILY STREAK REWARD HUB -->
-      <div class="card" style="background: linear-gradient(180deg, rgba(20,28,42,0.9) 0%, rgba(10,14,23,0.9) 100%); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 20px; padding: 18px; margin-bottom: 16px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(56, 189, 248, 0.08);">
+                                          <!-- DAILY STREAK REWARD HUB -->
+      <div class="card" style="background: linear-gradient(180deg, rgba(20,28,42,0.9) 0%, rgba(10,14,23,0.9) 100%); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 20px; padding: 18px; margin-bottom: 16px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
           <div>
-            <div style="font-size: 11px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px;">
+            <div style="font-size: 11px; font-weight: 800; color: #38bdf8; text-transform: uppercase;">
               <i class="fa-solid fa-calendar-check"></i> Daily Login Streak Reward
             </div>
             <div style="font-size: 15px; font-weight: 900; color: #fff; margin-top: 2px;" id="streakRewardText">
@@ -824,7 +629,6 @@
           </div>
         </div>
 
-        <!-- 7-Day Visual Progress Track -->
         <div style="display: flex; justify-content: space-between; gap: 4px; margin-bottom: 14px;" id="streakTrackContainer">
           <div class="streak-day-dot active" style="flex:1; background:rgba(34,197,94,0.2); border:1px solid #22c55e; border-radius:8px; padding:6px 2px; text-align:center;">
             <div style="font-size:9px; color:#888;">D1</div>
@@ -832,32 +636,32 @@
           </div>
           <div class="streak-day-dot" style="flex:1; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:6px 2px; text-align:center;">
             <div style="font-size:9px; color:#888;">D2</div>
-            <div style="font-size:10px; font-weight:800; color:#cbd5e1;">120</div>
+            <div style="font-size:10px; font-weight:800; color:#cbd5e1;">100</div>
           </div>
           <div class="streak-day-dot" style="flex:1; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:6px 2px; text-align:center;">
             <div style="font-size:9px; color:#888;">D3</div>
-            <div style="font-size:10px; font-weight:800; color:#cbd5e1;">150</div>
+            <div style="font-size:10px; font-weight:800; color:#cbd5e1;">100</div>
           </div>
           <div class="streak-day-dot" style="flex:1; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:6px 2px; text-align:center;">
             <div style="font-size:9px; color:#888;">D4</div>
-            <div style="font-size:10px; font-weight:800; color:#cbd5e1;">180</div>
+            <div style="font-size:10px; font-weight:800; color:#cbd5e1;">100</div>
           </div>
           <div class="streak-day-dot" style="flex:1; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:6px 2px; text-align:center;">
             <div style="font-size:9px; color:#888;">D5</div>
-            <div style="font-size:10px; font-weight:800; color:#cbd5e1;">220</div>
+            <div style="font-size:10px; font-weight:800; color:#cbd5e1;">100</div>
           </div>
           <div class="streak-day-dot" style="flex:1; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:6px 2px; text-align:center;">
             <div style="font-size:9px; color:#888;">D6</div>
-            <div style="font-size:10px; font-weight:800; color:#cbd5e1;">280</div>
+            <div style="font-size:10px; font-weight:800; color:#cbd5e1;">100</div>
           </div>
           <div class="streak-day-dot" style="flex:1; background:rgba(234,179,8,0.15); border:1px solid rgba(234,179,8,0.4); border-radius:8px; padding:6px 2px; text-align:center;">
             <div style="font-size:9px; color:#fbbf24;">D7</div>
-            <div style="font-size:10px; font-weight:800; color:#fbbf24;">500💎</div>
+            <div style="font-size:10px; font-weight:800; color:#fbbf24;">200💎</div>
           </div>
         </div>
 
         <button class="btn btn-metallic" id="dailyClaimBtn" style="width: 100%; padding: 14px; font-size: 13px; font-weight: 800; cursor: pointer;" onclick="claimDailyReward()">
-          <i class="fa-solid fa-gift"></i> Claim +100 ADI$ Daily Reward
+          <i class="fa-solid fa-gift"></i> Claim Daily Reward
         </button>
       </div>
 
@@ -867,7 +671,7 @@
           <i class="fa-solid fa-pickaxe"></i>
           <span>Mining</span>
         </div>
-        <div class="grid-item" onclick="confirmBoost()">
+        <div class="grid-item" onclick="alert('Boost Feature Coming Soon!')">
           <i class="fa-solid fa-rocket"></i>
           <span>Boost</span>
         </div>
@@ -881,12 +685,13 @@
         </div>
       </div>
 
+      <!-- LEADERBOARD CARD -->
       <div class="card">
         <div class="card-header">
-          <span class="card-label">Leaderboard & Badges</span>
+          <span class="card-label">Leaderboard</span>
         </div>
         <div id="leaderboard-container" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
-          <div style="text-align: center; color: var(--text-sub); font-size: 12px; padding: 10px 0;">Loading leaderboard...</div>
+          <div style="text-align: center; color: var(--text-sub); font-size: 12px; padding: 10px 0;">Loading leaderboard from Firebase...</div>
         </div>
       </div>
     </div>
@@ -903,10 +708,11 @@
         <button class="btn btn-metallic" id="mineBtn" style="width: 100%; padding: 16px; font-size: 13px;" onclick="startMining()">Start Mining</button>
      </div>
 
+      <!-- MINE PAGE SPECIFIC HISTORY -->
       <div class="card card-silver" style="margin-top: 15px; padding: 20px; text-align: left;">
-        <h3 style="font-size: 16px; margin-bottom: 12px; color: var(--text-main);">History</h3>
+        <h3 style="font-size: 15px; margin-bottom: 12px; color: var(--text-main);"><i class="fa-solid fa-clock-rotate-left"></i> Mining History</h3>
         <div id="mineHistoryList" style="font-size: 12px; color: var(--text-sub);">
-          <div style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: center;">No mining history yet.</div>
+          <div style="padding: 10px 0; text-align: center;">Loading mining history...</div>
         </div>
       </div>
     </div>
@@ -915,82 +721,39 @@
     <div id="page-markets" class="page">
       <div class="card">
         <div class="section-title" style="margin-top: 0;">Live Market Metrics</div>
-
         <div class="market-item" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #1e1e1e;">
-          <div class="coin-info" style="display: flex; align-items: center; gap: 8px;">
-            <div class="coin-icon" style="font-weight: bold;">ADI$</div>
-            <div style="display: flex; align-items: center;">
-              <strong style="font-size: 14px;">ADI$ </strong>
-              <span class="badge-listing" style="background: #ff9800; color: #000; font-size: 8px; font-weight: bold; padding: 2px 4px; border-radius: 3px; margin-left: 5px; text-transform: uppercase;">Listing Soon</span>
-            </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <strong style="font-size: 14px;">ADI$</strong>
+            <span style="background: #ff9800; color: #000; font-size: 8px; font-weight: bold; padding: 2px 4px; border-radius: 3px;">Listing Soon</span>
           </div>
           <div><strong id="market-adi-price" style="font-size: 14px;">$0.000100</strong></div>
         </div>
-
         <div class="market-item" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #1e1e1e;">
-          <div class="coin-info" style="display: flex; align-items: center; gap: 8px;">
-            <div class="coin-icon"><i class="fa-brands fa-bitcoin"></i></div>
-            <div><strong style="font-size: 14px;">Bitcoin</strong></div>
-          </div>
-          <div><strong id="market-btc-price" style="font-size: 14px;">Loading...</strong></div>
+          <div style="display: flex; align-items: center; gap: 8px;"><i class="fa-brands fa-bitcoin"></i> <strong>Bitcoin</strong></div>
+          <div><strong id="market-btc-price" style="font-size: 14px;">$92,450.00</strong></div>
         </div>
-
         <div class="market-item" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #1e1e1e;">
-          <div class="coin-info" style="display: flex; align-items: center; gap: 8px;">
-            <div class="coin-icon"><i class="fa-brands fa-ethereum"></i></div>
-            <div><strong style="font-size: 14px;">Ethereum</strong></div>
-          </div>
-          <div><strong id="market-eth-price" style="font-size: 14px;">Loading...</strong></div>
+          <div style="display: flex; align-items: center; gap: 8px;"><i class="fa-brands fa-ethereum"></i> <strong>Ethereum</strong></div>
+          <div><strong id="market-eth-price" style="font-size: 14px;">$3,410.00</strong></div>
         </div>
-
-        <div class="market-item" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #1e1e1e;">
-          <div class="coin-info" style="display: flex; align-items: center; gap: 8px;">
-            <div class="coin-icon"><i class="fa-solid fa-coins"></i></div>
-            <div><strong style="font-size: 14px;">BNB</strong></div>
-          </div>
-          <div><strong id="market-bnb-price" style="font-size: 14px;">Loading...</strong></div>
-        </div>
-
         <div class="market-item" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0;">
-          <div class="coin-info" style="display: flex; align-items: center; gap: 8px;">
-            <div class="coin-icon"><i class="fa-solid fa-dollar-sign"></i></div>
-            <div><strong style="font-size: 14px;">USDT (BEP20)</strong></div>
-          </div>
-          <div><strong id="market-usdt-price" style="font-size: 14px;">Loading...</strong></div>
+          <div style="display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-coins"></i> <strong>BNB</strong></div>
+          <div><strong id="market-bnb-price" style="font-size: 14px;">$645.00</strong></div>
         </div>
       </div>
     </div>
 
     <!-- 4. TASKS & GAMIFICATION PAGE -->
     <div id="page-tasks" class="page">
-        
-        <!-- DAILY CHECK-IN TASK CARD -->
-        <div class="card" style="background: linear-gradient(180deg, rgba(20,28,42,0.9) 0%, rgba(10,14,23,0.9) 100%); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 16px; padding: 16px; margin-bottom: 16px;">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div>
-              <div style="font-size: 11px; font-weight: 800; color: #38bdf8; text-transform: uppercase;">
-                <i class="fa-solid fa-gift"></i> Daily Task #1: Login Streak
-              </div>
-              <div style="font-size: 13px; font-weight: 800; color: #fff; margin-top: 2px;">
-                Earn +100 ADI$ Daily Reward
-              </div>
-            </div>
-            <button class="btn btn-metallic" id="taskDailyClaimBtn" style="padding: 8px 16px; font-size: 11px; flex: initial; cursor:pointer;" onclick="claimDailyReward()">
-              Claim
-            </button>
-          </div>
-        </div>
-
         <!-- DAILY SPIN WHEEL CARD -->
         <div class="card spin-card" style="text-align: center;">
             <div class="section-title" style="margin-top: 0;">Daily Spin Wheel</div>
             <div style="font-size: 11px; color: var(--text-sub); margin-bottom: 15px;">Spin to Win 2, 5, 19, or 50 ADI$ tokens!</div>
 
-            <!-- Wheel Outer Wrapper -->
-            <div class="wheel-wrapper" style="position: relative; width: 220px; height: 220px; margin: 0 auto;">
+            <div class="wheel-wrapper" style="position: relative; width: 200px; height: 200px; margin: 0 auto;">
                 <div class="wheel-pointer"></div>
                 <div class="wheel-container">
-                    <canvas id="wheelCanvas" width="220" height="220"></canvas>
+                    <canvas id="wheelCanvas" width="200" height="200"></canvas>
                 </div>
             </div>
 
@@ -998,75 +761,61 @@
             <button class="btn btn-metallic" id="spinBtn" onclick="spinWheelNow()" style="width: 100%;">Spin Wheel Now</button>
         </div>
 
-        <!-- MINI TAPPER CHALLENGE (PREMIUM NOTCOIN/BLUM STYLE) -->
-        <div class="card" style="background: linear-gradient(180deg, rgba(20,28,42,0.95) 0%, rgba(10,14,24,0.95) 100%); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 20px; padding: 18px 16px; text-align: center; position: relative; overflow: hidden; margin-bottom: 20px;">
+        <!-- TAB GAME (80 CLICKS = 20 TOKENS) -->
+        <div class="card" style="background: linear-gradient(180deg, rgba(20,28,42,0.95) 0%, rgba(10,14,24,0.95) 100%); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 20px; padding: 18px 16px; text-align: center; margin-bottom: 20px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
               <div style="text-align:left;">
                 <div style="font-size: 11px; font-weight: 800; color: #38bdf8; text-transform: uppercase;">
-                  <i class="fa-solid fa-bolt"></i> Speed Tap Challenge
+                  <i class="fa-solid fa-hand-pointer"></i> Tap Game Challenge
                 </div>
-                <div style="font-size: 13px; font-weight: 700; color: #fff;">15-Second Blitz Mining</div>
-              </div>
-              <div id="tapperComboBadge" style="background: rgba(234,179,8,0.15); border: 1px solid rgba(234,179,8,0.3); color: #fbbf24; font-size: 11px; font-weight: 800; padding: 4px 12px; border-radius: 20px;">
-                ⚡ 1.0x Normal
+                <div style="font-size: 12px; font-weight: 700; color: #fff;">80 Clicks = 20 ADI Tokens</div>
               </div>
             </div>
 
-            <!-- Stats Bar -->
             <div style="display: flex; gap: 8px; margin-bottom: 12px;">
               <div style="flex:1; background: rgba(0,0,0,0.5); padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
-                <div style="font-size:10px; color:var(--text-sub); text-transform:uppercase; font-weight:bold;">Total Taps</div>
-                <div id="tapperScore" style="font-size:20px; font-weight:900; color:#4ade80; margin-top:2px;">0</div>
-              </div>
-              <div style="flex:1; background: rgba(0,0,0,0.5); padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
-                <div style="font-size:10px; color:var(--text-sub); text-transform:uppercase; font-weight:bold;">Time Left</div>
-                <div id="tapperTime" style="font-size:20px; font-weight:900; color:#38bdf8; margin-top:2px;">15s</div>
+                <div style="font-size:10px; color:var(--text-sub); text-transform:uppercase; font-weight:bold;">Total Clicks</div>
+                <div id="tapperScore" style="font-size:20px; font-weight:900; color:#4ade80; margin-top:2px;">0 / 80</div>
               </div>
               <div style="flex:1; background: rgba(0,0,0,0.5); padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
                 <div style="font-size:10px; color:var(--text-sub); text-transform:uppercase; font-weight:bold;">Reward</div>
-                <div id="tapperRewardPreview" style="font-size:20px; font-weight:900; color:#fbbf24; margin-top:2px;">+0 ADI$</div>
+                <div id="tapperRewardPreview" style="font-size:20px; font-weight:900; color:#fbbf24; margin-top:2px;">+20 ADI</div>
               </div>
-            </div>
-
-            <!-- Progress Bar -->
-            <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.08); border-radius: 10px; overflow: hidden; margin-bottom: 16px;">
-              <div id="tapperProgressBar" style="width: 100%; height: 100%; background: linear-gradient(90deg, #38bdf8, #22c55e); transition: width 0.2s linear;"></div>
             </div>
 
             <!-- 3D Coin Tap Zone -->
-            <div style="position: relative; width: 160px; height: 160px; margin: 0 auto 16px;" id="tapParticleZone">
-              <div class="tap-coin-3d" id="tapperTapBtn" onclick="handleTap(event)">
+            <div style="position: relative; width: 140px; height: 140px; margin: 0 auto 16px;">
+              <div class="tap-coin-3d" id="tapperTapBtn" onclick="handle80Tap()">
                 <div class="tap-coin-inner">
                   <div class="tap-coin-logo">ADI$</div>
-                  <div class="tap-coin-sub">TAP TO MINE</div>
+                  <div class="tap-coin-sub">TAP HERE</div>
                 </div>
               </div>
             </div>
-
-            <button class="btn btn-metallic" id="startTapperBtn" style="width: 100%; padding: 14px; font-size: 13px; font-weight: 800; cursor: pointer;" onclick="startChallenge()">
-              <i class="fa-solid fa-play"></i> Start Challenge (15s)
-            </button>
         </div>
 
-        <!-- TASKS MANAGEMENT (WITH SECRET & GENERAL TABS) -->
+        <!-- TASKS MANAGEMENT -->
         <div class="section-title">Tasks Management</div>
 
-        <!-- Secret Code o Non-Secret Code Switch Tabs -->
+        <!-- Secret Code & General Tabs -->
         <div class="task-tabs" style="display: flex; gap: 8px; margin-bottom: 12px;">
-            <button class="btn-tab active" id="tabNonSecret" onclick="switchTaskTab('non-secret')" style="flex:1; padding:9px; font-size:11px; border-radius:8px; cursor:pointer;">
+            <button class="btn-tab active" id="tabNonSecret" onclick="switchTaskTab('non-secret')" style="flex:1; padding:9px; font-size:11px; border-radius:8px;">
                 <i class="fa-solid fa-list-check"></i> General Tasks
             </button>
-            <button class="btn-tab" id="tabSecret" onclick="switchTaskTab('secret')" style="flex:1; padding:9px; font-size:11px; border-radius:8px; cursor:pointer;">
+            <button class="btn-tab" id="tabSecret" onclick="switchTaskTab('secret')" style="flex:1; padding:9px; font-size:11px; border-radius:8px;">
                 <i class="fa-solid fa-key"></i> Secret Code Tasks
             </button>
         </div>
 
-        <!-- Active Task Display Container -->
-        <div id="dynamicTasksContainer"></div>
+        <div id="dynamicTasksContainer">
+          <div style="text-align: center; color: var(--text-sub); font-size: 12px; padding: 20px 0;">Loading tasks from Admin Panel...</div>
+        </div>
 
-        <!-- TASK HISTORY -->
+        <!-- TASK PAGE SPECIFIC HISTORY -->
         <div class="section-title" style="margin-top: 20px;">Task History</div>
-        <div id="taskHistoryContainer"></div>
+        <div id="taskHistoryContainer" style="font-size: 12px; color: var(--text-sub);">
+          <div style="padding: 10px 0; text-align: center;">Loading task history...</div>
+        </div>
     </div>
 
     <!-- 5. PROFILE PAGE -->
@@ -1083,10 +832,9 @@
         <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 12px; margin-top: 12px; border: 1px solid var(--card-border);">
           <div style="font-size: 11px; color: var(--text-sub); text-transform: uppercase; font-weight: 700;">Live Mining Timer</div>
           <div id="profMiningTimer" style="font-size: 14px; font-weight: 800; color: #4ade80; margin-top: 2px;">Session Ready</div>
-          <div id="profMinedTokens" style="font-size: 11px; color: #cbd5e1; margin-top: 2px;">Total Mined: 0 ADI$</div>
         </div>
 
-        <button class="btn btn-metallic" id="walletConnBtn" style="width: 100%; margin-top: 20px;" onclick="openWalletModal()">
+        <button class="btn btn-metallic" id="walletConnBtn" style="width: 100%; margin-top: 20px;" onclick="directConnectWallet()">
           <i class="fa-solid fa-wallet"></i> Connect Trust Wallet
         </button>
       </div>
@@ -1101,31 +849,27 @@
             <i class="fa-solid fa-circle-info"></i> About Us
           </button>
         </div>
-        <a href="/admin" class="btn btn-dark" style="width:100%; margin-top:10px; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:8px;">
-          <i class="fa-solid fa-shield-halved"></i> Executive Admin Control Center
-        </a>
       </div>
 
+      <!-- COMPLETE HISTORY IN PROFILE PAGE -->
       <div class="card" style="margin-top: 16px; background-color: #121212; border: 1px solid #2a2a2a; border-radius: 16px; padding: 20px;">
-        <div class="section-title" style="margin-top: 0; font-size: 13px; letter-spacing: 1px; color: #888888; text-transform: uppercase;">Activity History</div>
-        <div id="history-list-container" style="display: flex; flex-direction: column; gap: 12px; margin-top: 14px;">
-          <div style="text-align: center; color: #777; font-size: 13px; padding: 10px 0;">Loading history...</div>
+        <div class="section-title" style="margin-top: 0; font-size: 13px; letter-spacing: 1px; color: #888888; text-transform: uppercase;">Complete History (Tasks, Daily, Mining)</div>
+        <div id="history-list-container" style="display: flex; flex-direction: column; gap: 10px; margin-top: 14px;">
+          <div style="text-align: center; color: #777; font-size: 13px; padding: 10px 0;">Loading full history...</div>
         </div>
       </div>
     </div>
 
   </div>
 
-  <!-- NOTIFICATION HISTORY MODAL -->
+  <!-- NOTIFICATION MODAL -->
   <div id="notificationModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:99999; justify-content:center; align-items:center;">
     <div style="background:#141414; width:90%; max-width:400px; border-radius:16px; padding:20px; border:1px solid rgba(255,255,255,0.2); max-height:80vh; overflow-y:auto; color:#e2e8f0;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
-        <h3 style="color:#fff; margin:0; font-size:16px;"><i class="fa-regular fa-bell"></i> Notifications (1 - 30 Days)</h3>
-        <span onclick="closeNotificationModal()" style="color:#aaa; font-size:24px; cursor:pointer; font-weight:bold;">&times;</span>
+        <h3 style="color:#fff; margin:0; font-size:16px;"><i class="fa-regular fa-bell"></i> Notifications</h3>
+        <span onclick="closeNotificationModal()" style="color:#aaa; font-size:24px; cursor:pointer;">&times;</span>
       </div>
-      <div id="notificationHistoryList" style="display:flex; flex-direction:column; gap:10px;">
-        <div style="text-align:center; color:#888; font-size:12px; padding:15px;">Loading notifications...</div>
-      </div>
+      <div id="notificationHistoryList">System update: Welcome to ADI$ Network!</div>
     </div>
   </div>
 
@@ -1134,15 +878,10 @@
     <div style="background:#141414; width:90%; max-width:400px; border-radius:16px; padding:20px; border:1px solid rgba(255,255,255,0.2); max-height:80vh; overflow-y:auto; color:#e2e8f0;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
         <h3 style="color:#fff; margin:0; font-size:16px;"><i class="fa-solid fa-file-lines"></i> ADI Token White Paper</h3>
-        <span onclick="closeWhitepaperModal()" style="color:#aaa; font-size:24px; cursor:pointer; font-weight:bold;">&times;</span>
+        <span onclick="closeWhitepaperModal()" style="color:#aaa; font-size:24px; cursor:pointer;">&times;</span>
       </div>
       <div style="font-size:12px; line-height:1.6;">
-        <h4 style="color:#fff; margin-bottom:6px;">1. Project Overview</h4>
-        <p style="color:#a3a3a3; margin-bottom:12px;">ADI Mining Network is a decentralized Web3 social engagement ecosystem designed to deliver high-yield cloud token distribution seamlessly through Telegram infrastructure.</p>
-        <h4 style="color:#fff; margin-bottom:6px;">2. Tokenomics & Distribution</h4>
-        <p style="color:#a3a3a3; margin-bottom:12px;">Total Token Supply: 1,000,000,000 ADI$<br>Community Cloud Mining: 60%<br>Ecosystem Rewards & Tasks: 20%<br>Liquidity & Exchange Listing: 20%</p>
-        <h4 style="color:#fff; margin-bottom:6px;">3. Roadmap & Listing</h4>
-        <p style="color:#a3a3a3;">Phase 1: Telegram WebApp Cloud Mining Launch & User Growth.<br>Phase 2: Task Verification, Anti-bot Protocol & Wallet Integration.<br>Phase 3: DEX/CEX Listing & ADI Token Swap Portal Open.</p>
+        <p style="color:#a3a3a3; margin-bottom:12px;">ADI Mining Network is a decentralized Web3 social engagement ecosystem designed to deliver high-yield cloud token distribution.</p>
       </div>
     </div>
   </div>
@@ -1152,123 +891,48 @@
     <div style="background:#141414; width:90%; max-width:400px; border-radius:16px; padding:20px; border:1px solid rgba(255,255,255,0.2); color:#e2e8f0;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
         <h3 style="color:#fff; margin:0; font-size:16px;"><i class="fa-solid fa-circle-info"></i> About ADI Network</h3>
-        <span onclick="closeAboutModal()" style="color:#aaa; font-size:24px; cursor:pointer; font-weight:bold;">&times;</span>
+        <span onclick="closeAboutModal()" style="color:#aaa; font-size:24px; cursor:pointer;">&times;</span>
       </div>
       <div style="font-size:12px; line-height:1.6; text-align:center;">
-        <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgKceGcvpGJWaetc5tdIYsuemMTZcOzV4d_cf4Qz1fZ2R7OOiUGP5iNZW0vFk7YEhiz9_Lg9sHRH3RTQQMuW9lCQtC2F5GntyC2vrXtP18T3MazRgTVE6NjjB0KRTvM5XBxq1aLFTVuq8J8dbDKP72Aqw98fKNeFV-qDzR7KeuGMkSF5o2CC_hLzZyY0GYl/s1009/1000049532.jpg" style="width:70px; height:70px; border-radius:50%; margin-bottom:10px; border:2px solid var(--accent-green);">
         <h4 style="color:#fff; font-size:15px; margin-bottom:4px;">ADI Mining Protocol v2.5</h4>
-        <p style="color:#a3a3a3; margin-bottom:10px;">Official Community Mini App powered by Telegram WebApp Web3 SDK.</p>
-        <p style="color:#22c55e; font-size:11px; font-weight:bold;">Verified & Secured Cloud Architecture</p>
+        <p style="color:#a3a3a3;">Official Community Mini App powered by Telegram WebApp Web3 SDK.</p>
       </div>
     </div>
   </div>
-
-  <!-- HISTORY MODAL WINDOW -->
+ <!-- HISTORY MODAL WINDOW -->
   <div id="historyModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:9999; justify-content:center; align-items:center;">
-    <div style="background:#141414; width:90%; max-width:400px; border-radius:16px; padding:20px; border:1px solid rgba(255,255,255,0.2); box-shadow:0 10px 25px rgba(0,0,0,0.8);">
+    <div style="background:#141414; width:90%; max-width:400px; border-radius:16px; padding:20px; border:1px solid rgba(255,255,255,0.2);">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
         <h3 style="color:#fff; margin:0; font-size:18px;">Transaction History</h3>
-        <span onclick="closeHistoryModal()" style="color:#aaa; font-size:24px; cursor:pointer; font-weight:bold;">&times;</span>
+        <span onclick="closeHistoryModal()" style="color:#aaa; font-size:24px; cursor:pointer;">&times;</span>
       </div>
-      <div id="historyList" style="max-height:300px; overflow-y:auto; padding-right:5px;"></div>
+      <div id="historyList" style="max-height:300px; overflow-y:auto;"></div>
     </div>
   </div>
 
   <!-- REFERRAL MODAL WINDOW -->
   <div id="referralModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:999; justify-content:center; align-items:center;">
-    <div style="background:#141414; width:90%; max-width:420px; border-radius:16px; padding:20px; border:1px solid rgba(255,255,255,0.1); box-sizing:border-box;">
+    <div style="background:#141414; width:90%; max-width:420px; border-radius:16px; padding:20px; border:1px solid rgba(255,255,255,0.1);">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px;">
-        <h3 style="color:#fff; margin:0; font-size:16px;"><i class="fa-solid fa-users" style="color:var(--accent-silver);"></i> Invite Friends & Stats</h3>
-        <span onclick="closeReferralModal()" style="color:#aaa; font-size:24px; cursor:pointer; font-weight:bold;">&times;</span>
+        <h3 style="color:#fff; margin:0; font-size:16px;"><i class="fa-solid fa-users"></i> Invite Friends & Stats</h3>
+        <span onclick="closeReferralModal()" style="color:#aaa; font-size:24px; cursor:pointer;">&times;</span>
       </div>
-
       <div style="display:flex; gap:10px; margin-bottom:15px;">
-        <div style="flex:1; background:#1f1f1f; padding:12px; border-radius:12px; text-align:center; border:1px solid rgba(255,255,255,0.05);">
-          <div style="font-size:10px; color:var(--text-sub); font-weight:700;">TOTAL REFERRED</div>
+        <div style="flex:1; background:#1f1f1f; padding:12px; border-radius:12px; text-align:center;">
+          <div style="font-size:10px; color:var(--text-sub);">TOTAL REFERRED</div>
           <div id="refCount" style="font-size:16px; font-weight:800; color:#fff; margin-top:4px;">0</div>
         </div>
-        <div style="flex:1; background:#1f1f1f; padding:12px; border-radius:12px; text-align:center; border:1px solid rgba(255,255,255,0.05);">
-          <div style="font-size:10px; color:var(--text-sub); font-weight:700;">TOTAL EARNED</div>
+        <div style="flex:1; background:#1f1f1f; padding:12px; border-radius:12px; text-align:center;">
+          <div style="font-size:10px; color:var(--text-sub);">TOTAL EARNED</div>
           <div id="refEarnings" style="font-size:16px; font-weight:800; color:var(--accent-green); margin-top:4px;">0 ADI$</div>
         </div>
       </div>
-
-      <button class="btn btn-metallic" onclick="shareReferralLink()" style="width:100%; margin-bottom:12px; padding:12px; font-weight:bold; cursor:pointer;">
-        <i class="fa-solid fa-share-nodes"></i> Share Referral Link
-      </button>
-
-      <div style="background: #1a1a1a; padding: 10px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.08); margin-bottom: 15px;">
-        <label style="font-size: 11px; color: #888; display: block; margin-bottom: 6px; text-align: left;">Your Referral Link:</label>
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <input type="text" id="refLinkInput" readonly style="width: 100%; background: #111; color: #fff; border: 1px solid #333; padding: 10px; border-radius: 8px; font-size: 11px; outline: none;" value="Generating link...">
-          <button onclick="copyReferralLink()" style="background: var(--accent-green, #00e676); color: #000; font-weight: bold; border: none; padding: 10px 14px; border-radius: 8px; font-size: 11px; cursor: pointer; white-space: nowrap;">Copy</button>
+      <div style="background: #1a1a1a; padding: 10px; border-radius: 12px; margin-bottom: 15px;">
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="refLinkInput" readonly style="width: 100%; background: #111; color: #fff; border: 1px solid #333; padding: 10px; border-radius: 8px; font-size: 11px;" value="Generating link...">
+          <button onclick="copyReferralLink()" style="background: var(--accent-green); color: #000; font-weight: bold; border: none; padding: 10px 14px; border-radius: 8px; font-size: 11px; cursor: pointer;">Copy</button>
         </div>
       </div>
-
-      <div style="font-size:11px; font-weight:700; color:var(--text-sub); margin-bottom:8px; text-transform:uppercase;">Referral History (Active / Status)</div>
-      <div id="referralList" style="max-height:160px; overflow-y:auto; padding-right:5px;">
-        <p style="color:#888; text-align:center; font-size:12px;">Loading referrals...</p>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- WALLET CONNECTION MODAL -->
-  <div id="walletModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:99999; justify-content:center; align-items:center;">
-    <div style="background:#141414; width:90%; max-width:400px; border-radius:16px; padding:20px; border:1px solid rgba(255,255,255,0.15); color:#e2e8f0;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px;">
-        <h3 style="color:#fff; margin:0; font-size:16px;"><i class="fa-solid fa-wallet"></i> Connect BEP-20 Wallet</h3>
-        <span onclick="closeWalletModal()" style="color:#aaa; font-size:24px; cursor:pointer; font-weight:bold;">&times;</span>
-      </div>
-      <p style="font-size:12px; color:var(--text-sub); margin-bottom:14px; line-height:1.5;">Connect Trust Wallet, MetaMask, or paste your BSC (BEP-20) address to receive ADI$ distribution.</p>
-      
-      <div id="currentWalletDisplay" style="background:rgba(255,255,255,0.05); padding:10px 12px; border-radius:10px; font-size:11px; margin-bottom:14px; word-break:break-all; display:none;">
-        <div style="color:var(--text-sub); font-size:10px; text-transform:uppercase; font-weight:bold;">Current Saved Wallet:</div>
-        <div id="modalWalletAddressText" style="color:#4ade80; font-weight:bold; margin-top:2px;"></div>
-      </div>
-
-      <label style="font-size:11px; color:#888; display:block; margin-bottom:6px;">Paste BEP-20 (BSC) Address:</label>
-      <input type="text" id="manualWalletInput" placeholder="0x1234...abcd" style="width:100%; background:#111; color:#fff; border:1px solid #333; padding:10px; border-radius:8px; font-size:11px; outline:none; margin-bottom:12px; box-sizing:border-box;">
-
-      <button class="btn btn-metallic" style="width:100%; margin-bottom:10px;" onclick="saveManualWalletAddress()">
-        <i class="fa-solid fa-check"></i> Save Wallet Address
-      </button>
-
-      <button class="btn btn-dark" id="web3ConnectBtn" style="width:100%;" onclick="connectWeb3Wallet()">
-        <i class="fa-solid fa-link"></i> Connect Web3 (Trust / MetaMask)
-      </button>
-    </div>
-  </div>
-
-  <!-- EXCHANGE MODAL -->
-  <div id="exchangeModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:99999; justify-content:center; align-items:center;">
-    <div style="background:#141414; width:90%; max-width:400px; border-radius:16px; padding:20px; border:1px solid rgba(255,255,255,0.15); color:#e2e8f0;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px;">
-        <h3 style="color:#fff; margin:0; font-size:16px;"><i class="fa-solid fa-arrow-right-arrow-left"></i> ADI$ Token Exchange</h3>
-        <span onclick="closeExchangeModal()" style="color:#aaa; font-size:24px; cursor:pointer; font-weight:bold;">&times;</span>
-      </div>
-      
-      <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:12px; margin-bottom:14px; text-align:center;">
-        <div style="font-size:10px; color:var(--text-sub); text-transform:uppercase; font-weight:bold;">Listing Launch Rate</div>
-        <div style="font-size:16px; font-weight:800; color:#4ade80; margin-top:2px;">1 ADI$ = $0.000100 USDT</div>
-        <div style="font-size:11px; color:#94a3b8; margin-top:4px;" id="exchangeBalancePreview">Your Balance: 0 ADI$ ≈ $0.00 USD</div>
-      </div>
-
-      <label style="font-size:11px; color:#888; display:block; margin-bottom:6px;">Exchange Value Calculator (ADI$ to USDT):</label>
-      <input type="number" id="calcAdiInput" placeholder="Enter ADI tokens amount..." oninput="calculateExchangeAmount(this.value)" style="width:100%; background:#111; color:#fff; border:1px solid #333; padding:10px; border-radius:8px; font-size:12px; outline:none; margin-bottom:10px; box-sizing:border-box;">
-
-      <div style="display:flex; justify-content:space-between; padding:10px 12px; background:rgba(0,0,0,0.5); border-radius:8px; margin-bottom:15px; font-size:12px;">
-        <span style="color:#888;">Expected USDT:</span>
-        <strong id="calcUsdtResult" style="color:var(--accent-green);">$0.0000 USDT</strong>
-      </div>
-
-      <div style="font-size:11px; color:#94a3b8; line-height:1.5; margin-bottom:15px; background:rgba(255,255,255,0.03); padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.06);">
-        <i class="fa-solid fa-circle-info" style="color:#38bdf8;"></i> Official Token Listing & Liquidity distribution will go live on <b>November 20, 2026</b>.
-      </div>
-
-      <button class="btn btn-metallic" style="width:100%;" onclick="showAlert('Token swap pool will automatically unlock on November 20, 2026!')">
-        <i class="fa-solid fa-lock"></i> Swap Pool (Opens Nov 20, 2026)
-      </button>
     </div>
   </div>
 
@@ -1290,11 +954,7 @@
       <div class="reward-details-list">
         <div class="reward-detail-row">
           <span>Reward Source</span>
-          <strong id="rewardModalType">Daily Streak Bonus</strong>
-        </div>
-        <div class="reward-detail-row">
-          <span>Bonus / Multiplier</span>
-          <strong id="rewardModalBonus">1.0x Base Rate</strong>
+          <strong id="rewardModalType">Daily Bonus</strong>
         </div>
         <div class="reward-detail-row">
           <span>Total Balance</span>
@@ -1302,7 +962,7 @@
         </div>
       </div>
 
-      <button class="btn btn-metallic reward-continue-btn" onclick="closeRewardModal()">
+      <button class="btn btn-metallic" style="width: 100%; padding: 14px; border-radius: 14px; cursor: pointer;" onclick="closeRewardModal()">
         Awesome! Continue <i class="fa-solid fa-check"></i>
       </button>
     </div>
@@ -1316,6 +976,7 @@
     <div class="nav-item" onclick="switchTab('page-tasks', this)"><i class="fa-solid fa-list-check"></i><span>Tasks</span></div>
     <div class="nav-item" onclick="switchTab('page-profile', this)"><i class="fa-solid fa-user"></i><span>Profile</span></div>
   </div>
+
   <script>
     // Firebase Configuration
     const firebaseConfig = {
@@ -1324,1897 +985,421 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    // Global User Variables
+    // Browser Single Account Lock Strategy
     const tg = window.Telegram ? window.Telegram.WebApp : null;
-    let storedUid = localStorage.getItem('adi_miner_uid');
-    if (!storedUid) {
-      storedUid = 'miner_' + Math.floor(100000 + Math.random() * 900000);
-      localStorage.setItem('adi_miner_uid', storedUid);
-    }
-    let storedName = localStorage.getItem('adi_miner_name') || ("Miner_" + storedUid.slice(-4));
+    let userId = "default_browser_user";
+    let userName = "Master Account";
 
-    let userId = storedUid;
-    let userName = storedName;
+    if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+      userId = 'tg_' + tg.initDataUnsafe.user.id;
+      userName = tg.initDataUnsafe.user.first_name || "Miner";
+    } else {
+      userId = "browser_single_global_account";
+      userName = "Global Browser User";
+    }
+
     let userBalance = 0;
-    let totalMinedAmount = 0;
+    let streakCount = 1;
     let lastClaimDate = "";
-    let lastMineDate = "";
     let miningEndTime = 0;
     let miningInterval = null;
-    let walletAddress = "";
-    
-    // Streaks, Wheel & Game Variables
-    let streakCount = 0;
-    let multiplier = 1.0;
     let spinsLeft = 2;
     let lastSpinDate = "";
-    let tapperScore = 0;
-    let tapperTimeLeft = 15;
-    let tapperInterval = null;
-    let pushNotificationSent = false;
-
-    const segments = ['19 ADI', '50 ADI', '2 ADI', '5 ADI', '19 ADI', '50 ADI', '2 ADI', '5 ADI'];
-    const colors = ['#0e7490', '#0284c7', '#059669', '#2e2b70', '#0e7490', '#0284c7', '#059669', '#2e2b70'];
-    let currentRotation = 0;
-
-    const todayDate = new Date().toISOString().slice(0, 10);
-
-    if (tg) {
-      tg.ready();
-      tg.expand();
-      if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-        userId = tg.initDataUnsafe.user.id.toString();
-        userName = tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name || "User";
-        localStorage.setItem('adi_miner_uid', userId);
-        localStorage.setItem('adi_miner_name', userName);
-      }
-    }
-
-    function showToast(msg) {
-      let toast = document.getElementById('appToast');
-      if (!toast) {
-        toast = document.createElement('div');
-        toast.id = 'appToast';
-        toast.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(20,20,20,0.96);color:#fff;border:1px solid rgba(255,255,255,0.2);padding:12px 20px;border-radius:12px;font-size:13px;font-weight:600;z-index:999999;box-shadow:0 8px 30px rgba(0,0,0,0.85);max-width:90%;text-align:center;transition:opacity 0.25s ease;backdrop-filter:blur(10px);pointer-events:none;';
-        document.body.appendChild(toast);
-      }
-      toast.innerText = msg;
-      toast.style.opacity = '1';
-      toast.style.display = 'block';
-      clearTimeout(window.__toastTimeout);
-      window.__toastTimeout = setTimeout(() => {
-        toast.style.opacity = '0';
-        setTimeout(() => { toast.style.display = 'none'; }, 250);
-      }, 3000);
-    }
-
-    function showAlert(msg) {
-      if (tg && tg.showAlert) {
-        tg.showAlert(msg);
-      } else {
-        showToast(msg);
-      }
-    }
-    window.alert = function(msg) { showToast(msg); };
-
-    function initInAppAds() {}
-
-    function triggerAdAndExecute(formatType, callback) {
-      if (typeof callback === 'function') {
-        callback();
-      }
-    }
-
-    function switchTab(pageId, navElement) {
-      document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-      const activePage = document.getElementById(pageId);
-      if (activePage) activePage.classList.add('active');
-
-      if (navElement) {
-        document.querySelectorAll('.bottom-nav .nav-item').forEach(item => item.classList.remove('active'));
-        navElement.classList.add('active');
-      } else {
-        const pages = ['page-home', 'page-mine', 'page-markets', 'page-tasks', 'page-profile'];
-        const pIdx = pages.indexOf(pageId);
-        if (pIdx >= 0) {
-          const navItems = document.querySelectorAll('.bottom-nav .nav-item');
-          navItems.forEach(item => item.classList.remove('active'));
-          if (navItems[pIdx]) navItems[pIdx].classList.add('active');
-        }
-      }
-
-      window.scrollTo(0, 0);
-
-      if (pageId === 'page-tasks') {
-        setTimeout(drawWheel, 100);
-        renderTasksList();
-      } else if (pageId === 'page-markets') {
-        loadMarketPrices();
-      } else if (pageId === 'page-mine') {
-        checkMiningState();
-      } else if (pageId === 'page-home') {
-        loadLeaderboard();
-      }
-    }
-    
-    // COUNTDOWN & GLOBAL STATS
-    function startCountdownTimer() {
-      const targetDate = new Date('November 20, 2026 00:00:00').getTime();
-
-      setInterval(() => {
-        const now = new Date().getTime();
-        const difference = targetDate - now;
-
-        if (difference <= 0) {
-          if (document.getElementById('cd-days')) document.getElementById('cd-days').innerText = "00";
-          if (document.getElementById('cd-hours')) document.getElementById('cd-hours').innerText = "00";
-          if (document.getElementById('cd-minutes')) document.getElementById('cd-minutes').innerText = "00";
-          if (document.getElementById('cd-seconds')) document.getElementById('cd-seconds').innerText = "00";
-          return;
-        }
-
-        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-
-        if (document.getElementById('cd-days')) {
-          document.getElementById('cd-days').innerText = days < 10 ? '0' + days : days;
-          document.getElementById('cd-hours').innerText = hours < 10 ? '0' + hours : hours;
-          document.getElementById('cd-minutes').innerText = minutes < 10 ? '0' + minutes : minutes;
-          document.getElementById('cd-seconds').innerText = seconds < 10 ? '0' + seconds : seconds;
-        }
-      }, 1000);
-    }
-
-    function listenGlobalStats() {
-      database.ref('users').on('value', (snapshot) => {
-        let globalTotalMined = 0;
-        let activeMiners = 0;
-
-        if (snapshot.exists()) {
-          const users = snapshot.val();
-          activeMiners = Object.keys(users).length;
-
-          Object.values(users).forEach(u => {
-            const userToken = u.balance !== undefined ? u.balance : (u.totalMined || 0);
-            globalTotalMined += Number(userToken) || 0;
-          });
-        }
-
-        const globalEl = document.getElementById('globalMinedDisplay');
-        if (globalEl) globalEl.innerText = globalTotalMined.toLocaleString() + " ADI$";
-
-        const minersEl = document.getElementById('globalMinersDisplay');
-        if (minersEl) minersEl.innerText = activeMiners.toLocaleString();
-      });
-    }
-
-    // NOTIFICATION SYSTEM
-    function openNotificationModal() {
-      const modal = document.getElementById('notificationModal');
-      if (modal) modal.style.display = 'flex';
-
-      localStorage.setItem('lastNotifSeenTime', Date.now());
-      const notifBadge = document.getElementById('notifRedBadge');
-      if (notifBadge) notifBadge.style.display = 'none';
-
-      loadNotificationHistory();
-    }
-
-    function closeNotificationModal() {
-      const modal = document.getElementById('notificationModal');
-      if (modal) modal.style.display = 'none';
-    }
-
-    function listenForNewNotifications() {
-      if (typeof database === 'undefined' || !database.ref) return;
-
-      let lastReadTime = Number(localStorage.getItem('lastNotifSeenTime')) || 0;
-
-      database.ref('global_notification').on('value', (snapshot) => {
-        let hasUnseen = false;
-
-        if (snapshot.exists()) {
-          const item = snapshot.val();
-          if (item.title || item.message) {
-            if (!item.timestamp || item.timestamp > lastReadTime) {
-              hasUnseen = true;
-            }
-          } else {
-            Object.keys(item).forEach(key => {
-              const child = item[key];
-              if (child.timestamp && child.timestamp > lastReadTime) {
-                hasUnseen = true;
-              }
-            });
-          }
-        }
-
-        const notifBadge = document.getElementById('notifRedBadge');
-        if (notifBadge) notifBadge.style.display = hasUnseen ? 'block' : 'none';
-      });
-    }
-
-    function loadNotificationHistory() {
-      const container = document.getElementById('notificationHistoryList');
-      if (!container) return;
-
-      container.innerHTML = '<p style="text-align:center; color:#888; font-size:13px; margin:20px 0;">Loading notifications...</p>';
-
-      if (typeof database !== 'undefined' && database.ref) {
-        database.ref('global_notification').once('value', (snapshot) => {
-          if (!snapshot.exists()) {
-            container.innerHTML = '<p style="text-align:center; color:#888; font-size:13px; margin:20px 0;">No notifications found.</p>';
-            return;
-          }
-
-          const data = snapshot.val();
-          let html = '';
-          const notifList = [];
-
-          if (data.title || data.message) {
-            notifList.push(data);
-          } else {
-            Object.keys(data).forEach(key => notifList.push(data[key]));
-          }
-
-          notifList.forEach(item => {
-            const title = item.title || 'Notification';
-            const message = item.message || '';
-            let timeStr = item.timestamp ? new Date(Number(item.timestamp)).toLocaleString() : '';
-
-            html += `
-              <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 12px; margin-bottom: 8px; text-align: left;">
-                <div style="font-weight: bold; font-size: 14px; color: #ffffff; margin-bottom: 4px;">${title}</div>
-                <div style="font-size: 12px; color: #cbd5e1; line-height: 1.4; margin-bottom: 6px;">${message}</div>
-                ${timeStr ? `<div style="font-size: 10px; color: #888;">${timeStr}</div>` : ''}
-              </div>
-            `;
-          });
-
-          container.innerHTML = html;
-        }).catch((err) => {
-          console.error(err);
-          container.innerHTML = '<p style="text-align:center; color:#888; font-size:13px; margin:20px 0;">No notifications found.</p>';
-        });
-      } else {
-        container.innerHTML = '<p style="text-align:center; color:#888; font-size:13px; margin:20px 0;">No notifications found.</p>';
-      }
-    }
-
-    // DAILY STREAK
-    function processStreakCheck(userData) {
-      const lastDateStr = userData.lastMineDate || "";
-      streakCount = userData.streakCount || 0;
-
-      if (lastDateStr) {
-        const lastDate = new Date(lastDateStr);
-        const currentDate = new Date(todayDate);
-        const diffTime = Math.abs(currentDate - lastDate);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-        if (diffDays > 1) {
-          streakCount = 0;
-        }
-      }
-
-      if (streakCount >= 30) {
-        multiplier = 2.0;
-      } else if (streakCount >= 7) {
-        multiplier = 1.5;
-      } else if (streakCount >= 3) {
-        multiplier = 1.25;
-      } else {
-        multiplier = 1.0;
-      }
-
-      const streakEl = document.getElementById('homeMultiplierText');
-      if (streakEl) streakEl.innerText = `Speed: ${multiplier}x | Streak: ${streakCount} Days 🔥`;
-
-      const rateEl = document.getElementById('mineRateDisplay');
-      if (rateEl) rateEl.innerText = `Current Rate: ${Math.round(100 * multiplier)} ADI / 4 Hours`;
-    }
-
-    function claimDailyReward() {
-      if (lastClaimDate === todayDate) {
-        showAlert("You have already claimed today's reward! Come back tomorrow for the next streak bonus.");
-        return;
-      }
-
-      streakCount = (Number(streakCount) || 0) + 1;
-      processStreakCheck({ lastMineDate: todayDate, streakCount: streakCount });
-
-      const baseReward = 100;
-      const totalReward = Math.round(baseReward * multiplier);
-      userBalance = (Number(userBalance) || 0) + totalReward;
-      lastClaimDate = todayDate;
-
-      const historyId = 'hist_' + Date.now();
-      let updates = {};
-      updates['users/' + userId + '/balance'] = userBalance;
-      updates['users/' + userId + '/lastClaimDate'] = todayDate;
-      updates['users/' + userId + '/streakCount'] = streakCount;
-      updates['users/' + userId + '/history/' + historyId] = {
-        title: "Daily Streak Reward",
-        amount: "+" + totalReward + " ADI$",
-        date: new Date().toLocaleString(),
-        type: "Streak Reward",
-        timestamp: Date.now()
-      };
-
-      updateUI();
-
-      showRewardCelebration({
-        title: "Daily Streak Bonus Claimed!",
-        subtitle: "DAILY CHECK-IN REWARD",
-        amount: "+" + totalReward + " ADI$",
-        type: `Daily Streak (Day ${streakCount})`,
-        bonus: `${multiplier}x Speed Multiplier`,
-        icon: "🎁"
-      });
-
-      if (typeof database !== 'undefined' && database.ref) {
-        database.ref().update(updates).catch((err) => {
-          console.error("Firebase update failed:", err);
-        });
-      }
-    }
-
-    // SPIN WHEEL
-    function drawWheel() {
-      const wheelCanvas = document.getElementById('wheelCanvas');
-      if (!wheelCanvas) return;
-
-      const ctx = wheelCanvas.getContext('2d');
-      const numSegments = segments.length;
-      const anglePerSegment = (2 * Math.PI) / numSegments;
-      const center = 110;
-      const radius = 105;
-
-      ctx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
-
-      // Jewel gradient colors for alternating segments
-      const sliceColors = [
-        ['#0284c7', '#0369a1'], // 0: 19 ADI (Blue)
-        ['#eab308', '#ca8a04'], // 1: 50 ADI (Gold)
-        ['#059669', '#047857'], // 2: 2 ADI (Green)
-        ['#8b5cf6', '#6d28d9'], // 3: 5 ADI (Purple)
-        ['#0284c7', '#0369a1'], // 4: 19 ADI (Blue)
-        ['#eab308', '#ca8a04'], // 5: 50 ADI (Gold)
-        ['#059669', '#047857'], // 6: 2 ADI (Green)
-        ['#8b5cf6', '#6d28d9']  // 7: 5 ADI (Purple)
-      ];
-
-      for (let i = 0; i < numSegments; i++) {
-        const startAngle = i * anglePerSegment - Math.PI / 2;
-        const endAngle = startAngle + anglePerSegment;
-
-        ctx.beginPath();
-        ctx.moveTo(center, center);
-        ctx.arc(center, center, radius, startAngle, endAngle);
-        
-        const grad = ctx.createRadialGradient(center, center, 10, center, center, radius);
-        grad.addColorStop(0, sliceColors[i][0]);
-        grad.addColorStop(1, sliceColors[i][1]);
-        ctx.fillStyle = grad;
-        ctx.fill();
-
-        // Glowing divider line between slices
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-
-        // Text inside slice
-        ctx.save();
-        ctx.translate(center, center);
-        ctx.rotate(startAngle + anglePerSegment / 2);
-        ctx.textAlign = "right";
-        ctx.fillStyle = "#ffffff";
-        ctx.font = "900 12px 'Plus Jakarta Sans', sans-serif";
-        ctx.shadowColor = "rgba(0, 0, 0, 0.9)";
-        ctx.shadowBlur = 4;
-        ctx.fillText(segments[i], radius - 14, 4);
-        ctx.restore();
-      }
-
-      // Outer gold rim
-      ctx.beginPath();
-      ctx.arc(center, center, radius, 0, Math.PI * 2);
-      ctx.strokeStyle = '#facc15';
-      ctx.lineWidth = 4;
-      ctx.stroke();
-
-      // Center golden emblem
-      ctx.beginPath();
-      ctx.arc(center, center, 22, 0, Math.PI * 2);
-      const cGrad = ctx.createRadialGradient(center - 3, center - 3, 2, center, center, 22);
-      cGrad.addColorStop(0, '#fef08a');
-      cGrad.addColorStop(0.5, '#eab308');
-      cGrad.addColorStop(1, '#78350f');
-      ctx.fillStyle = cGrad;
-      ctx.fill();
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-
-      ctx.fillStyle = '#451a03';
-      ctx.font = "900 10px 'Plus Jakarta Sans', sans-serif";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText("ADI", center, center);
-    }
-
-    function spinWheelNow() {
-      if (lastSpinDate !== todayDate) {
-        spinsLeft = 2;
-        lastSpinDate = todayDate;
-      }
-
-      if (spinsLeft <= 0) {
-        showAlert("No spins left today! Come back tomorrow for 2 free lucky spins.");
-        return;
-      }
-
-      const btn = document.getElementById('spinBtn');
-      const wheelCanvas = document.getElementById('wheelCanvas');
-      if (btn) btn.disabled = true;
-
-      const randomIndex = Math.floor(Math.random() * segments.length);
-      const degreesPerSegment = 360 / segments.length; // 45 degrees
+    let tapperClicks = 0;
+    let userHistory = [];
+    let currentTaskTab = 'non-secret';
+
+    const segments = ['19 ADI', '50 ADI', '2 ADI', '5 ADI'];
+
+    // Initialize App
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('userName').innerText = userName;
+      document.getElementById('profUser').innerText = userName;
+      document.getElementById('profId').innerText = userId;
       
-      // Exact mathematical calculation:
-      // Slice `i` has its center at: (i * 45 + 22.5) degrees clockwise from 12 o'clock (the pointer).
-      // Rotating clockwise by (360 - (i * 45 + 22.5)) brings slice `i` DEAD CENTER under the top arrow!
-      const targetAngle = (360 - (randomIndex * degreesPerSegment + degreesPerSegment / 2)) % 360;
-      const currentBase = currentRotation % 360;
-      let diff = (targetAngle - currentBase) % 360;
-      if (diff <= 0) diff += 360;
-      currentRotation += (360 * 5) + diff;
+      initWheel();
+      loadUserData();
+      listenFirebaseTasks();
+      listenLeaderboard();
+      startCountdown();
+    });
 
-      if (wheelCanvas) {
-        wheelCanvas.style.transition = 'transform 4.5s cubic-bezier(0.12, 0.8, 0.15, 1)';
-        wheelCanvas.style.transform = `rotate(${currentRotation}deg)`;
-      }
-
-      setTimeout(() => {
-        spinsLeft--;
-        const spinsText = document.getElementById('spinsLeftText');
-        if (spinsText) spinsText.innerText = `Spins Left Today: ${spinsLeft}/2`;
-
-        const wonText = segments[randomIndex];
-        const rewardTokens = parseInt(wonText, 10) || 5;
-
-        userBalance = (Number(userBalance) || 0) + rewardTokens;
-        const histId = 'hist_' + Date.now();
-        const updates = {};
-        updates['users/' + userId + '/balance'] = userBalance;
-        updates['users/' + userId + '/spinsLeft'] = spinsLeft;
-        updates['users/' + userId + '/lastSpinDate'] = todayDate;
-        updates['users/' + userId + '/history/' + histId] = {
-          title: "Lucky Spin Prize (" + wonText + ")",
-          amount: "+" + rewardTokens + " ADI$",
-          date: new Date().toLocaleString(),
-          type: "Spin Reward",
-          timestamp: Date.now()
-        };
-
-        if (typeof database !== 'undefined' && database.ref) {
-          database.ref().update(updates).catch(() => {});
-        }
+    // 1. Firebase Data Sync
+    function loadUserData() {
+      database.ref('users/' + userId).on('value', (snapshot) => {
+        const data = snapshot.val() || {};
+        userBalance = data.balance || 0;
+        streakCount = data.streakCount || 1;
+        lastClaimDate = data.lastClaimDate || "";
+        miningEndTime = data.miningEndTime || 0;
+        spinsLeft = data.spinsLeft !== undefined ? data.spinsLeft : 2;
+        lastSpinDate = data.lastSpinDate || "";
+        userHistory = data.history || [];
 
         updateUI();
-
-        showRewardCelebration({
-          title: "Lucky Spin Prize Won!",
-          subtitle: "SPIN WHEEL JACKPOT",
-          amount: "+" + rewardTokens + " ADI$",
-          type: "Wheel Prize (" + wonText + ")",
-          bonus: spinsLeft + " Spins Remaining Today",
-          icon: "🎡"
-        });
-
-        if (btn) btn.disabled = (spinsLeft <= 0);
-      }, 4700);
-    }
-
-    // MINI TAPPER BLITZ SYSTEM
-    let tapperCombo = 1.0;
-
-    function startChallenge() {
-      if (tapperTimeLeft > 0 && tapperInterval !== null) return;
-
-      tapperScore = 0;
-      tapperTimeLeft = 15;
-      tapperCombo = 1.0;
-      
-      const scoreEl = document.getElementById('tapperScore');
-      const timeEl = document.getElementById('tapperTime');
-      const rewardEl = document.getElementById('tapperRewardPreview');
-      const barEl = document.getElementById('tapperProgressBar');
-      const comboBadge = document.getElementById('tapperComboBadge');
-      const startBtn = document.getElementById('startTapperBtn');
-
-      if (scoreEl) scoreEl.innerText = `0`;
-      if (timeEl) timeEl.innerText = `15s`;
-      if (rewardEl) rewardEl.innerText = `+0 ADI$`;
-      if (barEl) barEl.style.width = '100%';
-      if (comboBadge) {
-        comboBadge.innerHTML = '⚡ 1.0x Normal';
-        comboBadge.style.color = '#fbbf24';
-        comboBadge.style.borderColor = 'rgba(234, 179, 8, 0.3)';
-      }
-      if (startBtn) {
-        startBtn.disabled = true;
-        startBtn.style.opacity = '0.6';
-        startBtn.innerHTML = '<i class="fa-solid fa-bolt fa-beat"></i> Tapping In Progress...';
-      }
-
-      clearInterval(tapperInterval);
-      tapperInterval = setInterval(() => {
-        tapperTimeLeft--;
-        if (timeEl) timeEl.innerText = `${tapperTimeLeft}s`;
-        if (barEl) barEl.style.width = `${(tapperTimeLeft / 15) * 100}%`;
-
-        if (tapperTimeLeft <= 0) {
-          clearInterval(tapperInterval);
-          tapperInterval = null;
-          if (startBtn) {
-            startBtn.disabled = false;
-            startBtn.style.opacity = '1';
-            startBtn.innerHTML = '<i class="fa-solid fa-play"></i> Start Challenge (15s)';
-          }
-          if (barEl) barEl.style.width = '0%';
-
-          const earned = Math.min(Math.floor(tapperScore * tapperCombo * 0.5), 35);
-          if (earned > 0) {
-            userBalance = (Number(userBalance) || 0) + earned;
-            const histId = 'hist_' + Date.now();
-            const updates = {};
-            updates['users/' + userId + '/balance'] = userBalance;
-            updates['users/' + userId + '/history/' + histId] = {
-              title: `Speed Tapper (${tapperScore} Taps - ${tapperCombo}x)`,
-              amount: "+" + earned + " ADI$",
-              date: new Date().toLocaleString(),
-              type: "Game Reward",
-              timestamp: Date.now()
-            };
-            if (typeof database !== 'undefined' && database.ref) {
-              database.ref().update(updates).catch(() => {});
-            }
-            updateUI();
-            
-            showRewardCelebration({
-              title: "Tapper Blitz Completed!",
-              subtitle: "MINI TAPPER REWARD",
-              amount: "+" + earned + " ADI$",
-              type: `Speed Taps: ${tapperScore} Total Taps`,
-              bonus: `${tapperCombo}x Combo Multiplier Active!`,
-              icon: "⚡"
-            });
-          } else {
-            showAlert(`⚡ Time's up! Total Taps: ${tapperScore}. Tap faster next round to earn tokens!`);
-          }
-        }
-      }, 1000);
-    }
-
-    function handleTap(e) {
-      if (tapperTimeLeft > 0) {
-        tapperScore++;
-
-        // Dynamic combo calculation
-        if (tapperScore >= 35) {
-          tapperCombo = 2.0;
-        } else if (tapperScore >= 18) {
-          tapperCombo = 1.5;
-        } else {
-          tapperCombo = 1.0;
-        }
-
-        const scoreEl = document.getElementById('tapperScore');
-        const rewardEl = document.getElementById('tapperRewardPreview');
-        const comboBadge = document.getElementById('tapperComboBadge');
-
-        if (scoreEl) scoreEl.innerText = `${tapperScore}`;
-        const est = Math.min(Math.floor(tapperScore * tapperCombo * 0.5), 35);
-        if (rewardEl) rewardEl.innerText = `+${est} ADI$`;
-        if (comboBadge) {
-          if (tapperCombo >= 2.0) {
-            comboBadge.innerHTML = '🔥 2.0x HYPER!';
-            comboBadge.style.color = '#ef4444';
-            comboBadge.style.borderColor = 'rgba(239, 68, 68, 0.4)';
-          } else if (tapperCombo >= 1.5) {
-            comboBadge.innerHTML = '⚡ 1.5x COMBO!';
-            comboBadge.style.color = '#fbbf24';
-            comboBadge.style.borderColor = 'rgba(234, 179, 8, 0.4)';
-          } else {
-            comboBadge.innerHTML = '⚡ 1.0x Normal';
-            comboBadge.style.color = '#38bdf8';
-            comboBadge.style.borderColor = 'rgba(56, 189, 248, 0.3)';
-          }
-        }
-
-        // Floating +1 number effect
-        createFloatingTapNumber(e);
-
-        // Haptic feedback
-        if (tg && tg.HapticFeedback) {
-          try { tg.HapticFeedback.impactOccurred('light'); } catch(err) {}
-        }
-      }
-    }
-
-    function createFloatingTapNumber(e) {
-      const zone = document.getElementById('tapParticleZone');
-      if (!zone) return;
-
-      const numEl = document.createElement('div');
-      numEl.className = 'floating-tap-number';
-      numEl.innerText = tapperCombo >= 2.0 ? '+2' : '+1';
-      
-      let x = 80;
-      let y = 80;
-      if (e && e.clientX) {
-        const rect = zone.getBoundingClientRect();
-        x = e.clientX - rect.left;
-        y = e.clientY - rect.top;
-      } else {
-        x += (Math.random() - 0.5) * 40;
-        y += (Math.random() - 0.5) * 40;
-      }
-      numEl.style.left = x + 'px';
-      numEl.style.top = y + 'px';
-      zone.appendChild(numEl);
-
-      setTimeout(() => {
-        if (numEl.parentNode) numEl.parentNode.removeChild(numEl);
-      }, 700);
-    }
-
-    // MINING
-    function startMining() {
-      const now = Date.now();
-      if (typeof miningEndTime !== 'undefined' && miningEndTime > now) {
-        showAlert("Mining session is already running!");
-        return;
-      }
-
-      const yieldAmount = Math.round(100 * multiplier);
-      userBalance = (typeof userBalance !== 'undefined' ? userBalance : 0) + yieldAmount;
-      totalMinedAmount += yieldAmount;
-      miningEndTime = now + (4 * 60 * 60 * 1000);
-      pushNotificationSent = false;
-      
-      const historyId = 'hist_' + now;
-      let updates = {};
-
-      if (typeof userId !== 'undefined') {
-        updates['users/' + userId + '/balance'] = userBalance;
-        updates['users/' + userId + '/totalMined'] = totalMinedAmount;
-        updates['users/' + userId + '/lastMineDate'] = typeof todayDate !== 'undefined' ? todayDate : '';
-        updates['users/' + userId + '/miningEndTime'] = miningEndTime;
-        updates['users/' + userId + '/pushNotificationSent'] = false;
-        updates['users/' + userId + '/history/' + historyId] = {
-          title: "Block Mining",
-          amount: "+" + yieldAmount + " ADI$",
-          date: new Date().toLocaleString(),
-          type: "Mining Reward",
-          timestamp: now
-        };
-      }
-
-      if (typeof database !== 'undefined' && database.ref) {
-        database.ref().update(updates).then(() => {
-          checkMiningState();
-          updateUI();
-          showRewardCelebration({
-            title: "Mining Block Activated!",
-            subtitle: "CLOUD MINING REWARD",
-            amount: "+" + yieldAmount + " ADI$",
-            type: "Block Mining Yield",
-            bonus: `${multiplier}x Speed Multiplier (4h Session)`,
-            icon: "⛏️"
-          });
-        }).catch((error) => {
-          showAlert("Error: " + error.message);
-        });
-      }
-    }
-
-    function triggerPushNotification() {
-      if (pushNotificationSent) return;
-      pushNotificationSent = true;
-      database.ref('users/' + userId + '/pushNotificationSent').set(true);
-
-      const notifyMessage = "Your 4-hour mining cycle has completed! Come back now to claim your tokens.";
-      database.ref('pending_notifications/' + userId + '_' + Date.now()).set({
-        userId: userId,
-        message: notifyMessage,
-        timestamp: Date.now(),
-        status: "pending"
+        renderHistories();
       });
-
-      if (tg && tg.showPopup) {
-        tg.showPopup({
-          title: "Mining Finished!",
-          message: notifyMessage,
-          buttons: [{ type: "ok" }]
-        });
-      }
-    }
-
-    function checkMiningState() {
-      if (typeof miningInterval !== 'undefined' && miningInterval) {
-        clearInterval(miningInterval);
-      }
-
-      const now = Date.now();
-      const mineBtn = document.getElementById('mineBtn');
-      const miningCircle = document.getElementById('miningCircle');
-      const miningTimer = document.getElementById('miningTimer');
-      const homeTimer = document.getElementById('homeMiningTimer');
-      const profTimer = document.getElementById('profMiningTimer');
-      const homeTokens = document.getElementById('homeMinedTokens');
-      const profTokens = document.getElementById('profMinedTokens');
-
-      const activeEndTime = typeof miningEndTime !== 'undefined' ? miningEndTime : 0;
-
-      if (homeTokens) homeTokens.innerText = `Total Mined: ${totalMinedAmount.toLocaleString()} ADI$`;
-      if (profTokens) profTokens.innerText = `Total Mined: ${totalMinedAmount.toLocaleString()} ADI$`;
-
-      if (activeEndTime > now) {
-        if (miningCircle) miningCircle.classList.add('mining-active');
-        if (mineBtn) {
-          mineBtn.disabled = true;
-          mineBtn.style.opacity = "0.4";
-        }
-
-        miningInterval = setInterval(() => {
-          const currentTime = Date.now();
-          const remaining = activeEndTime - currentTime;
-
-          if (remaining <= 0) {
-            clearInterval(miningInterval);
-            if (miningCircle) miningCircle.classList.remove('mining-active');
-            const doneMsg = "Session complete. Ready to mine again!";
-            if (miningTimer) miningTimer.innerText = doneMsg;
-            if (homeTimer) homeTimer.innerText = "Session Completed!";
-            if (profTimer) profTimer.innerText = "Session Completed!";
-            if (mineBtn) {
-              mineBtn.innerText = "⛏ Start Mining";
-              mineBtn.disabled = false;
-              mineBtn.style.opacity = "1";
-            }
-            triggerPushNotification();
-          } else {
-            const h = Math.floor(remaining / (1000 * 60 * 60));
-            const m = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-            const s = Math.floor((remaining % (1000 * 60)) / 1000);
-            
-            const timerText = `${h}h ${m}m ${s}s`;
-            if (miningTimer) miningTimer.innerText = `Time Left: ${timerText}`;
-            if (homeTimer) homeTimer.innerText = `Mining Active: ${timerText}`;
-            if (profTimer) profTimer.innerText = `Mining Active: ${timerText}`;
-            if (mineBtn) mineBtn.innerText = `Mining Active (${timerText})`;
-          }
-        }, 1000);
-      } else {
-        if (miningCircle) miningCircle.classList.remove('mining-active');
-        if (homeTimer) homeTimer.innerText = "Session Ready";
-        if (profTimer) profTimer.innerText = "Session Ready";
-        if (mineBtn) {
-          mineBtn.innerText = "⛏ Start Mining";
-          mineBtn.disabled = false;
-          mineBtn.style.opacity = "1";
-        }
-      }
-    }
-
-    function confirmBoost() {
-      processBoostDeduction();
-    }
-
-    function processBoostDeduction() {
-      if (!userId) {
-        showAlert("User ID not found!");
-        return;
-      }
-
-      if (userBalance < 10) {
-        showAlert("You need at least 10 ADI$ to boost mining! Claim your daily bonus or complete tasks first.");
-        return;
-      }
-
-      const newBalance = userBalance - 10;
-      userBalance = newBalance;
-      multiplier = 2.0;
-      const histId = 'hist_' + Date.now();
-      
-      let updates = {};
-      updates[`users/${userId}/balance`] = newBalance;
-      updates[`users/${userId}/history/${histId}`] = {
-        title: "Mining Boost Fee (Speed 2.0x)",
-        amount: "-10 ADI$",
-        date: new Date().toLocaleString(),
-        type: "Boost",
-        timestamp: Date.now()
-      };
-
-      if (typeof database !== 'undefined' && database.ref) {
-        database.ref().update(updates).catch(() => {});
-      }
-
-      const streakEl = document.getElementById('homeMultiplierText');
-      if (streakEl) streakEl.innerText = `Speed: 2.0x (BOOSTED 🚀) | Streak: ${streakCount} Days`;
-      showAlert("🚀 Mining Boost Activated! Speed upgraded to 2.0x.");
-      updateUI();
-    }
-
-    // WALLET MODAL SYSTEM
-    function openWalletModal() {
-      const modal = document.getElementById('walletModal');
-      if (modal) modal.style.display = 'flex';
-      const curDisp = document.getElementById('currentWalletDisplay');
-      const txt = document.getElementById('modalWalletAddressText');
-      const input = document.getElementById('manualWalletInput');
-      if (walletAddress && walletAddress !== 'Not Connected') {
-        if (curDisp) curDisp.style.display = 'block';
-        if (txt) txt.innerText = walletAddress;
-        if (input) input.value = walletAddress;
-      } else {
-        if (curDisp) curDisp.style.display = 'none';
-        if (input) input.value = '';
-      }
-    }
-
-    function closeWalletModal() {
-      const modal = document.getElementById('walletModal');
-      if (modal) modal.style.display = 'none';
-    }
-
-    function saveManualWalletAddress() {
-      const input = document.getElementById('manualWalletInput');
-      const addr = input ? input.value.trim() : '';
-      if (!addr || !addr.startsWith('0x') || addr.length < 20) {
-        showAlert("Please enter a valid BEP-20 (BSC) address starting with 0x!");
-        return;
-      }
-      walletAddress = addr;
-      if (typeof database !== 'undefined' && database.ref) {
-        database.ref('users/' + userId + '/walletAddress').set(addr).catch(() => {});
-      }
-      showAlert("✅ BEP-20 Wallet Address Saved Successfully!");
-      updateUI();
-      closeWalletModal();
-    }
-
-    async function connectWeb3Wallet() {
-      if (window.ethereum) {
-        try {
-          const provider = new ethers.providers.Web3Provider(window.ethereum);
-          await provider.send("eth_requestAccounts", []);
-          const signer = provider.getSigner();
-          const address = await signer.getAddress();
-          walletAddress = address;
-          if (typeof database !== 'undefined' && database.ref) {
-            database.ref('users/' + userId + '/walletAddress').set(address).catch(() => {});
-          }
-          showAlert("✅ Wallet Connected: " + address.substring(0, 6) + "..." + address.slice(-4));
-          updateUI();
-          closeWalletModal();
-        } catch (e) {
-          showAlert("Web3 connection cancelled or failed.");
-        }
-      } else {
-        showAlert("No Web3 extension detected. You can paste your BSC wallet address in the box above!");
-      }
-    }
-
-    function autoConnectTrustWallet() {
-      openWalletModal();
-    }
-
-    // EXCHANGE MODAL SYSTEM
-    function openExchangeModal() {
-      const modal = document.getElementById('exchangeModal');
-      if (modal) modal.style.display = 'flex';
-      const balPrev = document.getElementById('exchangeBalancePreview');
-      if (balPrev) {
-        const usdVal = (userBalance * 0.0001).toFixed(4);
-        balPrev.innerText = `Your Balance: ${userBalance.toLocaleString()} ADI$ ≈ $${usdVal} USD`;
-      }
-      const calcInput = document.getElementById('calcAdiInput');
-      if (calcInput) {
-        calcInput.value = userBalance || 1000;
-        calculateExchangeAmount(calcInput.value);
-      }
-    }
-
-    function closeExchangeModal() {
-      const modal = document.getElementById('exchangeModal');
-      if (modal) modal.style.display = 'none';
-    }
-
-    function calculateExchangeAmount(val) {
-      const num = parseFloat(val) || 0;
-      const usdt = (num * 0.0001).toFixed(4);
-      const res = document.getElementById('calcUsdtResult');
-      if (res) res.innerText = `$${usdt} USDT`;
-    }
-
-    function openReferralModal() {
-      const modal = document.getElementById('referralModal');
-      if (modal) modal.style.display = 'flex';
-      const botUsername = "ADIAridropbot";
-      const appShortName = "app"; 
-      const refLink = `https://t.me/${botUsername}/${appShortName}?startapp=${userId}`;
-      const refInput = document.getElementById('refLinkInput');
-      if (refInput) refInput.value = refLink;
-      loadReferralData();
-    }
-
-    function closeReferralModal() {
-      const modal = document.getElementById('referralModal');
-      if (modal) modal.style.display = 'none';
-    }
-
-    function shareReferralLink() {
-      const botUsername = "ADIAridropbot";
-      const appShortName = "app";
-      const refLink = `https://t.me/${botUsername}/${appShortName}?startapp=${userId}`;
-      const shareText = "Join ADI Airdrop and earn 50 ADI bonus!";
-      
-      if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.openTelegramLink) {
-        const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=${encodeURIComponent(shareText)}`;
-        window.Telegram.WebApp.openTelegramLink(shareUrl);
-      } else {
-        navigator.clipboard.writeText(refLink).then(() => {
-          showAlert("Referral link copied to clipboard!\n" + refLink);
-        }).catch(() => {
-          prompt("Copy your referral link:", refLink);
-        });
-      }
-    }
-
-    function copyReferralLink() {
-      const refInput = document.getElementById('refLinkInput');
-      if (refInput && refInput.value) {
-        navigator.clipboard.writeText(refInput.value).then(() => {
-          showAlert("Referral link copied to clipboard!");
-        }).catch(() => {
-          refInput.select();
-          document.execCommand('copy');
-          showAlert("Referral link copied!");
-        });
-      }
-    }
-  
-    function loadReferralData() {
-      const refListEl = document.getElementById('referralList');
-      if (!refListEl) return;
-
-      database.ref('users/' + userId + '/referrals').once('value', (snapshot) => {
-        if (!snapshot.exists()) {
-          refListEl.innerHTML = '<p style="color:#888; text-align:center; font-size:12px;">No referrals yet.</p>';
-          if (document.getElementById('refCount')) document.getElementById('refCount').innerText = "0";
-          if (document.getElementById('refEarnings')) document.getElementById('refEarnings').innerText = "0 ADI$";
-          return;
-        }
-
-        const refs = snapshot.val();
-        const count = Object.keys(refs).length;
-        const earnings = count * 50;
-
-        if (document.getElementById('refCount')) document.getElementById('refCount').innerText = count;
-        if (document.getElementById('refEarnings')) document.getElementById('refEarnings').innerText = `${earnings} ADI$`;
-
-        let html = '';
-        Object.values(refs).forEach(ref => {
-          html += `
-            <div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid rgba(255,255,255,0.05); font-size:12px;">
-              <span>${ref.name || 'User'}</span>
-              <span style="color:var(--accent-green);">+50 ADI$</span>
-            </div>
-          `;
-        });
-        refListEl.innerHTML = html;
-      });
-    }
-
-        // ==========================================
-    // LEADERBOARD RENDER FUNCTION
-    // ==========================================
-    function loadLeaderboard() {
-      const container = document.getElementById('leaderboard-container');
-      if (!container) return;
-
-      database.ref('users').orderByChild('balance').limitToLast(10).on('value', (snapshot) => {
-        if (!snapshot.exists()) {
-          container.innerHTML = '<div style="text-align: center; color: var(--text-sub); font-size: 12px; padding: 10px 0;">No miners found</div>';
-          return;
-        }
-
-        let usersList = [];
-        snapshot.forEach((childSnap) => {
-          const uData = childSnap.val();
-          usersList.push({
-            id: childSnap.key,
-            username: uData.username || "Anonymous Miner",
-            balance: Number(uData.balance) || 0,
-            walletAddress: uData.walletAddress || ""
-          });
-        });
-
-        // Top balance scalar descending sort
-        usersList.sort((a, b) => b.balance - a.balance);
-
-        let html = '';
-        usersList.forEach((user, index) => {
-          const rank = index + 1;
-          let rankBadge = `<span style="font-weight: 800; width: 22px; text-align: center; color: #888;">#${rank}</span>`;
-          
-          if (rank === 1) {
-            rankBadge = `<span style="color: #ffd700; font-weight: 800; width: 22px; text-align: center; font-size: 14px;"><i class="fa-solid fa-crown"></i></span>`;
-          } else if (rank === 2) {
-            rankBadge = `<span style="color: #c0c0c0; font-weight: 800; width: 22px; text-align: center; font-size: 13px;"><i class="fa-solid fa-medal"></i></span>`;
-          } else if (rank === 3) {
-            rankBadge = `<span style="color: #cd7f32; font-weight: 800; width: 22px; text-align: center; font-size: 13px;"><i class="fa-solid fa-award"></i></span>`;
-          }
-
-          const isCurrentUser = user.id === userId;
-          const userHighlightStyle = isCurrentUser 
-            ? 'background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.3);' 
-            : 'background: rgba(255, 255, 255, 0.02); border: 1px solid var(--card-border);';
-
-          const shortName = user.username.length > 15 ? user.username.substring(0, 13) + '...' : user.username;
-
-          html += `
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-radius: 12px; ${userHighlightStyle}">
-              <div style="display: flex; align-items: center; gap: 10px;">
-                ${rankBadge}
-                <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--silver-gradient); color: #000; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 12px;">
-                  ${shortName.charAt(0).toUpperCase()}
-                </div>
-                <div>
-                  <div style="font-size: 12px; font-weight: 700; color: #fff;">${shortName} ${isCurrentUser ? '<span class="user-badge-label">YOU</span>' : ''}</div>
-                  <div style="font-size: 9px; color: var(--text-sub);">${user.walletAddress ? '<i class="fa-solid fa-link" style="color: var(--accent-green);"></i> Linked' : 'Unlinked Wallet'}</div>
-                </div>
-              </div>
-              <div style="font-size: 12px; font-weight: 800; color: var(--accent-silver);">
-                ${user.balance.toLocaleString()} <span style="font-size: 10px; color: var(--text-sub);">ADI$</span>
-              </div>
-            </div>
-          `;
-        });
-
-        container.innerHTML = html;
-      });
-    }
-
-    // Call Leaderboard Initialization
-    listenGlobalStats();
-    loadLeaderboard();
-
-
-        // Merge with community seed miners if fewer than 20
-        const mergedList = [...userMapList];
-        const existingUids = new Set(userMapList.map(u => u.uid));
-        defaultMiners.forEach(seed => {
-          if (!existingUids.has(seed.uid)) {
-            mergedList.push(seed);
-          }
-        });
-
-        // Always sort descending by balance
-        mergedList.sort((a, b) => b.balance - a.balance);
-
-        let html = '';
-        mergedList.slice(0, 20).forEach((item, index) => {
-          const rank = index + 1;
-          let badgeColor = '#94a3b8';
-          let rankIcon = `#${rank}`;
-          let tierBadge = 'Miner';
-
-          if (rank === 1) {
-            badgeColor = '#fbbf24';
-            rankIcon = '🥇';
-            tierBadge = 'Diamond';
-          } else if (rank === 2) {
-            badgeColor = '#cbd5e1';
-            rankIcon = '🥈';
-            tierBadge = 'Platinum';
-          } else if (rank === 3) {
-            badgeColor = '#d97706';
-            rankIcon = '🥉';
-            tierBadge = 'Gold';
-          } else if (rank <= 10) {
-            badgeColor = '#38bdf8';
-            tierBadge = 'Silver';
-          }
-
-          const isMe = (item.uid === userId);
-
-          html += `
-            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:${isMe ? 'rgba(34,197,94,0.12)' : 'rgba(255,255,255,0.03)'}; border:1px solid ${isMe ? 'rgba(34,197,94,0.4)' : 'rgba(255,255,255,0.06)'}; border-radius:12px; margin-bottom:6px;">
-              <div style="display:flex; align-items:center; gap:10px;">
-                <div style="font-size:14px; font-weight:800; width:26px; text-align:center; color:${badgeColor};">${rankIcon}</div>
-                <div class="avatar" style="width:34px; height:34px; font-size:13px; background:${isMe ? 'var(--accent-green)' : 'rgba(255,255,255,0.1)'}; color:${isMe ? '#000' : '#fff'}; border:1px solid rgba(255,255,255,0.2);">
-                  ${item.username.charAt(0).toUpperCase()}
-                </div>
-                <div>
-                  <div style="font-size:12px; font-weight:700; color:#fff;">
-                    ${item.username} ${isMe ? '<span style="color:#22c55e; font-size:10px; font-weight:bold;">(You)</span>' : ''}
-                  </div>
-                  <div style="font-size:9px; color:${badgeColor}; font-weight:700; margin-top:1px;">
-                    <i class="fa-solid fa-medal"></i> ${tierBadge} Tier
-                  </div>
-                </div>
-              </div>
-              <div style="text-align:right;">
-                <div style="font-size:13px; font-weight:800; color:var(--accent-silver);">${item.balance.toLocaleString()} ADI$</div>
-                <div style="font-size:9px; color:var(--text-sub);">Balance</div>
-              </div>
-            </div>
-          `;
-        });
-
-        container.innerHTML = html;
-      };
-
-      if (typeof database !== 'undefined' && database.ref) {
-        database.ref('users').on('value', (snap) => {
-          renderRanks(snap.exists() ? snap.val() : null);
-        }, () => {
-          renderRanks(null);
-        });
-      } else {
-        renderRanks(null);
-      }
-    }
-
-    // UNIFIED ACTIVITY & MINING HISTORY SYSTEM
-    function renderUserHistory(historyData) {
-      const profileList = document.getElementById('history-list-container');
-      const mineList = document.getElementById('mineHistoryList');
-      const modalList = document.getElementById('historyList');
-
-      if (!historyData || Object.keys(historyData).length === 0) {
-        const emptyMsg = '<div style="text-align:center; color:#777; font-size:12px; padding:12px;">No activity history recorded yet. Start mining or claim daily streak!</div>';
-        if (profileList) profileList.innerHTML = emptyMsg;
-        if (mineList) mineList.innerHTML = '<div style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: center; color:#777;">No mining history yet.</div>';
-        if (modalList) modalList.innerHTML = '<div style="text-align:center; color:#777; font-size:12px; padding:10px;">No history records found.</div>';
-        return;
-      }
-
-      const items = Object.values(historyData).reverse();
-
-      // 1. Profile Page Activity History Card
-      if (profileList) {
-        let phtml = '';
-        items.slice(0, 10).forEach(item => {
-          const isPositive = !item.amount || !item.amount.startsWith('-');
-          phtml += `
-            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:12px;">
-              <div>
-                <div style="font-size:12px; font-weight:700; color:#fff;">
-                  <i class="fa-solid ${isPositive ? 'fa-arrow-down' : 'fa-arrow-up'}" style="color:${isPositive ? '#22c55e' : '#ef4444'}; margin-right:6px; font-size:10px;"></i>
-                  ${item.title || 'Transaction'}
-                </div>
-                <div style="font-size:10px; color:#888; margin-top:2px;">${item.date || ''}</div>
-              </div>
-              <div style="font-size:12px; font-weight:800; color:${isPositive ? '#22c55e' : '#ef4444'};">${item.amount}</div>
-            </div>
-          `;
-        });
-        profileList.innerHTML = phtml;
-      }
-
-      // 2. Mine Page History Card
-      if (mineList) {
-        let mhtml = '';
-        const mineItems = items.filter(it => it.type === 'Mining Reward' || it.title === 'Block Mining' || it.type === 'Boost');
-        const toShow = mineItems.length > 0 ? mineItems.slice(0, 6) : items.slice(0, 6);
-        toShow.forEach(item => {
-          const isPositive = !item.amount || !item.amount.startsWith('-');
-          mhtml += `
-            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
-              <div>
-                <div style="font-size:12px; font-weight:600; color:#e2e8f0;">${item.title || 'Mining'}</div>
-                <div style="font-size:10px; color:#718096; margin-top:2px;">${item.date || ''}</div>
-              </div>
-              <div style="font-size:12px; font-weight:700; color:${isPositive ? '#22c55e' : '#ef4444'};">${item.amount}</div>
-            </div>
-          `;
-        });
-        mineList.innerHTML = mhtml;
-      }
-
-      // 3. Modal History List
-      if (modalList) {
-        let modHtml = '';
-        items.forEach(item => {
-          const isPositive = !item.amount || !item.amount.startsWith('-');
-          modHtml += `
-            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
-              <div>
-                <div style="font-size:12px; font-weight:bold; color:#fff;">${item.title || 'Transaction'}</div>
-                <div style="font-size:10px; color:#888; margin-top:2px;">${item.date || ''}</div>
-              </div>
-              <div style="font-size:12px; font-weight:bold; color:${isPositive ? '#22c55e' : '#ef4444'};">${item.amount}</div>
-            </div>
-          `;
-        });
-        modalList.innerHTML = modHtml;
-      }
-    }
-
-    function openHistoryModal() {
-      const modal = document.getElementById('historyModal');
-      if (modal) modal.style.display = 'flex';
-      loadHistoryData();
-    }
-
-    function closeHistoryModal() {
-      const modal = document.getElementById('historyModal');
-      if (modal) modal.style.display = 'none';
-    }
-
-    function loadHistoryData() {
-      if (typeof database !== 'undefined' && database.ref) {
-        database.ref('users/' + userId + '/history').once('value', (snapshot) => {
-          renderUserHistory(snapshot.exists() ? snapshot.val() : {});
-        });
-      }
-    }
-
-    // DYNAMIC TASKS SYSTEM
-    let activeTaskFilter = 'non-secret';
-    let userCompletedTasks = {};
-
-    function switchTaskTab(tabType) {
-      activeTaskFilter = tabType;
-      const tabNon = document.getElementById('tabNonSecret');
-      const tabSec = document.getElementById('tabSecret');
-
-      if (tabType === 'secret') {
-        if (tabNon) tabNon.classList.remove('active');
-        if (tabSec) tabSec.classList.add('active');
-      } else {
-        if (tabSec) tabSec.classList.remove('active');
-        if (tabNon) tabNon.classList.add('active');
-      }
-      renderTasksList();
-    }
-
-    let allCustomTasks = {};
-    let userPendingTasks = {};
-
-    function loadDynamicTasks() {
-      if (typeof database !== 'undefined' && database.ref) {
-        // Load user completed tasks
-        database.ref('users/' + userId + '/completedTasks').on('value', (snap) => {
-          userCompletedTasks = snap.exists() ? snap.val() : {};
-          renderTaskHistory();
-          renderTasksList();
-        });
-
-        // Load user pending submissions
-        database.ref('users/' + userId + '/pendingTasks').on('value', (snap) => {
-          userPendingTasks = snap.exists() ? snap.val() : {};
-          renderTasksList();
-        });
-
-        // Load active admin custom tasks
-        database.ref('custom_tasks').on('value', (snap) => {
-          allCustomTasks = snap.exists() ? snap.val() : {};
-          renderTasksList();
-        });
-      } else {
-        renderTasksList();
-      }
-    }
-
-    function renderTasksList() {
-      const container = document.getElementById('dynamicTasksContainer');
-      if (!container) return;
-
-      // Base default tasks merged with remote tasks
-      const defaultTasks = {
-        'task_def_1': {
-          title: "Join Official Telegram Community",
-          reward: 50,
-          link: "https://t.me/adi_community",
-          type: "General"
-        },
-        'task_def_2': {
-          title: "Follow ADI Network on X / Twitter",
-          reward: 50,
-          link: "https://x.com/adi_airdrop",
-          type: "General"
-        },
-        'task_def_3': {
-          title: "Watch Daily Video & Secret Code",
-          reward: 50,
-          link: "https://youtube.com",
-          code: "99010",
-          type: "SecretCode"
-        }
-      };
-
-      const mergedTasks = Object.assign({}, defaultTasks, allCustomTasks);
-      let html = '';
-      let visibleCount = 0;
-
-      Object.keys(mergedTasks).forEach(taskId => {
-        const t = mergedTasks[taskId];
-        const isSecret = (t.type === 'SecretCode' || Boolean(t.code));
-        const isCompleted = Boolean(userCompletedTasks && userCompletedTasks[taskId]);
-        const isPending = Boolean(userPendingTasks && userPendingTasks[taskId]);
-        const safeTitle = (t.title || 'Task').replace(/'/g, "\\'");
-
-        // Filter by active tab
-        if (activeTaskFilter === 'secret' && !isSecret) return;
-        if (activeTaskFilter === 'non-secret' && isSecret) return;
-
-        visibleCount++;
-
-        html += `
-          <div class="task-card">
-            <div class="task-header">
-              <div class="task-title">
-                <i class="fa-solid ${isSecret ? 'fa-key' : 'fa-circle-check'}" style="color:var(--accent-silver);"></i>
-                ${t.title}
-              </div>
-              <div class="task-reward">+${t.reward} ADI$</div>
-            </div>
-
-            <div style="margin-top:10px;">
-              ${t.link ? `
-                <div style="margin-bottom:8px;">
-                  <a href="${t.link}" target="_blank" rel="noopener noreferrer" class="btn btn-dark" style="display:inline-block; width:100%; text-align:center; text-decoration:none; padding:8px 12px; font-size:11px; box-sizing:border-box;">
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i> 1. Open Task Link
-                  </a>
-                </div>
-              ` : ''}
-
-              ${isCompleted ? `
-                <button class="btn" style="width:100%; background:rgba(34,197,94,0.15); color:#4ade80; border:1px solid rgba(74,222,128,0.3); padding:10px 12px; font-size:11px; font-weight:700;" disabled>
-                  <i class="fa-solid fa-circle-check"></i> Completed (+${t.reward} ADI$)
-                </button>
-              ` : isPending ? `
-                <button class="btn" style="width:100%; background:rgba(234,179,8,0.15); color:#fbbf24; border:1px solid rgba(234,179,8,0.3); padding:10px 12px; font-size:11px; font-weight:700;" disabled>
-                  <i class="fa-solid fa-hourglass-half"></i> Submitted & Under Admin Review
-                </button>
-              ` : isSecret ? `
-                <div style="display:flex; gap:6px; width:100%;">
-                  <input type="text" id="input_task_${taskId}" placeholder="Enter Secret Code..." style="flex:2; background:#111; color:#fff; border:1px solid #333; padding:8px 10px; border-radius:8px; font-size:11px; outline:none; box-sizing:border-box;">
-                  <button class="btn btn-metallic" style="flex:1; padding:8px 12px; font-size:11px; font-weight:bold; cursor:pointer;" onclick="verifySecretTask('${taskId}', '${t.code || ''}', ${t.reward}, '${safeTitle}')">
-                    Verify & Claim
-                  </button>
-                </div>
-              ` : `
-                <div style="display:flex; gap:6px; width:100%;">
-                  <input type="text" id="proof_task_${taskId}" placeholder="Enter username / proof (@handle)..." style="flex:2; background:#111; color:#fff; border:1px solid #333; padding:8px 10px; border-radius:8px; font-size:11px; outline:none; box-sizing:border-box;">
-                  <button class="btn btn-metallic" style="flex:1; padding:8px 10px; font-size:11px; font-weight:bold; cursor:pointer;" onclick="submitTaskProof('${taskId}', ${t.reward}, '${safeTitle}')">
-                    Submit Proof
-                  </button>
-                </div>
-              `}
-            </div>
-          </div>
-        `;
-      });
-
-      if (visibleCount === 0) {
-        html = `<div style="text-align:center; color:#777; font-size:12px; padding:20px;">No ${activeTaskFilter === 'secret' ? 'secret code' : 'general'} tasks available right now.</div>`;
-      }
-
-      container.innerHTML = html;
-    }
-
-    function submitTaskProof(taskId, reward, taskTitle) {
-      const inputEl = document.getElementById('proof_task_' + taskId);
-      const handle = inputEl ? inputEl.value.trim() : '';
-
-      if (!handle) {
-        showAlert("Please enter your Telegram / Twitter username (@handle)!");
-        return;
-      }
-
-      const proofKey = 'proof_' + Date.now();
-      const proofData = {
-        userId: userId,
-        username: userName,
-        taskId: taskId,
-        taskName: taskTitle,
-        proof: handle,
-        reward: reward,
-        submittedAt: Date.now()
-      };
-
-      const updates = {};
-      updates['pending_tasks/' + proofKey] = proofData;
-      updates[`users/${userId}/pendingTasks/${taskId}`] = {
-        proofKey: proofKey,
-        proof: handle,
-        status: 'pending',
-        submittedAt: Date.now()
-      };
-
-      if (typeof database !== 'undefined' && database.ref) {
-        database.ref().update(updates).then(() => {
-          if (!userPendingTasks) userPendingTasks = {};
-          userPendingTasks[taskId] = true;
-          renderTasksList();
-          showAlert(`✅ Proof Submitted for "${taskTitle}"! Admin will review and credit +${reward} ADI$.`);
-        }).catch(err => {
-          showAlert("Error: " + err.message);
-        });
-      }
-    }
-
-    function verifySecretTask(taskId, expectedCode, reward, taskTitle) {
-      const inputEl = document.getElementById('input_task_' + taskId);
-      const userEntered = inputEl ? inputEl.value.trim() : '';
-
-      if (!userEntered) {
-        showAlert("Please enter the secret code from the video/task!");
-        return;
-      }
-
-      if (expectedCode && userEntered.toLowerCase() !== expectedCode.toLowerCase()) {
-        showAlert("❌ Incorrect Secret Code! Please watch the task video carefully.");
-        return;
-      }
-
-      // Secret Code matched!
-      userBalance += Number(reward);
-      const histId = 'hist_' + Date.now();
-      const updates = {};
-
-      updates[`users/${userId}/balance`] = userBalance;
-      updates[`users/${userId}/completedTasks/${taskId}`] = {
-        title: taskTitle,
-        reward: reward,
-        completedAt: Date.now()
-      };
-      updates[`users/${userId}/history/${histId}`] = {
-        title: "Secret Code: " + taskTitle,
-        amount: "+" + reward + " ADI$",
-        date: new Date().toLocaleString(),
-        type: "Task Reward",
-        timestamp: Date.now()
-      };
-
-      if (typeof database !== 'undefined' && database.ref) {
-        database.ref().update(updates).catch(() => {});
-      }
-
-      if (!userCompletedTasks) userCompletedTasks = {};
-      userCompletedTasks[taskId] = true;
-      updateUI();
-      renderTasksList();
-      renderTaskHistory();
-
-      showRewardCelebration({
-        title: "Secret Code Decrypted!",
-        subtitle: "TASK VERIFIED",
-        amount: "+" + reward + " ADI$",
-        type: "Secret Code: " + taskTitle,
-        bonus: "Code Verification Bonus",
-        icon: "🔑"
-      });
-    }
-
-    function claimGeneralTask(taskId, reward, taskTitle) {
-      completeTaskAction(taskId, reward, taskTitle);
-    }
-
-    function completeTaskAction(taskId, reward, taskTitle) {
-      userBalance += Number(reward);
-      const histId = 'hist_' + Date.now();
-      const updates = {};
-
-      updates[`users/${userId}/balance`] = userBalance;
-      updates[`users/${userId}/completedTasks/${taskId}`] = {
-        title: taskTitle,
-        reward: reward,
-        completedAt: Date.now()
-      };
-      updates[`users/${userId}/history/${histId}`] = {
-        title: "Task: " + taskTitle,
-        amount: "+" + reward + " ADI$",
-        date: new Date().toLocaleString(),
-        type: "Task Reward",
-        timestamp: Date.now()
-      };
-
-      if (typeof database !== 'undefined' && database.ref) {
-        database.ref().update(updates).catch(() => {});
-      }
-
-      if (!userCompletedTasks) userCompletedTasks = {};
-      userCompletedTasks[taskId] = true;
-      updateUI();
-      renderTasksList();
-      renderTaskHistory();
-
-      showRewardCelebration({
-        title: "Task Completed!",
-        subtitle: "TASK REWARD CLAIMED",
-        amount: "+" + reward + " ADI$",
-        type: "General Task: " + taskTitle,
-        bonus: "Task Bonus",
-        icon: "✅"
-      });
-    }
-
-    function renderTaskHistory() {
-      const histContainer = document.getElementById('taskHistoryContainer');
-      if (!histContainer) return;
-
-      if (!userCompletedTasks || Object.keys(userCompletedTasks).length === 0) {
-        histContainer.innerHTML = '<div style="text-align:center; color:#777; font-size:12px; padding:10px;">No completed tasks yet. Complete tasks above to earn ADI$!</div>';
-        return;
-      }
-
-      let html = '';
-      Object.keys(userCompletedTasks).forEach(tid => {
-        const item = userCompletedTasks[tid];
-        const title = (item && item.title) ? item.title : 'Task Reward';
-        const reward = (item && item.reward) ? item.reward : 50;
-        const timeStr = (item && item.completedAt) ? new Date(item.completedAt).toLocaleDateString() : '';
-
-        html += `
-          <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:12px; margin-bottom:8px;">
-            <div>
-              <div style="font-size:12px; font-weight:700; color:#fff;">
-                <i class="fa-solid fa-check-circle" style="color:#22c55e; margin-right:6px;"></i> ${title}
-              </div>
-              ${timeStr ? `<div style="font-size:10px; color:#888; margin-top:2px;">${timeStr}</div>` : ''}
-            </div>
-            <div style="font-size:12px; font-weight:800; color:var(--accent-green);">+${reward} ADI$</div>
-          </div>
-        `;
-      });
-
-      histContainer.innerHTML = html;
-    }
-
-    // LIVE CRYPTO MARKET PRICES
-    function loadMarketPrices() {
-      fetch('https://api.binance.com/api/v3/ticker/price?symbols=%5B%22BTCUSDT%22,%22ETHUSDT%22,%22BNBUSDT%22%5D')
-        .then(res => res.json())
-        .then(data => {
-          if (Array.isArray(data)) {
-            data.forEach(item => {
-              const val = parseFloat(item.price);
-              const formatted = '$' + val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-              if (item.symbol === 'BTCUSDT' && document.getElementById('market-btc-price')) {
-                document.getElementById('market-btc-price').innerText = formatted;
-              }
-              if (item.symbol === 'ETHUSDT' && document.getElementById('market-eth-price')) {
-                document.getElementById('market-eth-price').innerText = formatted;
-              }
-              if (item.symbol === 'BNBUSDT' && document.getElementById('market-bnb-price')) {
-                document.getElementById('market-bnb-price').innerText = formatted;
-              }
-            });
-          }
-          if (document.getElementById('market-usdt-price')) {
-            document.getElementById('market-usdt-price').innerText = '$1.00';
-          }
-        })
-        .catch(() => {
-          if (document.getElementById('market-btc-price')) document.getElementById('market-btc-price').innerText = '$95,420.00';
-          if (document.getElementById('market-eth-price')) document.getElementById('market-eth-price').innerText = '$3,410.50';
-          if (document.getElementById('market-bnb-price')) document.getElementById('market-bnb-price').innerText = '$645.20';
-          if (document.getElementById('market-usdt-price')) document.getElementById('market-usdt-price').innerText = '$1.00';
-        });
-    }
-
-    function openWhitepaperModal() {
-      const modal = document.getElementById('whitepaperModal');
-      if (modal) modal.style.display = 'flex';
-    }
-
-    function closeWhitepaperModal() {
-      const modal = document.getElementById('whitepaperModal');
-      if (modal) modal.style.display = 'none';
-    }
-
-    function openAboutModal() {
-      const modal = document.getElementById('aboutModal');
-      if (modal) modal.style.display = 'flex';
-    }
-
-    function closeAboutModal() {
-      const modal = document.getElementById('aboutModal');
-      if (modal) modal.style.display = 'none';
     }
 
     function updateUI() {
-      const balEl = document.getElementById('totalBalance');
-      if (balEl) balEl.innerHTML = `${userBalance.toLocaleString()} <span>ADI$</span>`;
+      document.getElementById('totalBalance').innerHTML = `${userBalance} <span>ADI$</span>`;
+      document.getElementById('usdValue').innerText = `$${(userBalance * 0.0001).toFixed(4)} USD`;
+      document.getElementById('profBalance').innerText = `${userBalance} ADI$`;
+      document.getElementById('streakCountSpan').innerText = streakCount;
 
-      const usdEl = document.getElementById('usdValue');
-      if (usdEl) usdEl.innerText = `$${(userBalance * 0.0001).toFixed(4)} USD`;
-
-      const nameEl = document.getElementById('userName');
-      if (nameEl) nameEl.innerText = userName;
-
-      const profUser = document.getElementById('profUser');
-      if (profUser) profUser.innerText = userName;
-
-      const profId = document.getElementById('profId');
-      if (profId) profId.innerText = userId;
-
-      const profBal = document.getElementById('profBalance');
-      if (profBal) profBal.innerText = `${userBalance.toLocaleString()} ADI$`;
-
-      const connWallet = document.getElementById('connectedWalletAddr');
-      if (connWallet) connWallet.innerText = walletAddress ? walletAddress : "Not Connected";
-
-      // Update Daily Claim Button state
-      const claimBtn = document.getElementById('dailyClaimBtn');
-      if (claimBtn) {
-        if (lastClaimDate === todayDate) {
-          claimBtn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Claimed for Today (Streak Active)';
-          claimBtn.style.background = 'rgba(34,197,94,0.15)';
-          claimBtn.style.color = '#4ade80';
-          claimBtn.style.border = '1px solid rgba(74,222,128,0.3)';
-          claimBtn.disabled = true;
-        } else {
-          claimBtn.innerHTML = '<i class="fa-solid fa-gift"></i> Claim +100 ADI$ Daily Reward';
-          claimBtn.style.background = '';
-          claimBtn.style.color = '';
-          claimBtn.style.border = '';
-          claimBtn.disabled = false;
-        }
+      const today = new Date().toDateString();
+      if (lastSpinDate !== today) {
+        spinsLeft = 2;
       }
+      document.getElementById('spinsLeftText').innerText = `Spins Left Today: ${spinsLeft}/2`;
 
-      // Update Tasks page Daily Check-in Button
-      const taskClaimBtn = document.getElementById('taskDailyClaimBtn');
-      if (taskClaimBtn) {
-        if (lastClaimDate === todayDate) {
-          taskClaimBtn.innerHTML = '<i class="fa-solid fa-check"></i> Claimed';
-          taskClaimBtn.style.background = 'rgba(34,197,94,0.15)';
-          taskClaimBtn.style.color = '#4ade80';
-          taskClaimBtn.style.border = '1px solid rgba(74,222,128,0.3)';
-          taskClaimBtn.disabled = true;
-        } else {
-          taskClaimBtn.innerHTML = 'Claim';
-          taskClaimBtn.style.background = '';
-          taskClaimBtn.style.color = '';
-          taskClaimBtn.style.border = '';
-          taskClaimBtn.disabled = false;
-        }
-      }
+      checkMiningState();
+    }
 
-      // Update 7-Day progress pills
-      const streakSpan = document.getElementById('streakCountSpan');
-      if (streakSpan) streakSpan.innerText = Math.max(1, streakCount || 1);
+    // 2. Navigation
+    function switchTab(pageId, navEl) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
       
-      const dots = document.querySelectorAll('#streakTrackContainer .streak-day-dot');
-      const curDayIndex = ((Math.max(1, streakCount) - 1) % 7);
-      dots.forEach((dot, idx) => {
-        if (idx <= curDayIndex && streakCount > 0) {
-          dot.style.background = 'rgba(34,197,94,0.25)';
-          dot.style.borderColor = '#22c55e';
-        } else {
-          dot.style.background = 'rgba(255,255,255,0.04)';
-          dot.style.borderColor = 'rgba(255,255,255,0.08)';
+      document.getElementById(pageId).classList.add('active');
+      if (navEl) navEl.classList.add('active');
+    }
+
+    // 3. Leaderboard (Direct Firebase Only)
+    function listenLeaderboard() {
+      database.ref('users').orderByChild('balance').limitToLast(10).on('value', (snapshot) => {
+        const container = document.getElementById('leaderboard-container');
+        container.innerHTML = "";
+        let list = [];
+        snapshot.forEach(child => {
+          list.push(child.val());
+        });
+        list.reverse();
+
+        if (list.length === 0) {
+          container.innerHTML = `<div style="text-align: center; color: var(--text-sub); font-size: 12px; padding: 10px 0;">No active users on leaderboard</div>`;
+          return;
         }
+
+        list.forEach((usr, index) => {
+          const item = document.createElement('div');
+          item.className = 'history-item-box';
+          item.innerHTML = `
+            <div>
+              <strong style="color: #fff; font-size: 13px;">#${index + 1} ${usr.userName || 'Miner'}</strong>
+            </div>
+            <span style="color: var(--accent-green); font-weight: 800; font-size: 13px;">${usr.balance || 0} ADI$</span>
+          `;
+          container.appendChild(item);
+        });
+      });
+    }
+
+    // 4. Daily Claim (100 daily, 7th day = 200)
+    function claimDailyReward() {
+      const today = new Date().toDateString();
+      if (lastClaimDate === today) {
+        alert("You have already claimed your daily reward today!");
+        return;
+      }
+
+      let reward = 100;
+      if (streakCount >= 7) {
+        reward = 200;
+      }
+
+      userBalance += reward;
+      lastClaimDate = today;
+      let nextStreak = streakCount >= 7 ? 1 : streakCount + 1;
+
+      addHistoryRecord("Daily Claim", reward);
+
+      database.ref('users/' + userId).update({
+        balance: userBalance,
+        lastClaimDate: lastClaimDate,
+        streakCount: nextStreak
       });
 
-      // Update Profile Wallet Button text
-      const profWalletBtn = document.getElementById('walletConnBtn');
-      if (profWalletBtn) {
-        if (walletAddress && walletAddress !== 'Not Connected') {
-          profWalletBtn.innerHTML = `<i class="fa-solid fa-wallet"></i> Wallet Connected (${walletAddress.substring(0,6)}...${walletAddress.slice(-4)})`;
-          profWalletBtn.style.background = 'rgba(34,197,94,0.2)';
-          profWalletBtn.style.color = '#4ade80';
-          profWalletBtn.style.border = '1px solid rgba(74,222,128,0.4)';
-        } else {
-          profWalletBtn.innerHTML = '<i class="fa-solid fa-wallet"></i> Connect Trust Wallet';
-          profWalletBtn.style.background = '';
-          profWalletBtn.style.color = '';
-          profWalletBtn.style.border = '';
-        }
-      }
+      triggerRewardModal("Daily Claim Bonus", reward);
+    }
 
-      // Update Lucky Spins text
-      const spinsText = document.getElementById('spinsLeftText');
-      if (spinsText) {
-        spinsText.innerText = `Spins Left Today: ${spinsLeft}/2`;
+    // 5. Mining Logic
+    function startMining() {
+      const now = Date.now();
+      if (miningEndTime > now) return;
+
+      miningEndTime = now + (4 * 60 * 60 * 1000); // 4 Hours
+      database.ref('users/' + userId).update({ miningEndTime: miningEndTime });
+      checkMiningState();
+    }
+
+    function checkMiningState() {
+      clearInterval(miningInterval);
+      const timerDisplay = document.getElementById('miningTimer');
+      const homeTimerDisplay = document.getElementById('homeMiningTimer');
+      const profTimerDisplay = document.getElementById('profMiningTimer');
+      const btn = document.getElementById('mineBtn');
+
+      miningInterval = setInterval(() => {
+        const now = Date.now();
+        const diff = miningEndTime - now;
+
+        if (diff <= 0) {
+          clearInterval(miningInterval);
+          if (miningEndTime !== 0) {
+            userBalance += 100;
+            addHistoryRecord("Mining Reward", 100);
+            miningEndTime = 0;
+            database.ref('users/' + userId).update({ balance: userBalance, miningEndTime: 0 });
+            triggerRewardModal("Mining Completed", 100);
+          }
+          if (timerDisplay) timerDisplay.innerText = "Tap below to initialize mining session";
+          if (homeTimerDisplay) homeTimerDisplay.innerText = "Session Ready";
+          if (profTimerDisplay) profTimerDisplay.innerText = "Session Ready";
+          if (btn) { btn.disabled = false; btn.innerText = "Start Mining"; }
+        } else {
+          const hrs = Math.floor(diff / (1000 * 60 * 60));
+          const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+          const secs = Math.floor((diff % (1000 * 60)) / 1000);
+          const timeStr = `${hrs}h ${mins}m ${secs}s`;
+
+          if (timerDisplay) timerDisplay.innerText = `Mining Active: ${timeStr}`;
+          if (homeTimerDisplay) homeTimerDisplay.innerText = `Mining: ${timeStr}`;
+          if (profTimerDisplay) profTimerDisplay.innerText = timeStr;
+          if (btn) { btn.disabled = true; btn.innerText = "Mining in Progress..."; }
+        }
+      }, 1000);
+    }
+
+    // 6. Spin Wheel (Visually Customized)
+    function initWheel() {
+      const canvas = document.getElementById('wheelCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const colors = ['#0284c7', '#22c55e', '#eab308', '#ec4899'];
+      const arc = (Math.PI * 2) / segments.length;
+
+      for (let i = 0; i < segments.length; i++) {
+        ctx.beginPath();
+        ctx.fillStyle = colors[i];
+        ctx.moveTo(100, 100);
+        ctx.arc(100, 100, 100, i * arc, (i + 1) * arc);
+        ctx.fill();
+
+        ctx.save();
+        ctx.fillStyle = "#fff";
+        ctx.font = "bold 12px Plus Jakarta Sans";
+        ctx.translate(100, 100);
+        ctx.rotate(i * arc + arc / 2);
+        ctx.fillText(segments[i], 40, 5);
+        ctx.restore();
       }
     }
 
-    // REWARD CELEBRATION POP-UP MODAL CONTROLLER
-    function showRewardCelebration({ title, subtitle, amount, type, bonus, icon }) {
-      const modal = document.getElementById('rewardCelebrationModal');
-      if (!modal) return;
-
-      const titleEl = document.getElementById('rewardModalTitle');
-      const subEl = document.getElementById('rewardModalSubtitle');
-      const amtEl = document.getElementById('rewardModalAmount');
-      const typeEl = document.getElementById('rewardModalType');
-      const bonusEl = document.getElementById('rewardModalBonus');
-      const iconEl = document.getElementById('rewardModalIcon');
-      const usdEl = document.getElementById('rewardModalUsd');
-      const balEl = document.getElementById('rewardModalNewBalance');
-
-      if (titleEl) titleEl.innerText = title || "Congratulations!";
-      if (subEl) subEl.innerText = subtitle || "REWARD CLAIMED";
-      if (amtEl) amtEl.innerText = amount || "+0 ADI$";
-      if (typeEl) typeEl.innerText = type || "Reward";
-      if (bonusEl) bonusEl.innerText = bonus || "Standard Bonus";
-      if (iconEl) iconEl.innerText = icon || "🎉";
-
-      const numVal = parseFloat((amount || '').replace(/[^0-9.]/g, '')) || 0;
-      if (usdEl) usdEl.innerText = `≈ $${(numVal * 0.0001).toFixed(4)} USD`;
-      if (balEl) balEl.innerText = `${userBalance.toLocaleString()} ADI$`;
-
-      modal.style.display = 'flex';
-
-      if (tg && tg.HapticFeedback) {
-        try { tg.HapticFeedback.notificationOccurred('success'); } catch(e) {}
+    function spinWheelNow() {
+      const today = new Date().toDateString();
+      if (lastSpinDate === today && spinsLeft <= 0) {
+        alert("No spins left today!");
+        return;
       }
+
+      spinsLeft--;
+      lastSpinDate = today;
+      const wonReward = 19; // Reward spin value
+
+      userBalance += wonReward;
+      addHistoryRecord("Spin Wheel Reward", wonReward);
+
+      database.ref('users/' + userId).update({
+        balance: userBalance,
+        spinsLeft: spinsLeft,
+        lastSpinDate: lastSpinDate
+      });
+
+      triggerRewardModal("Spin Wheel Win", wonReward);
+    }
+
+    // 7. Tab Game (80 clicks = 20 tokens)
+    function handle80Tap() {
+      tapperClicks++;
+      document.getElementById('tapperScore').innerText = `${tapperClicks} / 80`;
+
+      if (tapperClicks >= 80) {
+        tapperClicks = 0;
+        document.getElementById('tapperScore').innerText = `0 / 80`;
+        userBalance += 20;
+        addHistoryRecord("80-Tap Challenge", 20);
+        database.ref('users/' + userId).update({ balance: userBalance });
+        triggerRewardModal("80-Tap Reward", 20);
+      }
+    }
+
+    // 8. Dynamic Tasks Filtering (From Admin Panel Only)
+    function switchTaskTab(tab) {
+      currentTaskTab = tab;
+      document.getElementById('tabNonSecret').classList.toggle('active', tab === 'non-secret');
+      document.getElementById('tabSecret').classList.toggle('active', tab === 'secret');
+      listenFirebaseTasks();
+    }
+
+    function listenFirebaseTasks() {
+      database.ref('tasks').on('value', (snapshot) => {
+        const container = document.getElementById('dynamicTasksContainer');
+        container.innerHTML = "";
+        const data = snapshot.val();
+
+        if (!data) {
+          container.innerHTML = `<div style="text-align: center; color: var(--text-sub); font-size: 12px; padding: 20px 0;">No tasks assigned by Admin yet.</div>`;
+          return;
+        }
+
+        let count = 0;
+        Object.keys(data).forEach(key => {
+          const task = data[key];
+          const isSecret = task.isSecret || false;
+
+          if ((currentTaskTab === 'secret' && isSecret) || (currentTaskTab === 'non-secret' && !isSecret)) {
+            count++;
+            const card = document.createElement('div');
+            card.className = 'task-card';
+            card.innerHTML = `
+              <div class="task-header">
+                <span class="task-title"><i class="fa-solid fa-tasks"></i> ${task.title}</span>
+                <span class="task-reward">+${task.reward} ADI</span>
+              </div>
+              ${isSecret ? `<input type="text" class="task-input" id="input_${key}" placeholder="Enter secret code...">` : ''}
+              <button class="btn btn-metallic" style="width:100%; margin-top:6px;" onclick="claimTask('${key}', ${task.reward}, '${task.code || ''}', ${isSecret})">Complete & Claim</button>
+            `;
+            container.appendChild(card);
+          }
+        });
+
+        if (count === 0) {
+          container.innerHTML = `<div style="text-align: center; color: var(--text-sub); font-size: 12px; padding: 20px 0;">No ${currentTaskTab} tasks available.</div>`;
+        }
+      });
+    }
+
+    function claimTask(taskId, reward, correctCode, isSecret) {
+      if (isSecret) {
+        const userCode = document.getElementById(`input_${taskId}`).value;
+        if (userCode !== correctCode) {
+          alert("Incorrect secret code!");
+          return;
+        }
+      }
+
+      userBalance += reward;
+      addHistoryRecord("Task Reward", reward);
+      database.ref('users/' + userId).update({ balance: userBalance });
+      triggerRewardModal("Task Completed", reward);
+    }
+
+    // 9. Wallet Integration (Direct Trust Wallet Redirect)
+    function directConnectWallet() {
+      const trustWalletDeepLink = "https://link.trustwallet.com/open_url?coin_id=60&url=" + encodeURIComponent(window.location.href);
+      window.location.href = trustWalletDeepLink;
+    }
+
+    // 10. Exchange Modal (Coming Soon Popup)
+    function openExchangeModal() {
+      alert("Coming Soon! Token exchange feature will open on November 20, 2026.");
+    }
+
+    // 11. History Syncing
+    function addHistoryRecord(type, amount) {
+      const record = {
+        type: type,
+        amount: amount,
+        date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString()
+      };
+      userHistory.unshift(record);
+      database.ref('users/' + userId + '/history').set(userHistory);
+    }
+
+    function renderHistories() {
+      const mineHist = document.getElementById('mineHistoryList');
+      const taskHist = document.getElementById('taskHistoryContainer');
+      const fullHist = document.getElementById('history-list-container');
+
+      if (mineHist) mineHist.innerHTML = "";
+      if (taskHist) taskHist.innerHTML = "";
+      if (fullHist) fullHist.innerHTML = "";
+
+      if (!userHistory || userHistory.length === 0) {
+        const emptyMsg = `<div style="text-align:center; padding:10px; color:#888;">No history records found.</div>`;
+        if (mineHist) mineHist.innerHTML = emptyMsg;
+        if (taskHist) taskHist.innerHTML = emptyMsg;
+        if (fullHist) fullHist.innerHTML = emptyMsg;
+        return;
+      }
+
+      userHistory.forEach(item => {
+        const html = `
+          <div class="history-item-box">
+            <div>
+              <strong style="color:#fff;">${item.type}</strong>
+              <div style="font-size:10px; color:#888;">${item.date}</div>
+            </div>
+            <span style="color: var(--accent-green); font-weight:800;">+${item.amount} ADI$</span>
+          </div>
+        `;
+
+        if (fullHist) fullHist.innerHTML += html;
+        if (item.type.includes("Mining") && mineHist) mineHist.innerHTML += html;
+        if (item.type.includes("Task") && taskHist) taskHist.innerHTML += html;
+      });
+    }
+
+    // Celebration Reward Pop-Up
+    function triggerRewardModal(type, amount) {
+      document.getElementById('rewardModalType').innerText = type;
+      document.getElementById('rewardModalAmount').innerText = `+${amount} ADI$`;
+      document.getElementById('rewardModalNewBalance').innerText = `${userBalance} ADI$`;
+      document.getElementById('rewardCelebrationModal').style.display = 'flex';
     }
 
     function closeRewardModal() {
-      const modal = document.getElementById('rewardCelebrationModal');
-      if (modal) modal.style.display = 'none';
+      document.getElementById('rewardCelebrationModal').style.display = 'none';
     }
 
-    function loadUserData() {
-      if (typeof database === 'undefined' || !database.ref) return;
+    // Countdown Timer (20 November 2026)
+    function startCountdown() {
+      const targetDate = new Date("November 20, 2026 00:00:00").getTime();
+      setInterval(() => {
+        const now = new Date().getTime();
+        const diff = targetDate - now;
 
-      database.ref('users/' + userId).on('value', (snapshot) => {
-        if (snapshot.exists()) {
-          const data = snapshot.val();
-          userBalance = Number(data.balance) || 0;
-          totalMinedAmount = Number(data.totalMined) || 0;
-          lastClaimDate = data.lastClaimDate || "";
-          lastMineDate = data.lastMineDate || "";
-          miningEndTime = data.miningEndTime || 0;
-          walletAddress = data.walletAddress || "";
-          streakCount = data.streakCount || 0;
-          
-          processStreakCheck(data);
-          checkMiningState();
-          renderUserHistory(data.history || {});
-        } else {
-          const initialHistory = {
-            ['hist_' + Date.now()]: {
-              title: "Welcome Bonus",
-              amount: "+50 ADI$",
-              date: new Date().toLocaleString(),
-              type: "Reward",
-              timestamp: Date.now()
-            }
-          };
-          userBalance = 50;
-          database.ref('users/' + userId).set({
-            username: userName,
-            balance: 50,
-            totalMined: 0,
-            joinedAt: Date.now(),
-            history: initialHistory
-          });
-          renderUserHistory(initialHistory);
+        if (diff > 0) {
+          document.getElementById('cd-days').innerText = Math.floor(diff / (1000 * 60 * 60 * 24));
+          document.getElementById('cd-hours').innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          document.getElementById('cd-minutes').innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+          document.getElementById('cd-seconds').innerText = Math.floor((diff % (1000 * 60)) / 1000);
         }
-        updateUI();
-      });
+      }, 1000);
     }
 
-    // AUTOMATIC IP & COUNTRY DETECTION & ADMIN NOTIFICATION
-    function countryCodeToFlag(isoCode) {
-      if (!isoCode || isoCode.length !== 2) return '🌐';
-      const codePoints = isoCode
-        .toUpperCase()
-        .split('')
-        .map(char => 127397 + char.charCodeAt());
-      return String.fromCodePoint(...codePoints);
+    // Modal Helpers
+    function openNotificationModal() { document.getElementById('notificationModal').style.display = 'flex'; }
+    function closeNotificationModal() { document.getElementById('notificationModal').style.display = 'none'; }
+    function openWhitepaperModal() { document.getElementById('whitepaperModal').style.display = 'flex'; }
+    function closeWhitepaperModal() { document.getElementById('whitepaperModal').style.display = 'none'; }
+    function openAboutModal() { document.getElementById('aboutModal').style.display = 'flex'; }
+    function closeAboutModal() { document.getElementById('aboutModal').style.display = 'none'; }
+    function openHistoryModal() { document.getElementById('historyModal').style.display = 'flex'; }
+    function closeHistoryModal() { document.getElementById('historyModal').style.display = 'none'; }
+    function openReferralModal() { 
+      document.getElementById('refLinkInput').value = `https://t.me/adi_mining_bot?start=${userId}`;
+      document.getElementById('referralModal').style.display = 'flex'; 
     }
-
-    function getTimezoneCountryFallback(tz) {
-      if (!tz) return { country: "Bangladesh 🇧🇩", code: "BD", city: "Dhaka" };
-      if (tz.includes("Dhaka")) return { country: "Bangladesh 🇧🇩", code: "BD", city: "Dhaka" };
-      if (tz.includes("Kolkata")) return { country: "India 🇮🇳", code: "IN", city: "Kolkata" };
-      if (tz.includes("Karachi")) return { country: "Pakistan 🇵🇰", code: "PK", city: "Karachi" };
-      if (tz.includes("Kathmandu")) return { country: "Nepal 🇳🇵", code: "NP", city: "Kathmandu" };
-      if (tz.includes("Dubai") || tz.includes("Riyadh")) return { country: "Middle East 🇸🇦🇦🇪", code: "AE", city: "Dubai" };
-      if (tz.includes("London")) return { country: "United Kingdom 🇬🇧", code: "GB", city: "London" };
-      if (tz.includes("New_York") || tz.includes("Chicago") || tz.includes("Los_Angeles")) return { country: "United States 🇺🇸", code: "US", city: "USA" };
-      return { country: "Global Miner 🌐", code: "GL", city: tz.split('/')[1] || "Global" };
+    function closeReferralModal() { document.getElementById('referralModal').style.display = 'none'; }
+    function copyReferralLink() {
+      const copyText = document.getElementById('refLinkInput');
+      copyText.select();
+      document.execCommand("copy");
+      alert("Referral link copied!");
     }
-
-    async function detectAndSyncUserGeoIP() {
-      if (typeof database === 'undefined' || !database.ref || !userId) return;
-
-      const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
-      let ip = "";
-      let country = "";
-      let countryCode = "";
-      let city = "";
-
-      // 1. Try ipwho.is with timeout
-      try {
-        const res = await fetch("https://geo.ipify.org/api/v2/country?apiKey=at_szSAVD4MadSvQJ5VjDMhYQRkxSWNv&ipAddress=8.8.8.8", { signal: AbortSignal.timeout(3000) });
-        if (res.ok) {
-          const data = await res.json();
-          if (data && data.success) {
-            ip = data.ip || "";
-            countryCode = data.country_code || "";
-            const flag = (data.flag && data.flag.emoji) ? data.flag.emoji : countryCodeToFlag(countryCode);
-            country = `${data.country || 'Global'} ${flag}`.trim();
-            city = data.city || "";
-          }
-        }
-      } catch (e) {}
-
-      // 2. Try ipapi.co if not resolved
-      if (!ip || !country) {
-        try {
-          const res = await fetch("https://ipapi.co/json/", { signal: AbortSignal.timeout(3000) });
-          if (res.ok) {
-            const data = await res.json();
-            ip = data.ip || ip;
-            countryCode = data.country_code || countryCode;
-            const flag = countryCodeToFlag(countryCode);
-            country = `${data.country_name || 'Global'} ${flag}`.trim();
-            city = data.city || city;
-          }
-        } catch (e) {}
-      }
-
-      // 3. Try /api/client-ip if still missing IP
-      if (!ip) {
-        try {
-          const res = await fetch("/api/client-ip", { signal: AbortSignal.timeout(2000) });
-          if (res.ok) {
-            const data = await res.json();
-            if (data.ip && data.ip !== "127.0.0.1" && data.ip !== "::1") ip = data.ip;
-          }
-        } catch (e) {}
-      }
-
-      // 4. Timezone fallback for country if still missing
-      if (!country) {
-        const fallback = getTimezoneCountryFallback(userTimezone);
-        country = fallback.country;
-        countryCode = fallback.code;
-        city = fallback.city;
-      }
-
-      const geoPayload = {
-        ip: ip || "Online (Auto-Detect)",
-        country: country,
-        countryCode: countryCode,
-        city: city,
-        timezone: userTimezone,
-        device: navigator.userAgent || "Web / Mobile",
-        lastSeen: new Date().toLocaleString()
-      };
-
-      database.ref('users/' + userId).update(geoPayload).catch(() => {});
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      startCountdownTimer();
-      listenGlobalStats();
-      listenForNewNotifications();
-      drawWheel();
-      loadLeaderboard();
-      loadDynamicTasks();
-      loadMarketPrices();
-      loadUserData();
-      detectAndSyncUserGeoIP();
-      setInterval(loadMarketPrices, 30000);
-    });
   </script>
 </body>
-</html> 
-            
+</html>
+  
