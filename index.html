@@ -3566,57 +3566,55 @@
 
     // LEADERBOARD & BADGES SYSTEM (TOP 20 MEMBERS)
     function loadLeaderboard() {
-  const container = document.getElementById('leaderboard-container');
-  if (!container || typeof database === 'undefined' || !database.ref) return;
-
-  database.ref('users').on('value', (snapshot) => {
-    try {
-      const users = snapshot.exists() ? snapshot.val() : {};
-      
-      const miners = Object.keys(users).filter(uid => {
-        const u = users[uid] || {};
-        const banned = (u.banned === true || u.isBanned === true || String(u.status || '').toLowerCase() === 'banned' || String(u.accountStatus || '').toLowerCase() === 'banned');
-        
-        // সেফটি চেক: ভ্যারিয়েবলগুলো ডিফাইন করা না থাকলে ক্রাশ করবে না
-        const isLegacy = typeof isLegacyBrowserUid === 'function' ? isLegacyBrowserUid(uid) : false;
-        const sharedUid = typeof BROWSER_SHARED_UID !== 'undefined' ? BROWSER_SHARED_UID : null;
-
-        return (!banned && (!isLegacy || uid === sharedUid));
-      }).map(uid => {
-        const u = users[uid] || {};
-        // UID-এর শেষের ৪টি ক্যারেক্টার নিয়ে 'user9080' ফরম্যাট তৈরি
-        const shortId = String(uid || '').slice(-4) || '0000';
-        return { 
-          uid, 
-          displayId: `user${shortId}`, 
-          balance: Number(u.balance) || 0, 
-          totalMined: Number(u.totalMined) || 0 
-        };
+      const container = document.getElementById('leaderboard-container');
+      if (!container || typeof database === 'undefined' || !database.ref) return;
+      database.ref('users').on('value', (snapshot) => {
+        const users = snapshot.exists() ? snapshot.val() : {};
+        const miners = Object.keys(users).filter(uid => {
+          const u=users[uid]||{};
+          const banned=(u.banned===true || u.isBanned===true || String(u.status||'').toLowerCase()==='banned' || String(u.accountStatus||'').toLowerCase()==='banned');
+          return (!banned && (!isLegacyBrowserUid(uid) || uid === BROWSER_SHARED_UID));
+        }).map(uid => {
+          const u = users[uid] || {};
+          // শুধু এই লাইনটি পরিবর্তন করা হয়েছে যেন ইউজারনেমের বদলে user + UID-এর শেষ ৪ ডিজিট দেখায়
+          return { uid, username: 'user' + String(uid).slice(-4), balance: Number(u.balance)||0, totalMined: Number(u.totalMined)||0 };
+        });
+        miners.sort((a,b)=>b.balance-a.balance || b.totalMined-a.totalMined);
+        const top=miners.slice(0,20);
+        if(!top.length){
+          container.innerHTML='<div style="text-align:center; color:var(--text-sub); font-size:12px; padding:10px 0;">No Firebase miner data yet.</div>';
+          return;
+        }
+        const esc=v=>String(v).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));
+        container.innerHTML=top.map((m,i)=>`
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 12px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:12px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;">${i+1}</div>
+              <div><div style="font-size:12px;font-weight:700;color:#fff;">${esc(m.username)}</div></div>
+            </div>
+            <div style="font-size:12px;font-weight:800;color:var(--accent-green);">${m.balance.toLocaleString()} ADI$</div>
+          </div>`).join('');
       });
+    }
 
-      miners.sort((a, b) => b.balance - a.balance || b.totalMined - a.totalMined);
-      const top = miners.slice(0, 20);
+    function renderUserHistory(historyData) {
+      window.__userHistoryCache = historyData || {};
+      renderTaskHistory();
+      renderMineHistory(window.__userHistoryCache);
 
-      if (!top.length) {
-        container.innerHTML = '<div style="text-align:center; color:var(--text-sub); font-size:12px; padding:10px 0;">No Firebase miner data yet.</div>';
+      const profileList = document.getElementById('history-list-container');
+      const mineList = document.getElementById('mineHistoryList');
+      const modalList = document.getElementById('historyList');
+
+      if (!historyData || Object.keys(historyData).length === 0) {
+        const emptyMsg = '<div style="text-align:center; color:#777; font-size:12px; padding:12px;">No activity history recorded yet. Start mining or claim daily streak!</div>';
+        if (profileList) profileList.innerHTML = emptyMsg;
+        if (mineList) mineList.innerHTML = '<div style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: center; color:#777;">No mining history yet.</div>';
+        if (modalList) modalList.innerHTML = '<div style="text-align:center; color:#777; font-size:12px; padding:10px;">No history records found.</div>';
         return;
       }
 
-      const esc = v => String(v).replace(/[&<>"']/g, ch => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'}[ch]));
-      
-      container.innerHTML = top.map((m, i) => `
-        <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 12px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:12px; margin-bottom:6px;">
-          <div style="display:flex; align-items:center; gap:10px;">
-            <div style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;">${i + 1}</div>
-            <div><div style="font-size:12px;font-weight:700;color:#fff;">${esc(m.displayId)}</div></div>
-          </div>
-          <div style="font-size:12px;font-weight:800;color:var(--accent-green);">${m.balance.toLocaleString()} ADI$</div>
-        </div>`).join('');
-    } catch (err) {
-      console.error("Leaderboard error:", err);
-    }
-  });
-}
+      const items = Object.values(historyData).reverse();
 
       // 1. Profile Page Activity History Card
       if (profileList) {
