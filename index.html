@@ -3582,6 +3582,16 @@
   balance: Number(u.balance)||0 };
   
 });
+                  const isMe = (m.uid === myUserId || m.username === myUserId || uid === myUserId);
+
+          const bgStyle = isMe 
+            ? 'background: rgba(255, 215, 0, 0.15); border: 1px solid #ffd700;' 
+            : 'background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);'; 
+
+          const nameColor = isMe ? 'color: #ffd700;' : 'color: #fff;';
+          const badgeText = isMe ? `${i + 1} (You)` : `${i + 1}`;
+        });
+  
         miners.sort((a,b)=>b.balance-a.balance || b.totalMined-a.totalMined);
         const top=miners.slice(0,20);
         if(!top.length){
