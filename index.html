@@ -5006,31 +5006,7 @@ setupAdTrigger('web3ConnectBtn');
   document.addEventListener('DOMContentLoaded', () => { restoreCommunityLinkState(); showCommunityGateIfNeeded(); });
   // Re-check when returning from Telegram and after app startup.
   setTimeout(() => { restoreCommunityLinkState(); showCommunityGateIfNeeded(); }, 0);
-    // টেলিগ্রাম থেকে ইউজারের আসল তথ্য চেক করে ফায়ারবেসে সেভ করার ফাংশন
-    function saveTelegramUserToFirebase() {
-      const tgUser = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initDataUnsafe.user : null;
-      
-      if (tgUser && tgUser.id) {
-        const uid = tgUser.id; // টেলিগ্রামের আসল ইউজার আইডি
-        const realUsername = (tgUser.first_name || '') + (tgUser.last_name ? ' ' + tgUser.last_name : '') || tgUser.username || ('User ' + String(uid).slice(-4));
-        
-        // ফায়ারবেসে এই আসল নামসহ ডাটা সেভ বা আপডেট করে দেওয়া
-        database.ref('users/' + uid).update({
-          username: realUsername,
-          firstName: tgUser.first_name || '',
-          lastName: tgUser.last_name || '',
-          telegramUsername: tgUser.username || ''
-        }).then(() => {
-          console.log("Telegram user name successfully saved:", realUsername);
-        });
-      }
-    }
-
-    // পেজ লোড হওয়ার সাথে সাথে ফাংশনটি অটোমেটিক রান করার জন্য কল করা হলো
-    window.addEventListener('DOMContentLoaded', () => {
-      saveTelegramUserToFirebase();
-    });
-
+    
 </script>
 
 </body>
