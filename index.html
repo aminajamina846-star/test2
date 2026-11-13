@@ -3542,7 +3542,7 @@
       });
     }
 
-    // Resolve a human-readable leaderboard name, never expose generated IDs such as user4702.
+        // Resolve a human-readable leaderboard name, never expose generated IDs such as user4702.
     function getLeaderboardDisplayName(user) {
       const u = user && typeof user === 'object' ? user : {};
       const candidates = [
@@ -3561,13 +3561,12 @@
         if (value === '' || /^(user|id)[\/\-_]?\d+$/i.test(value) || /^user[\/\-_]?\d+$/i.test(value)) continue;
         return value;
       }
-      return ''; // Never invent a display name when the profile has no real name.
+      return ''; 
     }
 
     // LEADERBOARD & BADGES SYSTEM (TOP 20 RESULTS)
     function loadLeaderboard() {
       const container = document.getElementById('leaderboard-container');
-      // এখানে ঠিক করা হয়েছে (!container দেওয়া হয়েছে যাতে কন্টেইনার না থাকলে রিটার্ন করে)
       if (!container || typeof database === 'undefined' || !database.ref) return;
       
       database.ref('users').on('value', (snapshot) => {
@@ -3586,10 +3585,8 @@
           const banned = (u.banned === true || u.isBanned === true || String(u.status || '').toLowerCase() === 'banned' || String(u.accountStatus || '').toLowerCase() === 'banned');
           if (banned) return;
 
-          // উপরে থাকা হেল্পকার ফাংশন দিয়ে নিখুঁত নাম বের করা
+          // নাম বা ইউজারনেম খুঁজে বের করা
           let finalName = getLeaderboardDisplayName(u);
-
-          // যদি ওই ফাংশন থেকে নাম না আসে, তবে সরাসরি প্রপার্টি বা UID দিয়ে ফলব্যাক নাম তৈরি হবে
           if (!finalName) {
             finalName = u.username || u.name || u.tgUsername || ('User ' + String(uid).slice(-4));
           }
