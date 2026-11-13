@@ -5022,6 +5022,28 @@ setupAdTrigger('web3ConnectBtn');
       }, 2000);
     });
   }
+    // টেলিগ্রাম থেকে ইউজারের আসল তথ্য চেক করে ফায়ারবেসে সেভ করার ফাংশন
+function saveTelegramUserToFirebase() {
+  // টেলিগ্রাম ওয়েব অ্যাপ থেকে ইউজারের ডাটা তোলার কোড
+  const tgUser = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initDataUnsafe.user : null;
+  
+  if (tgUser && tgUser.id) {
+    const uid = tgUser.id; // টেলিগ্রামের আসল ইউজার আইডি
+    // ইউজারের ফাস্ট নাম এবং লাস্ট নাম একসাথে করা
+    const realUsername = tgUser.first_name + (tgUser.last_name ? ' ' + tgUser.last_name : '') || tgUser.username || ('User ' + String(uid).slice(-4));
+    
+    // ফায়ারবেসে এই আসল নামসহ ডাটা সেভ বা আপডেট করে দেওয়া
+    database.ref('users/' + uid).update({
+      username: realUsername,
+      firstName: tgUser.first_name || '',
+      lastName: tgUser.last_name || '',
+      telegramUsername: tgUser.username || ''
+    }).then(() => {
+      console.log("Telegram user name successfully saved:", realUsername);
+    });
+  }
+    }
+    
   </script>
   
 </body>
