@@ -3591,11 +3591,8 @@
           // ফায়ারবেস থেকে নাম অথবা নাম না থাকলে আইডি দিয়ে নাম সেট করা
           const displayName = u.username || u.name || ('User ' + String(uid).slice(-4));
           return { 
-            uid, 
-            username: displayName, 
-            balance: Number(u.balance) || 0, 
-            totalMined: Number(u.totalMined) || 0 
-          };
+            username: u.username || u.name || ('User ' + String(uid).slice(-4))
+            
         });
 
         miners.sort((a, b) => b.balance - a.balance || b.totalMined - a.totalMined);
