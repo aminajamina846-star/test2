@@ -3565,11 +3565,11 @@
     }
 
     // LEADERBOARD & BADGES SYSTEM (TOP 20 MEMBERS)
-                            function loadLeaderboard() {
+                                function loadLeaderboard() {
       const container = document.getElementById('leaderboard-container');
       if (!container || typeof database === 'undefined' || !database.ref) return;
       
-      // ব্রাউজারের লোকালস্টোরেজ বা গ্লোবাল ভেরিয়েবল থেকে আপনার আইডি অটোমেটিক খুঁজে নেওয়ার কোড
+      // ব্রাউজারে যার যার নিজস্ব আইডি বা টেলিগ্রাম আইডি সেভ করা থাকে, সেটি ফেচ করা হচ্ছে
       const myUserId = String(
         (typeof currentUserId !== 'undefined' && currentUserId) || 
         localStorage.getItem('telegramId') || 
@@ -3608,21 +3608,20 @@
         const esc=v=>String(v).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));
         
         container.innerHTML = top.map((m, i) => {
-          // অটোমেটিক আপনার আইডি, টেলিগ্রাম আইডি বা নামের শেষ অংশ মিলিয়ে চেক করবে
+          // এটি শুধু যার যার নিজের ডিভাইসে তার নিজের আইডির সাথে মিলবে
           const isMe = myUserId && (
             m.uid === myUserId || 
             m.telegramId === myUserId || 
             m.telegramId.endsWith(myUserId) || 
-            myUserId.endsWith(m.telegramId) ||
-            m.username.includes(myUserId)
+            myUserId.endsWith(m.telegramId)
           );
 
-          // নিজের আইডি হলে গোল্ডেন কালার এবং বর্ডার হবে
+          // যে যার নিজের অ্যাকাউন্ট দেখবে, শুধু তারটাই গোল্ডেন কালার ও (You) দেখাবে
           const bgStyle = isMe 
-            ? 'background: rgba(255, 215, 0, 0.2); border: 1.5px solid #ffd700;' 
+            ? 'background: rgba(255, 215, 0, 0.15); border: 1px solid #ffd700;' 
             : 'background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);'; 
 
-          const nameColor = isMe ? 'color: #ffd700; font-weight: 900;' : 'color: #fff;';
+          const nameColor = isMe ? 'color: #ffd700; font-weight: 800;' : 'color: #fff;';
           const badgeText = isMe ? `${i + 1} (You)` : `${i + 1}`;
 
           return `
@@ -3636,6 +3635,7 @@
         }).join('');
       });
     }
+
 
   function renderUserHistory(historyData) {
       window.__userHistoryCache = historyData || {};
