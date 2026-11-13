@@ -3565,12 +3565,12 @@
     }
 
     // LEADERBOARD & BADGES SYSTEM (TOP 20 MEMBERS)
-                    function loadLeaderboard() {
+                        function loadLeaderboard() {
       const container = document.getElementById('leaderboard-container');
       if (!container || typeof database === 'undefined' || !database.ref) return;
       
-      // আপনার নিজের আইডি বা টেলিগ্রাম আইডি চেনার জন্য
-      const myUserId = (typeof currentUserId !== 'undefined' && currentUserId) ? currentUserId : (localStorage.getItem('userId') || localStorage.getItem('telegramId') || ''); 
+      // আপনার ব্রাউজার বা লোকালস্টোরেজ থেকে আইডি নেওয়ার সঠিক পদ্ধতি
+      const myUserId = (typeof currentUserId !== 'undefined' && currentUserId) ? String(currentUserId) : String(localStorage.getItem('userId') || localStorage.getItem('telegramId') || ''); 
 
       database.ref('users').on('value', (snapshot) => {
         const users = snapshot.exists() ? snapshot.val() : {};
@@ -3580,10 +3580,10 @@
           return (!banned && (!isLegacyBrowserUid(uid) || uid === BROWSER_SHARED_UID));
         }).map(uid => {
           const u = users[uid] || {};
-          const tgId = u.telegramId || u.id || uid;
-          const displayName = u.username || ('user' + String(tgId).slice(-4));
+          const tgId = String(u.telegramId || u.id || uid);
+          const displayName = u.username || ('user' + tgId.slice(-4));
           return { 
-            uid, 
+            uid: String(uid), 
             telegramId: tgId,
             username: displayName, 
             balance: Number(u.balance)||0, 
@@ -3602,10 +3602,10 @@
         const esc=v=>String(v).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));
         
         container.innerHTML = top.map((m, i) => {
-          // চেক করা হচ্ছে এটি আপনার আইডি কিনা
-          const isMe = (myUserId && (m.uid === myUserId || m.telegramId == myUserId || m.username === myUserId));
+          // আপনার আইডি মিলছে কিনা তা চেক করা (uid, telegramId বা শেষ ৪ ডিজিট দিয়ে)
+          const isMe = myUserId && (m.uid === myUserId || m.telegramId === myUserId || myUserId.endsWith(m.telegramId) || m.telegramId.endsWith(myUserId));
 
-          // নিজের আইডি হলে কালার এবং বর্ডার হবে, অন্যদের জন্য সাধারণ থাকবে
+          // নিজের আইডি হলে গোল্ডেন কালার, অন্যদের জন্য নরমাল
           const bgStyle = isMe 
             ? 'background: rgba(255, 215, 0, 0.15); border: 1px solid #ffd700;' 
             : 'background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);'; 
@@ -3614,9 +3614,9 @@
           const badgeText = isMe ? `${i + 1} (You)` : `${i + 1}`;
 
           return `
-            <div style="display:flex; align-items:center; justify-space-between; padding:10px 12px; ${bgStyle} border-radius:12px; margin-bottom: 6px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 12px; ${bgStyle} border-radius:12px; margin-bottom: 6px;">
               <div style="display:flex; align-items:center; gap:10px;">
-                <div style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;">${badgeText}</div>
+                <div style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800; color:#fff;">${badgeText}</div>
                 <div><div style="font-size:12px;font-weight:700; ${nameColor}">${esc(m.username)}</div></div>
               </div>
               <div style="font-size:12px;font-weight:800;color:var(--accent-green);">${m.balance.toLocaleString()} ADI$</div>
