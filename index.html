@@ -3542,7 +3542,7 @@
       });
     }
 
-    // Resolve a human-readable leaderboard name; never expose generated IDs such as user4789.
+    // Resolve a human-readable leaderboard name, never expose generated IDs such as user4702.
     function getLeaderboardDisplayName(user) {
       const u = user && typeof user === 'object' ? user : {};
       const candidates = [
@@ -3558,27 +3558,27 @@
       for (const candidate of candidates) {
         if (typeof candidate !== 'string') continue;
         const value = candidate.trim();
-        if (!value || /^user\d+$/i.test(value) || /^user[_ -]?\d+$/i.test(value)) continue;
+        if (value === '' || /^(user|id)[\/\-_]?\d+$/i.test(value) || /^user[\/\-_]?\d+$/i.test(value)) continue;
         return value;
       }
       return ''; // Never invent a display name when the profile has no real name.
     }
 
-    // LEADERBOARD & BADGES SYSTEM (TOP 20 MEMBERS)
-                function loadLeaderboard() {
+    // LEADERBOARD & BADGES SYSTEM (TOP 20 RESULTS)
+    function loadLeaderboard() {
       const container = document.getElementById('leaderboard-container');
+      // এখানে ঠিক করা হয়েছে (!container দেওয়া হয়েছে যাতে কন্টেইনার না থাকলে রিটার্ন করে)
       if (!container || typeof database === 'undefined' || !database.ref) return;
       
       database.ref('users').on('value', (snapshot) => {
         if (!snapshot.exists()) {
-          container.innerHTML = '<div style="text-align:center; color:#888; font-size:12px; padding:10px 0;">No users found in database.</div>';
+          container.innerHTML = '<div style="text-align:center; color:#888; font-size:12px; padding:10px 0;">No users found.</div>';
           return;
         }
 
         const usersData = snapshot.val();
         const miners = [];
 
-        // লুপ চালিয়ে প্রতিটি ইউজারের ডেটা আলাদা করা হচ্ছে
         Object.keys(usersData).forEach(uid => {
           const u = usersData[uid] || {};
           
@@ -3586,20 +3586,12 @@
           const banned = (u.banned === true || u.isBanned === true || String(u.status || '').toLowerCase() === 'banned' || String(u.accountStatus || '').toLowerCase() === 'banned');
           if (banned) return;
 
-          // আপনার স্ক্রিনশট অনুযায়ী ডেটাবেসে সরাসরি u.username রয়েছে ("abdulAziz")
-          let finalName = u.username 
-            || u.name 
-            || u.tgUsername 
-            || u.telegramUsername 
-            || u.displayName 
-            || u.fullName;
+          // উপরে থাকা হেল্পকার ফাংশন দিয়ে নিখুঁত নাম বের করা
+          let finalName = getLeaderboardDisplayName(u);
 
-          if (!finalName && (u.first_name || u.last_name)) {
-            finalName = (u.first_name || '') + (u.last_name ? ' ' + u.last_name : '');
-          }
-
+          // যদি ওই ফাংশন থেকে নাম না আসে, তবে সরাসরি প্রপার্টি বা UID দিয়ে ফলব্যাক নাম তৈরি হবে
           if (!finalName) {
-            finalName = 'User ' + String(uid).slice(-4);
+            finalName = u.username || u.name || u.tgUsername || ('User ' + String(uid).slice(-4));
           }
 
           miners.push({
@@ -3610,7 +3602,7 @@
           });
         });
 
-        // সর্টিং (যাদের ব্যালেন্স বেশি তারা উপরে থাকবে)
+        // সর্টিং (বেশি ব্যালেন্স ওয়ালারা উপরে থাকবে)
         miners.sort((a, b) => b.balance - a.balance || b.totalMined - a.totalMined);
         const top = miners.slice(0, 20);
 
@@ -3624,15 +3616,13 @@
         container.innerHTML = top.map((m, i) => `
           <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 12px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:12px; margin-bottom:6px;">
             <div style="display:flex; align-items:center; gap:10px;">
-              <div style="width:28px;height:28px;border-radius:50%;background:${i === 0 ? '#ffd700' : i === 1 ? '#c0c0c0' : i === 2 ? '#cd7f32' : 'rgba(255,255,25`esis,255,0.08)'};color:${i < 3 ? '#000' : '#fff'};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;">${i + 1}</div>
+              <div style="width:28px;height:28px;border-radius:50%;background:${i === 0 ? '#ffd700' : i === 1 ? '#c0c0c0' : i === 2 ? '#cd7f32' : 'rgba(255,255,255,0.08)'};color:${i < 3 ? '#000' : '#fff'};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;">${i + 1}</div>
               <div><div style="font-size:12px;font-weight:700;color:#fff;">${esc(m.username)}</div></div>
             </div>
             <div style="font-size:12px;font-weight:800;color:var(--accent-green, #00ff88);">${m.balance.toLocaleString()} ADI$</div>
           </div>`).join('');
       });
     }
-
-
 
       // 1. Profile Page Activity History Card
       if (profileList) {
