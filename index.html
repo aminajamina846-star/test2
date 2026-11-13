@@ -3577,7 +3577,7 @@
         }).map(uid => {
           const u = users[uid] || {};
           return { uid, username:u.username||'User', balance:Number(u.balance)||0, totalMined:Number(u.totalMined)||0 };
-        });
+ });
         miners.sort((a,b)=>b.balance-a.balance || b.totalMined-a.totalMined);
         const top=miners.slice(0,20);
         if(!top.length){
