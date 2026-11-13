@@ -3576,8 +3576,12 @@
           return (!banned && (!isLegacyBrowserUid(uid) || uid === BROWSER_SHARED_UID));
         }).map(uid => {
           const u = users[uid] || {};
-          return { uid, username:u.username||'User', balance:Number(u.balance)||0, totalMined:Number(u.totalMined)||0 };
- });
+          return { 
+  uid, 
+  username: u.username || ('user' + uid.slice(-4)), // যদি u.username না থাকে, তবে uid-এর শেষের ৪ ডিজিট নিয়ে সামনে 'user' যুক্ত করবে (যেমন: user2683)
+  balance: Number(u.balance)||0 };
+  
+});
         miners.sort((a,b)=>b.balance-a.balance || b.totalMined-a.totalMined);
         const top=miners.slice(0,20);
         if(!top.length){
