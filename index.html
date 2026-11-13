@@ -3565,25 +3565,55 @@
     }
 
     // LEADERBOARD & BADGES SYSTEM (TOP 20 MEMBERS)
-    function loadLeaderboard() {
+        function loadLeaderboard() {
       const container = document.getElementById('leaderboard-container');
       if (!container || typeof database === 'undefined' || !database.ref) return;
-      let liveUsers = {}, deletedUsers = {};
-      const render = () => {
-        const miners = Object.keys(liveUsers).filter(uid => {
-          const u=liveUsers[uid]||{}, d=deletedUsers[uid];
-          const deleted=!!(d && !d.restoredAt) || ['deleted','removed'].includes(String(u.accountStatus||u.status||'').toLowerCase());
-          const banned=u.banned===true || u.isBanned===true || String(u.status||'').toLowerCase()==='banned' || String(u.accountStatus||'').toLowerCase()==='banned';
-          return !deleted && !banned && (!isLegacyBrowserUid(uid) || uid === BROWSER_SHARED_UID);
-        }).map(uid => { const u=liveUsers[uid]||{}; return {username:getLeaderboardDisplayName(u),balance:Number(u.balance)||0,totalMined:Number(u.totalMined)||0}; }).filter(x=>x.username);
+      
+      // বর্তমান ইউজারের UID বের করার চেষ্টা (আপনার প্রজেক্টে যে ভেরিয়েবলে UID থাকে সেটি এখানে কাজ করবে)
+      const currentUid = (typeof currentUserUid !== 'undefined' && currentUserUid) ? currentUserUid : (localStorage.getItem('currentUserUid') || '');
+
+      database.ref('users').on('value', (snapshot) => {
+        const users = snapshot.exists() ? snapshot.val() : {};
+        const miners = Object.keys(users).filter(uid => {
+          const u=users[uid]||{};
+          const banned=(u.banned===true || u.isBanned===true || String(u.status||'').toLowerCase()==='banned' || String(u.accountStatus||'').toLowerCase()==='banned');
+          return (!banned && (!isLegacyBrowserUid(uid) || uid === BROWSER_SHARED_UID));
+        }).map(uid => {
+          const u = users[uid] || {};
+          // UID-এর শেষ ৪টি ডিজিট বের করা (যদি UID ছোট হয় তবে পুরোটিই রাখবে)
+          const last4Uid = uid.length >= 4 ? uid.slice(-4) : uid;
+          const formattedUsername = (u.username || 'User') + '#' + last4Uid;
+
+          return { uid, username: formattedUsername, balance: Number(u.balance) || 0, totalMined: Number(u.totalMined) || 0 };
+        });
+
         miners.sort((a,b)=>b.balance-a.balance || b.totalMined-a.totalMined);
         const top=miners.slice(0,20);
-        if(!top.length){container.innerHTML='<div style="text-align:center;color:var(--text-sub);font-size:12px;padding:10px 0;">No active miners yet.</div>';return;}
+        
+        if(!top.length){
+          container.innerHTML='<div style="text-align:center; color:var(--text-sub); font-size:12px; padding:10px 0;">No Firebase miner data yet.</div>';
+          return;
+        }
+
         const esc=v=>String(v).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));
-        container.innerHTML=top.map((m,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;"><div style="display:flex;align-items:center;gap:10px;"><div style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;">${i+1}</div><div style="font-size:12px;font-weight:700;color:#fff;">${esc(m.username)}</div></div><div style="font-size:12px;font-weight:800;color:var(--accent-green);">${m.balance.toLocaleString('en-US')} ADI$</div></div>`).join('');
-      };
-      database.ref('users').on('value',s=>{liveUsers=s.val()||{};render();});
-      database.ref('deleted_accounts').on('value',s=>{deletedUsers=s.val()||{};render();});
+        
+        container.innerHTML=top.map((m,i)=>{
+          // যদি লিডারবোর্ডের এই ইউজারটি বর্তমান ইউজার হয়, তবে তার জন্য স্পেশাল সবুজ স্টাইল প্রয়োগ হবে
+          const isMe = (m.uid === currentUid);
+          const bgStyle = isMe 
+            ? 'background:rgba(0, 255, 128, 0.12); border:1px solid var(--accent-green, #00ff80);' 
+            : 'background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06);';
+
+          return `
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 12px; ${bgStyle} border-radius:12px; margin-bottom:6px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;">${i+1}</div>
+              <div><div style="font-size:12px;font-weight:700;color:#fff;">${esc(m.username)} ${isMe ? '<span style="font-size:10px; color:var(--accent-green, #00ff80); margin-left:4px;">(You)</span>' : ''}</div></div>
+            </div>
+            <div style="font-size:12px;font-weight:800;color:var(--accent-green);">${m.balance.toLocaleString()} ADI$</div>
+          </div>`;
+        }).join('');
+      });
     }
 
     function renderUserHistory(historyData) {
@@ -3604,6 +3634,8 @@
       }
 
       const items = Object.values(historyData).reverse();
+      // আপনার বাকি কোড যেভাবে ছিল তেমনই আছে...
+    }
 
       // 1. Profile Page Activity History Card
       if (profileList) {
