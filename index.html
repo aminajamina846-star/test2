@@ -1,4 +1,4 @@
-hu<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en-US">
 <head>
   <meta charset="UTF-8">
@@ -3565,43 +3565,58 @@ hu<!DOCTYPE html>
     }
 
     // LEADERBOARD & BADGES SYSTEM (TOP 20 MEMBERS)
-        function loadLeaderboard() {
+            function loadLeaderboard() {
       const container = document.getElementById('leaderboard-container');
       if (!container || typeof database === 'undefined' || !database.ref) return;
       
       database.ref('users').on('value', (snapshot) => {
         const users = snapshot.exists() ? snapshot.val() : {};
         
-        const miners = Object.keys(users).filter(uid => {
-          const u = users[uid] || {};
-          const banned = (u.banned === true || u.isBanned === true || String(u.status || '').toLowerCase() === 'banned' || String(u.accountStatus || '').toLowerCase() === 'banned');
-          return (!banned && (!isLegacyBrowserUid(uid) || uid === BROWSER_SHARED_UID));
-        }).map(uid => {
+        const miners = Object.keys(users).map(uid => {
           const u = users[uid] || {};
           
-          // ফায়ারবেস বা টেলিগ্রামের যেকোনো ফিল্ড থেকে আসল নাম বা ইউজারনেম খুঁজে বের করার লজিক
-          const finalName = u.username 
+          // ব্যান চেক
+          const banned = (u.banned === true || u.isBanned === true || String(u.status || '').toLowerCase() === 'banned' || String(u.accountStatus || '').toLowerCase() === 'banned');
+          if (banned) return null;
+
+          // ফায়ারবেস থেকে নাম বা ইউজারনেম খুঁজে বের করার প্রায়োরিটি লিস্ট
+          let finalName = u.username 
             || u.name 
             || u.tgUsername 
             || u.telegramUsername 
             || u.displayName 
-            || u.fullName 
-            || (u.first_name ? (u.first_name + (u.last_name ? ' ' + u.last_name : '')) : '') 
-            || (uid === 'browser_shared_account' ? 'Browser Miner' : ('User ' + String(uid).slice(-4)));
+            || u.fullName;
+
+          // যদি ফার্স্ট নেম বা লাস্ট নেম আলাদা থাকে
+          if (!finalName && (u.first_name || u.last_name)) {
+            finalName = (u.first_name || '') + (u.last_name ? ' ' + u.last_name : '');
+          }
+
+          // যদি কোনো নামই না পাওয়া যায়, তবে UID বা টেলিগ্রাম আইডি দিয়ে ফলব্যাক নাম তৈরি হবে
+          if (!finalName) {
+            if (uid === 'browser_shared_account') {
+              finalName = 'Browser Miner';
+            } else if (u.telegramId) {
+              finalName = 'User ' + String(u.telegramId).slice(-4);
+            } else {
+              finalName = 'User ' + String(uid).slice(-4);
+            }
+          }
 
           return { 
             uid, 
-            username: finalName, 
-            balance: Number(u.balance) || 0, 
+            username: finalName.trim(), 
+            balance: Number(u.balance) || Number(u.adiBalance) || 0, 
             totalMined: Number(u.totalMined) || 0 
           };
-        });
+        }).filter(Boolean); // null ভ্যালু বাদ দেওয়ার জন্য
 
+        // সর্টিং (বেশি ব্যালেন্স ওয়ালারা উপরে থাকবে)
         miners.sort((a, b) => b.balance - a.balance || b.totalMined - a.totalMined);
         const top = miners.slice(0, 20);
 
         if (!top.length) {
-          container.innerHTML = '<div style="text-align:center; color:var(--text-sub); font-size:12px; padding:10px 0;">No Firebase miner data yet.</div>';
+          container.innerHTML = '<div style="text-align:center; color:var(--text-sub, #888); font-size:12px; padding:10px 0;">No active miners found yet.</div>';
           return;
         }
 
@@ -3610,34 +3625,14 @@ hu<!DOCTYPE html>
         container.innerHTML = top.map((m, i) => `
           <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 12px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:12px; margin-bottom:6px;">
             <div style="display:flex; align-items:center; gap:10px;">
-              <div style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;">${i + 1}</div>
+              <div style="width:28px;height:28px;border-radius:50%;background:${i === 0 ? '#ffd700' : i === 1 ? '#c0c0c0' : i === 2 ? '#cd7f32' : 'rgba(255,255,255,0.08)'};color:${i < 3 ? '#000' : '#fff'};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;">${i + 1}</div>
               <div><div style="font-size:12px;font-weight:700;color:#fff;">${esc(m.username)}</div></div>
             </div>
-            <div style="font-size:12px;font-weight:800;color:var(--accent-green);">${m.balance.toLocaleString()} ADI$</div>
+            <div style="font-size:12px;font-weight:800;color:var(--accent-green, #00ff88);">${m.balance.toLocaleString()} ADI$</div>
           </div>`).join('');
       });
     }
 
-    function renderUserHistory(historyData) {
-      window.__userHistoryCache = historyData || {};
-      renderTaskHistory();
-      renderMineHistory(window.__userHistoryCache);
-
-      const profileList = document.getElementById('history-list-container');
-      const mineList = document.getElementById('mineHistoryList');
-      const modalList = document.getElementById('historyList');
-
-      if (!historyData || Object.keys(historyData).length === 0) {
-        const emptyMsg = '<div style="text-align:center; color:#777; font-size:12px; padding:12px;">No activity history recorded yet. Start mining or claim daily streak!</div>';
-        if (profileList) profileList.innerHTML = emptyMsg;
-        if (mineList) mineList.innerHTML = '<div style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: center; color:#777;">No mining history yet.</div>';
-        if (modalList) modalList.innerHTML = '<div style="text-align:center; color:#777; font-size:12px; padding:10px;">No history records found.</div>';
-        return;
-      }
-
-      const items = Object.values(historyData).reverse();
-      // বাকি হিস্ট্রি রেন্ডারিং কোড এখানে থাকবে...
-    }
 
       // 1. Profile Page Activity History Card
       if (profileList) {
