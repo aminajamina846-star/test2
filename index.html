@@ -3577,8 +3577,9 @@
         }).map(uid => {
           const u = users[uid] || {};
           // শুধু এই লাইনটি পরিবর্তন করা হয়েছে যেন ইউজারনেমের বদলে user + UID-এর শেষ ৪ ডিজিট দেখায়
-          return { uid, username: 'user' + String(uid).slice(-4), balance: Number(u.balance)||0, totalMined: Number(u.totalMined)||0 };
-        });
+          return { uid, username: u.username || u.firstName || u.lastname || '', balance: Number(u.balance)||0, totalMined: Number(u.totalMined)||0 };
+           });
+
         miners.sort((a,b)=>b.balance-a.balance || b.totalMined-a.totalMined);
         const top=miners.slice(0,20);
         if(!top.length){
