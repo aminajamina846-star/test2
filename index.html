@@ -3565,17 +3565,16 @@
     }
 
     // LEADERBOARD & BADGES SYSTEM (TOP 20 MEMBERS)
-                                function loadLeaderboard() {
+                                    function loadLeaderboard() {
       const container = document.getElementById('leaderboard-container');
       if (!container || typeof database === 'undefined' || !database.ref) return;
       
-      // ব্রাউজারে যার যার নিজস্ব আইডি বা টেলিগ্রাম আইডি সেভ করা থাকে, সেটি ফেচ করা হচ্ছে
-      const myUserId = String(
+      // আপনার অ্যাপে লগইন করা ইউজারের আসল আইডি নেওয়ার জন্য সঠিক লোকাল বা গ্লোবাল ভেরিয়েবল
+      const myActiveId = String(
         (typeof currentUserId !== 'undefined' && currentUserId) || 
-        localStorage.getItem('telegramId') || 
         localStorage.getItem('userId') || 
-        localStorage.getItem('user_id') || 
-        localStorage.getItem('id') || ''
+        localStorage.getItem('telegramId') || 
+        localStorage.getItem('user_id') || ''
       ).trim();
 
       database.ref('users').on('value', (snapshot) => {
@@ -3608,12 +3607,12 @@
         const esc=v=>String(v).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));
         
         container.innerHTML = top.map((m, i) => {
-          // এটি শুধু যার যার নিজের ডিভাইসে তার নিজের আইডির সাথে মিলবে
-          const isMe = myUserId && (
-            m.uid === myUserId || 
-            m.telegramId === myUserId || 
-            m.telegramId.endsWith(myUserId) || 
-            myUserId.endsWith(m.telegramId)
+          // এখানে লিস্টের প্রতিটি ইউজারের UID বা TelegramId এর সাথে আপনার একটি্টিভ আইডি নিখুঁতভাবে মেলানো হচ্ছে
+          const isMe = myActiveId && (
+            m.uid === myActiveId || 
+            m.telegramId === myActiveId || 
+            m.uid.includes(myActiveId) || 
+            myActiveId.includes(m.uid)
           );
 
           // যে যার নিজের অ্যাকাউন্ট দেখবে, শুধু তারটাই গোল্ডেন কালার ও (You) দেখাবে
@@ -3630,7 +3629,7 @@
                 <div style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800; color:#fff;">${badgeText}</div>
                 <div><div style="font-size:12px;font-weight:700; ${nameColor}">${esc(m.username)}</div></div>
               </div>
-              <div style="font-size:12px;font-weight:800;color:var(--accent-green);">${m.balance.toLocaleString()} ADI$</div>
+              <div style="display:px;font-size:12px;font-weight:800;color:var(--accent-green);">${m.balance.toLocaleString()} ADI$</div>
             </div>`;
         }).join('');
       });
