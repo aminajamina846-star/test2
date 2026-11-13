@@ -3575,15 +3575,7 @@
           const banned=(u.banned===true || u.isBanned===true || String(u.status||'').toLowerCase()==='banned' || String(u.accountStatus||'').toLowerCase()==='banned');
           return (!banned && (!isLegacyBrowserUid(uid) || uid === BROWSER_SHARED_UID));
         }).map(uid => {
-          const finalName = u.username 
-  || u.name 
-  || u.tgUsername 
-  || u.telegramUsername 
-  || u.displayName 
-  || u.fullName 
-  || (u.first_name ? (u.first_name + (u.last_name ? ' ' + u.last_name : '')) : '') 
-  || (u.firstName ? (u.firstName + (u.lastName ? ' ' + u.lastName : '')) : '') 
-  || (uid === 'browser_shared_account' ? 'Browser Miner' : ('User ' + String(uid).slice(-4)));
+          const finalName = getLeaderboardDisplayName(u) || (uid === 'browser_shared_account' ? 'Browser Miner' : ('User ' + String(uid).slice(-4)));
 
 
         miners.sort((a,b)=>b.balance-a.balance || b.totalMined-a.totalMined);
