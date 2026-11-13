@@ -3565,11 +3565,12 @@
     }
 
     // LEADERBOARD & BADGES SYSTEM (TOP 20 MEMBERS)
-            function loadLeaderboard() {
+                function loadLeaderboard() {
       const container = document.getElementById('leaderboard-container');
       if (!container || typeof database === 'undefined' || !database.ref) return;
       
-      const myUserId = typeof currentUserId !== 'undefined' ? currentUserId : localStorage.getItem('userId') || ''; 
+      // ১. আপনার নিজের আইডি বা টেলিগ্রাম আইডি ব্রাউজার থেকে নেওয়ার কোড
+      const myUserId = (typeof currentUserId !== 'undefined' && currentUserId) ? currentUserId : (localStorage.getItem('userId') || localStorage.getItem('telegramId') || ''); 
 
       database.ref('users').on('value', (snapshot) => {
         const users = snapshot.exists() ? snapshot.val() : {};
@@ -3579,11 +3580,14 @@
           return (!banned && (!isLegacyBrowserUid(uid) || uid === BROWSER_SHARED_UID));
         }).map(uid => {
           const u = users[uid] || {};
+          const tgId = u.telegramId || u.id || uid;
+          const displayName = u.username || ('user' + String(tgId).slice(-4));
           return { 
             uid, 
-            username: u.username || ('user' + uid.slice(-4)), 
-            balance: Number(u.balance)||0,
-            totalMined: Number(u.totalMined)||0
+            telegramId: tgId,
+            username: displayName, 
+            balance: Number(u.balance)||0, 
+            totalMined: Number(u.totalMined)||0 
           };
         });
 
@@ -3598,13 +3602,15 @@
         const esc=v=>String(v).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));
         
         container.innerHTML = top.map((m, i) => {
-          const isMe = (m.uid === myUserId || m.username === myUserId);
+          // ২. চেক করা হচ্ছে এটি আপনার আইডি কিনা
+          const isMe = (myUserId && (m.uid === myUserId || m.telegramId == myUserId || m.username === myUserId));
 
+          // ৩. নিজের আইডি হলে কালার এবং বর্ডার হবে, অন্যদের জন্য সাধারণ থাকবে
           const bgStyle = isMe 
             ? 'background: rgba(255, 215, 0, 0.15); border: 1px solid #ffd700;' 
             : 'background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);'; 
 
-          const nameColor = isMe ? 'color: #ffd700;' : 'color: #fff;';
+          const nameColor = isMe ? 'color: #ffd700; font-weight: 800;' : 'color: #fff;';
           const badgeText = isMe ? `${i + 1} (You)` : `${i + 1}`;
 
           return `
@@ -3617,7 +3623,8 @@
             </div>`;
         }).join('');
       });
-            }
+    }
+
   function renderUserHistory(historyData) {
       window.__userHistoryCache = historyData || {};
       renderTaskHistory();
