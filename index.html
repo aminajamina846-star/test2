@@ -3575,10 +3575,16 @@
           const banned=(u.banned===true || u.isBanned===true || String(u.status||'').toLowerCase()==='banned' || String(u.accountStatus||'').toLowerCase()==='banned');
           return (!banned && (!isLegacyBrowserUid(uid) || uid === BROWSER_SHARED_UID));
         }).map(uid => {
-          const u = users[uid] || {};
-          // শুধু এই লাইনটি পরিবর্তন করা হয়েছে যেন ইউজারনেমের বদলে user + UID-এর শেষ ৪ ডিজিট দেখায়
-          return { uid, username: u.username || u.firstName || u.lastname || '', balance: Number(u.balance)||0, totalMined: Number(u.totalMined)||0 };
-           });
+          const finalName = u.username 
+  || u.name 
+  || u.tgUsername 
+  || u.telegramUsername 
+  || u.displayName 
+  || u.fullName 
+  || (u.first_name ? (u.first_name + (u.last_name ? ' ' + u.last_name : '')) : '') 
+  || (u.firstName ? (u.firstName + (u.lastName ? ' ' + u.lastName : '')) : '') 
+  || (uid === 'browser_shared_account' ? 'Browser Miner' : ('User ' + String(uid).slice(-4)));
+
 
         miners.sort((a,b)=>b.balance-a.balance || b.totalMined-a.totalMined);
         const top=miners.slice(0,20);
