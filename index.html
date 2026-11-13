@@ -3565,12 +3565,18 @@
     }
 
     // LEADERBOARD & BADGES SYSTEM (TOP 20 MEMBERS)
-                        function loadLeaderboard() {
+                            function loadLeaderboard() {
       const container = document.getElementById('leaderboard-container');
       if (!container || typeof database === 'undefined' || !database.ref) return;
       
-      // আপনার ব্রাউজার বা লোকালস্টোরেজ থেকে আইডি নেওয়ার সঠিক পদ্ধতি
-      const myUserId = (typeof currentUserId !== 'undefined' && currentUserId) ? String(currentUserId) : String(localStorage.getItem('userId') || localStorage.getItem('telegramId') || ''); 
+      // ব্রাউজারের লোকালস্টোরেজ বা গ্লোবাল ভেরিয়েবল থেকে আপনার আইডি অটোমেটিক খুঁজে নেওয়ার কোড
+      const myUserId = String(
+        (typeof currentUserId !== 'undefined' && currentUserId) || 
+        localStorage.getItem('telegramId') || 
+        localStorage.getItem('userId') || 
+        localStorage.getItem('user_id') || 
+        localStorage.getItem('id') || ''
+      ).trim();
 
       database.ref('users').on('value', (snapshot) => {
         const users = snapshot.exists() ? snapshot.val() : {};
@@ -3602,15 +3608,21 @@
         const esc=v=>String(v).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));
         
         container.innerHTML = top.map((m, i) => {
-          // আপনার আইডি মিলছে কিনা তা চেক করা (uid, telegramId বা শেষ ৪ ডিজিট দিয়ে)
-          const isMe = myUserId && (m.uid === myUserId || m.telegramId === myUserId || myUserId.endsWith(m.telegramId) || m.telegramId.endsWith(myUserId));
+          // অটোমেটিক আপনার আইডি, টেলিগ্রাম আইডি বা নামের শেষ অংশ মিলিয়ে চেক করবে
+          const isMe = myUserId && (
+            m.uid === myUserId || 
+            m.telegramId === myUserId || 
+            m.telegramId.endsWith(myUserId) || 
+            myUserId.endsWith(m.telegramId) ||
+            m.username.includes(myUserId)
+          );
 
-          // নিজের আইডি হলে গোল্ডেন কালার, অন্যদের জন্য নরমাল
+          // নিজের আইডি হলে গোল্ডেন কালার এবং বর্ডার হবে
           const bgStyle = isMe 
-            ? 'background: rgba(255, 215, 0, 0.15); border: 1px solid #ffd700;' 
+            ? 'background: rgba(255, 215, 0, 0.2); border: 1.5px solid #ffd700;' 
             : 'background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);'; 
 
-          const nameColor = isMe ? 'color: #ffd700; font-weight: 800;' : 'color: #fff;';
+          const nameColor = isMe ? 'color: #ffd700; font-weight: 900;' : 'color: #fff;';
           const badgeText = isMe ? `${i + 1} (You)` : `${i + 1}`;
 
           return `
