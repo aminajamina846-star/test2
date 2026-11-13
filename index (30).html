@@ -1,0 +1,694 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080b10">
+  <meta name="description" content="ADI Network official portal: $ADI token information, market chart, contract details, announcements and community links.">
+  <title>ADI Network ($ADI) | Official Portal</title>
+
+  <!-- Tailwind CDN is convenient for a single-file deployment. For strict production CSP,
+       compile Tailwind locally and pin/host third-party assets yourself. -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui'] },
+        colors: { ink: '#080b10', panel: '#101722', silver: '#dce4ee', muted: '#91a0b4', accent: '#a8c5e8' },
+        boxShadow: { glow: '0 0 45px rgba(148, 180, 218, .12)' }
+      }}
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@5.0.8/dist/lightweight-charts.standalone.production.js"></script>
+  <script>
+    if (!window.LightweightCharts) {
+      document.write('<script src="https://unpkg.com/lightweight-charts@5.0.8/dist/lightweight-charts.standalone.production.js"><\\/script>');
+    }
+  </script>
+
+  <style>
+    :root { color-scheme: dark; --line: rgba(190,205,224,.13); --muted:#91a0b4; }
+    * { box-sizing: border-box; }
+    html { scroll-behavior:smooth; scroll-padding-top:100px; }
+    body { margin:0; background:#080b10; color:#e7edf5; font-family:Inter,ui-sans-serif,system-ui,sans-serif; overflow-x:hidden; }
+    body:before { content:""; position:fixed; inset:0; pointer-events:none; z-index:-1; background:
+      radial-gradient(ellipse at 12% 0%,rgba(111,145,184,.13),transparent 34%),
+      radial-gradient(ellipse at 88% 18%,rgba(91,111,143,.10),transparent 30%),
+      linear-gradient(180deg,#080b10,#0a0f17 55%,#080b10); }
+    .glass { background:linear-gradient(145deg,rgba(21,30,43,.92),rgba(12,18,27,.94)); border:1px solid var(--line); box-shadow:0 18px 60px rgba(0,0,0,.18); }
+    .silver-text { background:linear-gradient(110deg,#fff 5%,#b9c9dc 48%,#71849c 90%); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .eyebrow { color:#9fb4cc; font-size:.7rem; font-weight:800; letter-spacing:.18em; text-transform:uppercase; }
+    .btn { display:inline-flex; align-items:center; justify-content:center; gap:.55rem; border-radius:13px; padding:.78rem 1.05rem; font-weight:700; font-size:.86rem; transition:.2s ease; }
+    .btn:hover { transform:translateY(-2px); filter:brightness(1.1); }
+    .btn-primary { color:#08111b; background:linear-gradient(120deg,#f0f4fa,#a9bdd4); box-shadow:0 8px 28px rgba(166,190,218,.18); }
+    .btn-secondary { color:#dbe6f3; border:1px solid rgba(190,205,224,.2); background:rgba(255,255,255,.045); }
+    .pill { border:1px solid var(--line); background:rgba(255,255,255,.04); border-radius:999px; padding:.35rem .7rem; color:#b9c7d8; font-size:.72rem; }
+    .notice-red { border:1px solid rgba(248,113,113,.28); background:linear-gradient(120deg,rgba(127,29,29,.22),rgba(16,23,34,.92)); }
+    .notice-amber { border:1px solid rgba(245,158,11,.25); background:linear-gradient(120deg,rgba(120,78,18,.16),rgba(16,23,34,.92)); }
+    .section-title { font-size:clamp(1.35rem,3vw,1.85rem); font-weight:800; letter-spacing:-.04em; }
+    .muted { color:var(--muted); }
+    .nav-link { color:#aab8c9; font-size:.84rem; font-weight:600; transition:color .2s; }
+    .nav-link:hover { color:#fff; }
+    a:focus-visible, button:focus-visible { outline:2px solid #c5d4e5; outline-offset:3px; }
+    footer a { display:inline-flex; align-items:center; gap:.35rem; text-decoration:none; transition:color .2s, transform .2s; }
+    footer a:hover { color:#fff; transform:translateX(2px); }
+    .footer-link { display:inline-flex; align-items:center; border:1px solid rgba(190,205,224,.12); background:rgba(255,255,255,.025); border-radius:10px; padding:.48rem .65rem; }
+    .footer-link:hover { border-color:rgba(190,205,224,.28); background:rgba(255,255,255,.06); }
+
+
+    .social-card{display:flex;min-height:112px;flex-direction:column;align-items:center;justify-content:center;gap:7px;border:1px solid rgba(148,163,184,.18);border-radius:17px;background:linear-gradient(145deg,rgba(30,41,59,.72),rgba(9,14,22,.85));color:#dce6f2;padding:15px 10px;transition:transform .25s,border-color .25s,background .25s,box-shadow .25s}
+    .social-card i{font-size:22px;color:#a9c5e3}.social-card span{font-size:13px;font-weight:800}.social-card small{font-size:10px;color:#8192a8}
+    .social-card:hover{transform:translateY(-4px);border-color:rgba(147,197,253,.45);background:linear-gradient(145deg,rgba(39,57,80,.9),rgba(13,21,33,.95));box-shadow:0 12px 30px rgba(0,0,0,.22)}
+    .footer-group{padding:18px;border:1px solid rgba(148,163,184,.12);border-radius:18px;background:linear-gradient(145deg,rgba(24,34,48,.68),rgba(9,14,22,.55))}
+    .footer-group ul{display:grid;gap:9px}.footer-group li a{display:flex;align-items:center;gap:9px;padding:10px 11px;border:1px solid rgba(148,163,184,.10);border-radius:11px;background:rgba(255,255,255,.025);font-size:12px;color:#aab8ca;transition:.2s}
+    .footer-group li a i{width:16px;text-align:center;color:#9db9d8;font-size:14px}.footer-group li a span{margin-left:auto;color:#6f849e}
+    .footer-group li a:hover{color:#fff;border-color:rgba(173,202,232,.28);background:rgba(255,255,255,.06)}
+    .footer-email{color:#c2d2e4}.footer-email:hover{color:white}
+    .team-card{display:flex;align-items:flex-start;gap:17px;padding:22px;border:1px solid rgba(148,163,184,.16);border-radius:20px;background:linear-gradient(140deg,rgba(23,34,49,.86),rgba(8,13,21,.92));box-shadow:0 15px 40px rgba(0,0,0,.14)}
+    .team-avatar{display:grid;width:54px;height:54px;flex:none;place-items:center;border:1px solid rgba(191,219,254,.3);border-radius:17px;background:linear-gradient(145deg,#34465d,#121c2b);color:#e5eef9;font-size:16px;font-weight:900;letter-spacing:.06em;box-shadow:inset 0 1px rgba(255,255,255,.12)}
+    .team-action{display:inline-flex;align-items:center;gap:7px;padding:8px 11px;border:1px solid rgba(148,163,184,.2);border-radius:10px;color:#c6d6e8;font-size:12px;font-weight:700;background:rgba(255,255,255,.035);transition:.2s}
+    .team-action:hover{border-color:rgba(147,197,253,.45);background:rgba(255,255,255,.08);color:#fff}
+    @media(max-width:420px){.team-card{padding:16px;gap:12px}.team-avatar{width:46px;height:46px;border-radius:14px}.social-card{min-height:104px}}
+
+    .chart-fallback{height:100%;min-height:360px;display:flex;flex-direction:column;background:radial-gradient(ellipse at 50% 0%,rgba(113,146,184,.12),transparent 60%),#080e16}
+    .chart-fallback-top{display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid rgba(148,163,184,.13);color:#e5edf7}
+    .chart-fallback-top strong{display:block;font-size:14px;letter-spacing:.04em}
+    .chart-fallback-top small{display:block;margin-top:3px;color:#8494a9;font-size:11px}
+    .chart-live-dot{width:9px;height:9px;flex:none;border-radius:50%;background:#65d6a3;box-shadow:0 0 15px #65d6a3}
+    .chart-fallback iframe{display:block;width:100%;height:410px;border:0;background:#080e16}
+    .chart-source-link{display:flex;justify-content:center;align-items:center;gap:8px;margin:12px 16px 16px;padding:12px 16px;border:1px solid rgba(148,163,184,.2);border-radius:12px;color:#b9d5f1;font-size:13px;font-weight:700;background:rgba(255,255,255,.035)}
+    .chart-source-link:hover{background:rgba(255,255,255,.08);color:#fff}
+    .chart-embed-error{padding:12px 16px;color:#fda4af;font-size:12px;text-align:center}
+    footer .footer-group{padding:18px;border:1px solid rgba(148,163,184,.12);border-radius:18px;background:linear-gradient(145deg,rgba(24,34,48,.68),rgba(9,14,22,.55))}
+    footer .footer-group ul{display:grid;gap:10px}
+    footer .footer-group li a{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 11px;border:1px solid rgba(148,163,184,.10);border-radius:11px;background:rgba(255,255,255,.025);font-size:13px;color:#aab8ca}
+    footer .footer-group li a:after{content:'↗';font-size:11px;color:#6f849e}
+    footer .footer-group li a:hover{color:#fff;border-color:rgba(173,202,232,.28);background:rgba(255,255,255,.06)}
+    @media(max-width:640px){.chart-fallback iframe{height:340px}footer .footer-group{padding:14px}}
+
+    .time-btn { border:1px solid var(--line); border-radius:9px; padding:.43rem .75rem; color:#9eacbd; font-size:.76rem; font-weight:700; }
+    .time-btn.active { color:#07111b; background:#c5d4e5; border-color:#c5d4e5; }
+    #marketChart { width:100%; height:390px; min-height:320px; overflow:hidden; border-radius:16px; }
+    .faq-answer { display:grid; grid-template-rows:0fr; transition:grid-template-rows .25s ease; }
+    .faq-answer > div { overflow:hidden; }
+    .faq-item.open .faq-answer { grid-template-rows:1fr; }
+    .faq-item.open .faq-chevron { transform:rotate(180deg); }
+    .faq-chevron { transition:transform .2s; }
+    .mono { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; overflow-wrap:anywhere; }
+    .dot { width:7px;height:7px;border-radius:50%;background:#8ed6ad;box-shadow:0 0 12px #8ed6ad;display:inline-block; }
+
+    /* Scroll-triggered premium section + per-letter heading reveal */
+    .scroll-reveal { opacity:0; transform:translateY(26px) scale(.99); transition:opacity .75s cubic-bezier(.2,.7,.2,1), transform .75s cubic-bezier(.2,.7,.2,1); }
+    .scroll-reveal.is-visible { opacity:1; transform:translateY(0) scale(1); }
+    .letter-heading .heading-letter { display:inline-block; opacity:0; transform:translate3d(0,.75em,0) rotateX(-65deg); transform-origin:50% 100%; transition:opacity .48s ease, transform .58s cubic-bezier(.16,1,.3,1); transition-delay:var(--letter-delay,0ms); }
+    .letter-heading.letters-visible .heading-letter { opacity:1; transform:translate3d(0,0,0) rotateX(0); }
+    .letter-heading .heading-space { display:inline-block; width:.28em; }
+    .glass, .notice-red, .notice-amber { transition:border-color .35s ease, box-shadow .35s ease, transform .35s ease; }
+    .glass:hover { border-color:rgba(190,205,224,.24); box-shadow:0 22px 70px rgba(0,0,0,.28),0 0 35px rgba(148,180,218,.06); }
+    @media(max-width:767px) { #marketChart{height:320px} .mobile-menu{display:none} .mobile-menu.show{display:flex} }
+    @media(min-width:768px) { .mobile-menu{display:flex!important} }
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+  </style>
+</head>
+
+<body class="min-h-screen">
+  <header class="sticky top-0 z-40 border-b border-white/10 bg-[#080b10]/90 backdrop-blur-xl">
+    <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
+      <a href="#top" class="flex min-w-0 items-center gap-3" aria-label="ADI Network home">
+        <div class="h-11 w-11 shrink-0 overflow-hidden rounded-full border border-slate-300/30 bg-slate-800 shadow-glow">
+          <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgKceGcvpGJWaetc5tdIYsuemMTZcOzV4d_cf4Qz1fZ2R7OOiUGP5iNZW0vFk7YEhiz9_Lg9sHRH3RTQQMuW9lCQtC2F5GntyC2vrXtP18T3MazRgTVE6NjjB0KRTvM5XBxq1aLFTVuq8J8dbDKP72Aqw98fKNeFV-qDzR7KeuGMkSF5o2CC_hLzZyY0GYl/s1009/1000049532.jpg" alt="ADI Network logo" class="h-full w-full object-cover" onerror="this.style.display='none';this.parentElement.innerHTML='<span class=&quot;grid h-full place-items-center font-black text-slate-100&quot;>ADI</span>'">
+        </div>
+        <div class="min-w-0">
+          <div class="silver-text truncate text-base font-extrabold tracking-[.13em] sm:text-lg">ADI NETWORK</div>
+          <div class="truncate text-[10px] font-semibold tracking-wider text-slate-500 sm:text-xs">OFFICIAL PROJECT PORTAL</div>
+        </div>
+      </a>
+      <nav class="hidden items-center gap-6 md:flex" aria-label="Main navigation">
+        <a class="nav-link" href="#market">Market</a><a class="nav-link" href="#contract">Contract</a><a class="nav-link" href="#faq">FAQ</a>
+        <a class="nav-link" href="https://aditoken.site/WHITEPAPER.html" target="_blank" rel="noopener noreferrer">Whitepaper ↗</a>
+      </nav>
+      <div class="relative">
+        <button id="menuButton" class="btn btn-secondary !p-3" aria-expanded="false" aria-controls="navMenu" aria-label="Open navigation menu"><i class="fa-solid fa-bars"></i></button>
+        <div id="navMenu" class="mobile-menu absolute right-0 top-14 z-50 hidden w-60 flex-col gap-1 rounded-2xl border border-white/10 bg-[#111925] p-2 shadow-2xl md:w-64">
+          <a class="rounded-xl px-4 py-3 text-sm text-slate-200 hover:bg-white/5" href="https://aditoken.site/WHITEPAPER.html" target="_blank" rel="noopener noreferrer"><i class="fa-regular fa-file-lines mr-2"></i>Whitepaper</a>
+          <a class="rounded-xl px-4 py-3 text-sm text-slate-200 hover:bg-white/5" href="#faq"> <i class="fa-regular fa-circle-question mr-2"></i>FAQ</a>
+          <a class="rounded-xl px-4 py-3 text-sm text-slate-200 hover:bg-white/5" href="https://t.me/ADIAridropbot/app" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-robot mr-2"></i>Telegram Mini App</a>
+          <a class="rounded-xl px-4 py-3 text-sm text-slate-200 hover:bg-white/5" href="https://t.me/adiofficialannusment" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-telegram mr-2"></i>Official Telegram</a>
+          <a class="rounded-xl px-4 py-3 text-sm text-slate-200 hover:bg-white/5" href="https://x.com/adiairdrops" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-x-twitter mr-2"></i>Official X</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="top" class="mx-auto max-w-7xl space-y-8 px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+    <section class="grid items-center gap-8 lg:grid-cols-[1.2fr_.8fr]">
+      <div class="py-3">
+        <div class="mb-5 flex flex-wrap gap-2"><span class="pill"><span class="dot mr-2"></span>BNB SMART CHAIN</span><span class="pill">BEP-20 TOKEN</span><span class="pill">$ADI</span></div>
+        <p class="eyebrow mb-3">A Web3 community ecosystem</p>
+        <h1 class="silver-text max-w-3xl text-4xl font-extrabold leading-[1.08] tracking-[-.055em] sm:text-6xl">Built for the next wave of Web3.</h1>
+        <p class="mt-5 max-w-2xl text-sm leading-7 text-slate-400 sm:text-base">ADI Network ($ADI) is presented as a Telegram-connected utility ecosystem on BNB Smart Chain, with community participation, cloud-mining features and ecosystem utilities.</p>
+        <div class="mt-7 flex flex-wrap gap-3">
+          <a class="btn btn-primary" href="https://pancakeswap.finance/swap?outputCurrency=0xdcaf4214cb2c7503e124fc360d51d5bb43770383&chainId=56" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-right-arrow-left"></i>Trade $ADI on PancakeSwap</a>
+          <a class="btn btn-secondary" href="https://t.me/adiofficialannusment" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-telegram"></i>Join community</a>
+        </div>
+        <p class="mt-4 text-xs text-slate-600">Crypto assets are volatile. Verify the network and contract address before trading.</p>
+      </div>
+      <div class="glass relative overflow-hidden rounded-3xl p-6 sm:p-8">
+        <div class="absolute -right-16 -top-20 h-56 w-56 rounded-full bg-slate-400/10 blur-3xl"></div>
+        <p class="eyebrow">Token overview</p>
+        <div class="mt-5 grid grid-cols-2 gap-3">
+          <div class="rounded-2xl border border-white/10 bg-black/20 p-4"><p class="text-xs text-slate-500">Token</p><p class="mt-1 text-xl font-extrabold">ADI</p></div>
+          <div class="rounded-2xl border border-white/10 bg-black/20 p-4"><p class="text-xs text-slate-500">Network</p><p class="mt-1 text-xl font-extrabold">BNB Chain</p></div>
+          <div class="rounded-2xl border border-white/10 bg-black/20 p-4"><p class="text-xs text-slate-500">Total supply*</p><p class="mt-1 text-xl font-extrabold">10M</p></div>
+          <div class="rounded-2xl border border-white/10 bg-black/20 p-4"><p class="text-xs text-slate-500">Token standard</p><p class="mt-1 text-xl font-extrabold">BEP-20</p></div>
+        </div>
+        <p class="mt-4 text-[11px] leading-5 text-slate-500">*Supply and project information are reproduced from the project materials supplied for this portal. Verify on-chain before relying on them.</p>
+      </div>
+    </section>
+
+    <section class="notice-red rounded-2xl p-5 sm:p-7" aria-labelledby="security-title">
+      <div class="mb-3 flex flex-wrap items-center gap-2"><span class="rounded-full bg-red-500/15 px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest text-red-300">Security notice</span><span class="text-xs text-red-200/70">Community safety update</span></div>
+      <h2 id="security-title" class="text-lg font-extrabold text-red-200 sm:text-xl"><i class="fa-solid fa-shield-halved mr-2"></i>Database Security Update</h2>
+      <p class="mt-3 text-sm leading-7 text-slate-300">The project notice supplied for this portal reports unauthorized database access associated with a public configuration vulnerability and says containment and security remediation are underway. This statement has not been independently verified here.</p>
+      <div class="mt-4 rounded-xl border-l-4 border-amber-400 bg-amber-400/10 p-4 text-sm leading-6 text-amber-100"><strong>Stay alert:</strong> Never share your seed phrase or private key. Do not trust unsolicited wallet-recovery requests, transaction demands or unofficial links. Confirm announcements through the project's official Telegram channel.</div>
+      <a class="mt-4 inline-flex text-sm font-bold text-red-200 underline decoration-red-300/40 underline-offset-4" href="https://t.me/adiofficialannusment" target="_blank" rel="noopener noreferrer">Check official announcements <i class="fa-solid fa-arrow-up-right-from-square ml-2 text-xs"></i></a>
+    </section>
+
+    <section class="notice-amber rounded-2xl p-5 sm:p-6">
+      <div class="flex items-start gap-4"><div class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-amber-400/10 text-amber-300"><i class="fa-solid fa-screwdriver-wrench"></i></div><div><p class="eyebrow !text-amber-300">Service notice</p><h2 class="mt-1 text-lg font-bold text-amber-100">Temporary system maintenance</h2><p class="mt-2 text-sm leading-6 text-slate-300">The project-provided notice describes a temporary two-day Mini App maintenance window for security upgrades, database migration and performance work. Confirm the current maintenance schedule and relaunch status in the official channel; update or remove this notice when the window ends.</p><p class="mt-3 text-xs text-amber-200/80">The two-day period is not represented as starting today.</p></div></div>
+    </section>
+
+    <section id="market" class="glass rounded-3xl p-4 sm:p-6">
+      <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+        <div><p class="eyebrow">ADI market · GeckoTerminal pool feed</p><h2 class="section-title mt-2">Live market chart</h2><div class="mt-3 flex flex-wrap items-baseline gap-3"><span id="livePrice" class="text-3xl font-extrabold tracking-tight">—</span><span id="priceChange" class="text-sm text-slate-500">Waiting for market data</span></div></div>
+        <div class="flex flex-wrap gap-2" role="group" aria-label="Chart timeframe">
+          <button class="time-btn" data-timeframe="5m">5m</button><button class="time-btn active" data-timeframe="1h">1h</button><button class="time-btn" data-timeframe="4h">4h</button><button class="time-btn" data-timeframe="1d">1d</button>
+        </div>
+      </div>
+      <div class="mt-5 overflow-hidden rounded-2xl border border-white/10 bg-[#0b111a]">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 px-4 py-3"><div class="flex items-center gap-2 text-xs text-slate-400"><span class="dot"></span><span id="chartStatus" role="status">Connecting to GeckoTerminal…</span></div><span id="lastUpdated" class="text-[11px] text-slate-600">—</span></div>
+        <div id="marketChart" aria-label="ADI candlestick and volume chart"></div>
+      </div>
+      <p class="mt-3 text-[11px] leading-5 text-slate-500">Market data is retrieved from the public GeckoTerminal API and may be delayed, rate-limited or unavailable. This chart is informational, not an execution quote. Volume is shown in the API's reported units.</p>
+    </section>
+
+    <section id="contract" class="grid gap-5 lg:grid-cols-2">
+      <div class="glass rounded-3xl p-6 sm:p-7">
+        <p class="eyebrow">Verified address checklist</p><h2 class="section-title mt-2">Smart contract</h2>
+        <div class="mt-5 grid grid-cols-2 gap-3 text-sm">
+          <div class="rounded-xl bg-black/20 p-3"><p class="text-xs text-slate-500">Network</p><p class="mt-1 font-bold">BNB Smart Chain</p></div>
+          <div class="rounded-xl bg-black/20 p-3"><p class="text-xs text-slate-500">Standard</p><p class="mt-1 font-bold">BEP-20</p></div>
+          <div class="rounded-xl bg-black/20 p-3"><p class="text-xs text-slate-500">Name / symbol</p><p class="mt-1 font-bold">ADI / ADI</p></div>
+          <div class="rounded-xl bg-black/20 p-3"><p class="text-xs text-slate-500">Decimals</p><p class="mt-1 font-bold">18 (project supplied)</p></div>
+        </div>
+        <p class="mb-2 mt-5 text-xs font-bold uppercase tracking-wider text-slate-500">Contract address</p>
+        <div class="flex flex-col gap-3 rounded-xl border border-white/10 bg-black/30 p-3 sm:flex-row sm:items-center">
+          <code id="contractAddress" class="mono min-w-0 flex-1 text-xs leading-6 text-sky-200">0xdcaf4214cb2c7503e124fc360d51d5bb43770383</code>
+          <button id="copyButton" class="btn btn-secondary shrink-0 !py-2.5" type="button"><i class="fa-regular fa-copy"></i><span>Copy CA</span></button>
+        </div>
+        <div class="mt-4 flex flex-wrap gap-3"><a class="text-xs font-semibold text-sky-300 hover:text-white" href="https://bscscan.com/token/0xdcaf4214cb2c7503e124fc360d51d5bb43770383" target="_blank" rel="noopener noreferrer">View on BscScan ↗</a><a class="text-xs font-semibold text-sky-300 hover:text-white" href="https://pancakeswap.finance/swap?outputCurrency=0xdcaf4214cb2c7503e124fc360d51d5bb43770383&chainId=56" target="_blank" rel="noopener noreferrer">Open PancakeSwap ↗</a></div>
+        <p id="copyFeedback" class="mt-2 min-h-4 text-xs text-emerald-300" aria-live="polite"></p>
+      </div>
+      <div class="glass rounded-3xl p-6 sm:p-7">
+        <p class="eyebrow">Wallet setup</p><h2 class="section-title mt-2">Add $ADI to Trust Wallet</h2>
+        <ol class="mt-5 space-y-4">
+          <li class="flex gap-3"><span class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-white/10 text-xs font-extrabold">01</span><div><p class="text-sm font-bold">Open Trust Wallet</p><p class="mt-1 text-xs leading-5 text-slate-400">Open the app and go to the token management or Manage Crypto screen.</p></div></li>
+          <li class="flex gap-3"><span class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-white/10 text-xs font-extrabold">02</span><div><p class="text-sm font-bold">Choose BNB Smart Chain</p><p class="mt-1 text-xs leading-5 text-slate-400">Select BNB Smart Chain (BEP-20), not BNB Beacon Chain.</p></div></li>
+          <li class="flex gap-3"><span class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-white/10 text-xs font-extrabold">03</span><div><p class="text-sm font-bold">Import the token</p><p class="mt-1 text-xs leading-5 text-slate-400">Choose the custom token option and paste the contract address above.</p></div></li>
+          <li class="flex gap-3"><span class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-white/10 text-xs font-extrabold">04</span><div><p class="text-sm font-bold">Review before saving</p><p class="mt-1 text-xs leading-5 text-slate-400">Check the network and token details shown by the wallet, then save/import.</p></div></li>
+        </ol>
+        <p class="mt-5 rounded-xl border border-amber-400/20 bg-amber-400/5 p-3 text-xs leading-5 text-amber-100">Always compare the address character-for-character with the official project source and BscScan. Never enter a recovery phrase on a website.</p>
+      </div>
+    </section>
+
+    <section id="faq" class="glass rounded-3xl p-6 sm:p-8">
+      <p class="eyebrow">Help center</p><h2 class="section-title mt-2">FAQ</h2>
+      <div class="mt-6 space-y-3">
+        <article class="faq-item rounded-xl border border-white/10 bg-black/20"><button class="faq-toggle flex w-full items-center justify-between gap-4 p-4 text-left text-sm font-bold" aria-expanded="false"><span>What is ADI Network ($ADI)?</span><i class="faq-chevron fa-solid fa-chevron-down text-slate-400"></i></button><div class="faq-answer"><div><p class="px-4 pb-4 text-sm leading-6 text-slate-400">Project materials describe ADI as a BEP-20 utility token on BNB Smart Chain connected to a Telegram Mini App and ecosystem features.</p></div></div></article>
+        <article class="faq-item rounded-xl border border-white/10 bg-black/20"><button class="faq-toggle flex w-full items-center justify-between gap-4 p-4 text-left text-sm font-bold" aria-expanded="false"><span>What is the total token supply?</span><i class="faq-chevron fa-solid fa-chevron-down text-slate-400"></i></button><div class="faq-answer"><div><p class="px-4 pb-4 text-sm leading-6 text-slate-400">The supplied project information states a fixed total supply of <strong class="text-slate-200">10,000,000 ADI</strong>. Confirm the deployed token's on-chain supply on BscScan.</p></div></div></article>
+        <article class="faq-item rounded-xl border border-white/10 bg-black/20"><button class="faq-toggle flex w-full items-center justify-between gap-4 p-4 text-left text-sm font-bold" aria-expanded="false"><span>How is the token supply distributed?</span><i class="faq-chevron fa-solid fa-chevron-down text-slate-400"></i></button><div class="faq-answer"><div><p class="px-4 pb-4 text-sm leading-6 text-slate-400">The supplied allocation is: Community airdrop & mining 40% (4M); exchanges & listing 30% (3M); team 20% (2M); marketing & ecosystem 10% (1M). These allocations are project-provided and are not independently verified by this page.</p></div></div></article>
+        <article class="faq-item rounded-xl border border-white/10 bg-black/20"><button class="faq-toggle flex w-full items-center justify-between gap-4 p-4 text-left text-sm font-bold" aria-expanded="false"><span>Who leads the project?</span><i class="faq-chevron fa-solid fa-chevron-down text-slate-400"></i></button><div class="faq-answer"><div><p class="px-4 pb-4 text-sm leading-6 text-slate-400">The supplied project information names <strong class="text-slate-200">Abdul Hamid</strong> as Founder & Lead Developer and <strong class="text-slate-200">Rakib Hasan</strong> as Co-Founder.</p></div></div></article>
+        <article class="faq-item rounded-xl border border-white/10 bg-black/20"><button class="faq-toggle flex w-full items-center justify-between gap-4 p-4 text-left text-sm font-bold" aria-expanded="false"><span>Where can I trade $ADI?</span><i class="faq-chevron fa-solid fa-chevron-down text-slate-400"></i></button><div class="faq-answer"><div><p class="px-4 pb-4 text-sm leading-6 text-slate-400">Use the PancakeSwap link on this page and verify the token contract and BNB Smart Chain network before confirming any transaction. Liquidity and availability can change.</p></div></div></article>
+        <article class="faq-item rounded-xl border border-white/10 bg-black/20"><button class="faq-toggle flex w-full items-center justify-between gap-4 p-4 text-left text-sm font-bold" aria-expanded="false"><span>What are the official project links?</span><i class="faq-chevron fa-solid fa-chevron-down text-slate-400"></i></button><div class="faq-answer"><div><p class="px-4 pb-4 text-sm leading-6 text-slate-400">The official project destinations are organized in the Stay Connected area and footer below.</p></div></div></article>
+      </div>
+    </section>
+
+    <section class="glass connected-panel rounded-3xl p-6 text-center sm:p-9">
+      <p class="eyebrow">Stay connected</p>
+      <h2 class="silver-text mt-2 text-2xl font-extrabold sm:text-3xl">Follow official ADI channels</h2>
+      <p class="mx-auto mt-3 max-w-xl text-sm leading-6 text-slate-400">Get project announcements, community updates and official resources. Always verify links before connecting a wallet.</p>
+      <div class="social-grid mx-auto mt-7 grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4">
+        <a class="social-card" href="https://t.me/ADIAridropbot/app" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-telegram"></i><span>Telegram App</span><small>Open mini app</small></a>
+        <a class="social-card" href="https://t.me/adiofficialannusment" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-telegram"></i><span>Telegram Channel</span><small>Project updates</small></a>
+        <a class="social-card" href="https://x.com/adiairdrops" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-x-twitter"></i><span>Follow on X</span><small>Official profile</small></a>
+        <a class="social-card" href="https://www.youtube.com/@ADICommunity-i6m" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-youtube"></i><span>YouTube</span><small>Watch videos</small></a>
+        <a class="social-card sm:col-span-2" href="https://aditoken.site/WHITEPAPER.html" target="_blank" rel="noopener noreferrer"><i class="fa-regular fa-file-lines"></i><span>Whitepaper</span><small>Read project document</small></a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer border-t border-white/10 bg-[#070a0f] px-4 py-12">
+    <div class="mx-auto max-w-7xl">
+      <div class="grid gap-10 lg:grid-cols-[1fr_2fr]">
+        <div>
+          <a href="#top" class="inline-flex items-center gap-3" aria-label="Back to ADI Network home">
+            <span class="h-14 w-14 overflow-hidden rounded-full border border-slate-300/25 bg-slate-900 shadow-lg"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgKceGcvpGJWaetc5tdIYsuemMTZcOzV4d_cf4Qz1fZ2R7OOiUGP5iNZW0vFk7YEhiz9_Lg9sHRH3RTQQMuW9lCQtC2F5GntyC2vrXtP18T3MazRgTVE6NjjB0KRTvM5XBxq1aLFTVuq8J8dbDKP72Aqw98fKNeFV-qDzR7KeuGMkSF5o2CC_hLzZyY0GYl/s1009/1000049532.jpg" alt="ADI Network logo" class="h-full w-full object-cover"></span>
+            <span><span class="silver-text block text-base font-extrabold tracking-[.18em]">ADI NETWORK</span><span class="mt-1 block text-[10px] tracking-[.18em] text-slate-500">OFFICIAL PROJECT PORTAL</span></span>
+          </a>
+          <p class="mt-5 max-w-sm text-sm leading-7 text-slate-500">Project information, token resources and official community destinations in one place.</p>
+          <a class="footer-email mt-5 inline-flex items-center gap-2 text-sm font-semibold" href="mailto:contact@aditoken.site"><i class="fa-regular fa-envelope"></i> contact@aditoken.site</a>
+        </div>
+        <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div class="footer-group">
+            <p class="eyebrow mb-4">Project</p>
+            <ul>
+              <li><a href="https://aditoken.site/WHITEPAPER.html" target="_blank" rel="noopener noreferrer"><i class="fa-regular fa-file-lines"></i> Whitepaper <span>↗</span></a></li>
+              <li><a href="#contract"><i class="fa-solid fa-shield-halved"></i> Contract details <span>↗</span></a></li>
+              <li><a href="#market"><i class="fa-solid fa-chart-line"></i> Market chart <span>↗</span></a></li>
+              <li><a href="#faq"><i class="fa-regular fa-circle-question"></i> Help center <span>↗</span></a></li>
+            </ul>
+          </div>
+          <div class="footer-group">
+            <p class="eyebrow mb-4">Community</p>
+            <ul>
+              <li><a href="https://t.me/ADIAridropbot/app" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-telegram"></i> Telegram Mini App <span>↗</span></a></li>
+              <li><a href="https://t.me/adiofficialannusment" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-telegram"></i> Telegram Channel <span>↗</span></a></li>
+              <li><a href="https://x.com/adiairdrops" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-x-twitter"></i> Official X <span>↗</span></a></li>
+              <li><a href="https://www.youtube.com/@ADICommunity-i6m" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-youtube"></i> YouTube <span>↗</span></a></li>
+            </ul>
+          </div>
+          <div class="footer-group sm:col-span-2 xl:col-span-1">
+            <p class="eyebrow mb-4">Project contacts</p>
+            <ul>
+              <li><a href="https://x.com/Abdulhamid26601" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-x-twitter"></i> Founder profile <span>↗</span></a></li>
+              <li><a href="mailto:founder@aditoken.site"><i class="fa-regular fa-envelope"></i> Founder email <span>↗</span></a></li>
+              <li><a href="https://x.com/RakibADI_" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-x-twitter"></i> Co-Founder profile <span>↗</span></a></li>
+              <li><a href="mailto:co-founder@aditoken.site"><i class="fa-regular fa-envelope"></i> Co-Founder email <span>↗</span></a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <section class="team-section mt-12">
+        <div class="mb-5 flex flex-wrap items-end justify-between gap-3">
+          <div><p class="eyebrow">People behind the project</p><h2 class="silver-text mt-2 text-2xl font-extrabold">Meet the team</h2></div>
+          <span class="text-xs tracking-wide text-slate-500">Official project contacts</span>
+        </div>
+        <div class="grid gap-4 md:grid-cols-2">
+          <article class="team-card">
+            <div class="team-avatar">AH</div>
+            <div class="min-w-0 flex-1">
+              <p class="text-lg font-extrabold text-slate-100">Abdul Hamid</p>
+              <p class="mt-1 text-xs font-bold uppercase tracking-[.18em] text-sky-300">Founder · Lead Developer</p>
+              <p class="mt-3 text-sm leading-6 text-slate-400">Project leadership and development.</p>
+              <div class="mt-4 flex flex-wrap gap-2">
+                <a class="team-action" href="https://x.com/Abdulhamid26601" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-x-twitter"></i> View profile</a>
+                <a class="team-action" href="mailto:founder@aditoken.site"><i class="fa-regular fa-envelope"></i> Email</a>
+              </div>
+            </div>
+          </article>
+          <article class="team-card">
+            <div class="team-avatar">RH</div>
+            <div class="min-w-0 flex-1">
+              <p class="text-lg font-extrabold text-slate-100">Rakib Hasan</p>
+              <p class="mt-1 text-xs font-bold uppercase tracking-[.18em] text-sky-300">Co-Founder</p>
+              <p class="mt-3 text-sm leading-6 text-slate-400">Project co-founder and community support.</p>
+              <div class="mt-4 flex flex-wrap gap-2">
+                <a class="team-action" href="https://x.com/RakibADI_" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-x-twitter"></i> View profile</a>
+                <a class="team-action" href="mailto:co-founder@aditoken.site"><i class="fa-regular fa-envelope"></i> Email</a>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <div class="mt-10 flex flex-col gap-3 border-t border-white/10 pt-6 text-xs text-slate-600 sm:flex-row sm:items-center sm:justify-between">
+        <p>© <span id="year"></span> ADI Network. All rights reserved.</p>
+        <p class="max-w-2xl leading-5">Informational only, not financial advice. Digital assets involve risk. Verify addresses, claims and transaction details independently.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const POOL_ADDRESS = '0xd570353b35f7cf11dca3a5c3c139c1521100a137';
+      const ADI_TOKEN_ADDRESS = '0xdcaf4214cb2c7503e124fc360d51d5bb43770383';
+      const API_ROOT = 'https://api.geckoterminal.com/api/v2';
+      const REFRESH_MS = 60000;
+      const timeframes = {
+        '5m': { period: 'minute', aggregate: 5, limit: 100 },
+        '1h': { period: 'hour', aggregate: 1, limit: 100 },
+        '4h': { period: 'hour', aggregate: 4, limit: 100 },
+        '1d': { period: 'day', aggregate: 1, limit: 100 }
+      };
+
+      const menuButton = document.getElementById('menuButton');
+      const navMenu = document.getElementById('navMenu');
+      menuButton.addEventListener('click', () => {
+        const isOpen = navMenu.classList.toggle('show');
+        menuButton.setAttribute('aria-expanded', String(isOpen));
+      });
+      document.addEventListener('click', (event) => {
+        if (!navMenu.contains(event.target) && !menuButton.contains(event.target)) {
+          navMenu.classList.remove('show');
+          menuButton.setAttribute('aria-expanded', 'false');
+        }
+      });
+      navMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+        navMenu.classList.remove('show');
+        menuButton.setAttribute('aria-expanded', 'false');
+      }));
+
+      document.querySelectorAll('.faq-toggle').forEach(button => {
+        button.addEventListener('click', () => {
+          const item = button.closest('.faq-item');
+          const willOpen = !item.classList.contains('open');
+          document.querySelectorAll('.faq-item').forEach(other => {
+            other.classList.remove('open');
+            other.querySelector('.faq-toggle').setAttribute('aria-expanded', 'false');
+          });
+          if (willOpen) {
+            item.classList.add('open');
+            button.setAttribute('aria-expanded', 'true');
+          }
+        });
+      });
+
+      const copyButton = document.getElementById('copyButton');
+      copyButton.addEventListener('click', async () => {
+        const address = document.getElementById('contractAddress').textContent.trim();
+        const feedback = document.getElementById('copyFeedback');
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(address);
+          } else {
+            const field = document.createElement('textarea');
+            field.value = address; field.style.position = 'fixed'; field.style.opacity = '0';
+            document.body.appendChild(field); field.select();
+            const copied = document.execCommand('copy'); field.remove();
+            if (!copied) throw new Error('Clipboard unavailable');
+          }
+          copyButton.innerHTML = '<i class="fa-solid fa-check"></i><span>Copied</span>';
+          feedback.textContent = 'Contract address copied.';
+        } catch (error) {
+          feedback.textContent = 'Copy failed. Please select and copy the address manually.';
+        }
+        setTimeout(() => { copyButton.innerHTML = '<i class="fa-regular fa-copy"></i><span>Copy CA</span>'; }, 2200);
+      });
+
+      document.getElementById('year').textContent = new Date().getFullYear();
+
+      // Split heading text into individually animated characters, while retaining
+      // the original accessible name for screen readers.
+      const headingSelector = 'main h1, main h2, main h3, main .section-title';
+      document.querySelectorAll(headingSelector).forEach((heading) => {
+        if (heading.dataset.letterReady) return;
+        const accessibleText = heading.textContent.trim().replace(/\\s+/g, ' ');
+        if (!accessibleText) return;
+        heading.setAttribute('aria-label', accessibleText);
+        heading.classList.add('letter-heading');
+        const walker = document.createTreeWalker(heading, NodeFilter.SHOW_TEXT);
+        const textNodes = [];
+        while (walker.nextNode()) textNodes.push(walker.currentNode);
+        textNodes.forEach((node) => {
+          const fragment = document.createDocumentFragment();
+          [...node.nodeValue].forEach((char, index) => {
+            if (char === ' ') {
+              const space = document.createElement('span');
+              space.className = 'heading-space';
+              space.setAttribute('aria-hidden', 'true');
+              space.textContent = ' ';
+              fragment.appendChild(space);
+            } else {
+              const letter = document.createElement('span');
+              letter.className = 'heading-letter';
+              letter.style.setProperty('--letter-delay', `${Math.min(index * 24, 480)}ms`);
+              letter.setAttribute('aria-hidden', 'true');
+              letter.textContent = char;
+              fragment.appendChild(letter);
+            }
+          });
+          node.parentNode.replaceChild(fragment, node);
+        });
+        heading.dataset.letterReady = 'true';
+      });
+
+      const revealTargets = document.querySelectorAll('main > section, main section .glass, main section .notice-red, main section .notice-amber');
+      if (!('IntersectionObserver' in window)) {
+        revealTargets.forEach(el => el.classList.add('is-visible'));
+        document.querySelectorAll('.letter-heading').forEach(h => h.classList.add('letters-visible'));
+      } else {
+      revealTargets.forEach(el => el.classList.add('scroll-reveal'));
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            entry.target.querySelectorAll('.letter-heading').forEach(h => h.classList.add('letters-visible'));
+            if (entry.target.matches('.letter-heading')) entry.target.classList.add('letters-visible');
+          } else {
+            entry.target.classList.remove('is-visible');
+            entry.target.querySelectorAll('.letter-heading').forEach(h => h.classList.remove('letters-visible'));
+          }
+        });
+      }, { threshold: 0.14, rootMargin: '0px 0px -6% 0px' });
+      revealTargets.forEach(el => revealObserver.observe(el));
+      document.querySelectorAll('.letter-heading').forEach(h => revealObserver.observe(h));
+      }
+
+      const chartEl = document.getElementById('marketChart');
+      const statusEl = document.getElementById('chartStatus');
+      const priceEl = document.getElementById('livePrice');
+      const changeEl = document.getElementById('priceChange');
+      const updatedEl = document.getElementById('lastUpdated');
+
+      if (!window.LightweightCharts) {
+        statusEl.textContent = 'Chart library could not load from either CDN. Check your internet connection or host the library locally.';
+        priceEl.textContent = 'Unavailable';
+        changeEl.textContent = 'Chart library unavailable';
+        chartEl.innerHTML = '<div style="height:100%;display:grid;place-items:center;padding:24px;text-align:center;color:#91a0b4;font-size:13px">Chart library is blocked by the browser or network. Please reload, or open this site on a stable connection.</div>';
+        return;
+      }
+
+      const chart = LightweightCharts.createChart(chartEl, {
+        width: chartEl.clientWidth,
+        height: chartEl.clientHeight,
+        layout: { background: { type: 'solid', color: '#0b111a' }, textColor: '#91a0b4', fontFamily: 'Inter, sans-serif' },
+        grid: { vertLines: { color: 'rgba(148,163,184,.07)' }, horzLines: { color: 'rgba(148,163,184,.07)' } },
+        rightPriceScale: { borderColor: 'rgba(148,163,184,.16)' },
+        timeScale: { borderColor: 'rgba(148,163,184,.16)', timeVisible: true, secondsVisible: false },
+        crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+        handleScroll: { mouseWheel: true, pressedMouseMove: true },
+        handleScale: { mouseWheel: true, pinch: true, axisPressedMouseMove: true }
+      });
+      const candleSeries = chart.addSeries(LightweightCharts.CandlestickSeries, {
+        upColor: '#6ed6a1', downColor: '#ed7180',
+        borderUpColor: '#6ed6a1', borderDownColor: '#ed7180',
+        wickUpColor: '#6ed6a1', wickDownColor: '#ed7180'
+      });
+      const volumeSeries = chart.addSeries(LightweightCharts.HistogramSeries, {
+        priceFormat: { type: 'volume' }, priceScaleId: ''
+      });
+      volumeSeries.priceScale().applyOptions({ scaleMargins: { top: 0.82, bottom: 0 } });
+      const resizeObserver = new ResizeObserver(entries => {
+        if (!entries.length) return;
+        chart.applyOptions({ width: Math.floor(entries[0].contentRect.width), height: Math.floor(entries[0].contentRect.height) });
+      });
+      resizeObserver.observe(chartEl);
+
+      let poolMetadata = null;
+      let poolTokenSide = null;
+      let activePoolAddress = POOL_ADDRESS;
+      let selectedTimeframe = '1h';
+      let requestController = null;
+      let lastCandle = null;
+      let refreshTimer = null;
+
+      function formatPrice(value) {
+        if (!Number.isFinite(value)) return '—';
+        return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumSignificantDigits: 8 }).format(value);
+      }
+      function setStatus(message, isError = false) {
+        statusEl.textContent = message;
+        statusEl.style.color = isError ? '#fca5a5' : '#91a0b4';
+      }
+
+      async function loadChart() {
+        if (requestController) requestController.abort();
+        requestController = new AbortController();
+        const tf = timeframes[selectedTimeframe];
+        setStatus('Verifying ADI pool pair and fetching candles…');
+        try {
+          // Resolve pool orientation first. Never assume ADI is the pool's base token:
+          // a base/quote mismatch can display the paired asset's price instead.
+          if (!poolMetadata) {
+            let metaResponse = null;
+            let lastMetaError = null;
+            for (const root of [API_ROOT]) {
+              try {
+                const candidate = await fetch(`${root}/networks/bsc/pools/${activePoolAddress}?include=base_token,quote_token`, {
+                  signal: requestController.signal,
+                  headers: { 'accept': 'application/json;version=20230203' }
+                });
+                if (!candidate.ok) throw new Error(`Pool lookup failed (HTTP ${candidate.status})`);
+                metaResponse = candidate;
+                break;
+              } catch (err) {
+                if (err.name === 'AbortError') throw err;
+                lastMetaError = err;
+              }
+            }
+            if (metaResponse) poolMetadata = await metaResponse.json();
+            else {
+              // Continue to exact-token pool discovery below if the configured pool is gone.
+              poolMetadata = { data: { attributes: {} } };
+            }
+            let attrs = poolMetadata?.data?.attributes || {};
+            const target = ADI_TOKEN_ADDRESS.toLowerCase();
+            let baseAddress = String(attrs.base_token_address || poolMetadata?.data?.relationships?.base_token?.data?.id?.split('_').slice(1).join('_') || '').toLowerCase();
+            let quoteAddress = String(attrs.quote_token_address || poolMetadata?.data?.relationships?.quote_token?.data?.id?.split('_').slice(1).join('_') || '').toLowerCase();
+
+            // If the saved pool address is stale or points to a different pair,
+            // discover active BSC pools for the exact ADI contract and choose
+            // the deepest available pool rather than silently charting another token.
+            if (baseAddress !== target && quoteAddress !== target) {
+              const discoveryResponse = await fetch(
+                `${API_ROOT}/networks/bsc/tokens/${ADI_TOKEN_ADDRESS}/pools`,
+                { signal: requestController.signal, headers: { 'accept': 'application/json;version=20230203' } }
+              );
+              if (!discoveryResponse.ok) throw new Error(`Pool mismatch; ADI pool discovery returned HTTP ${discoveryResponse.status}`);
+              const discovery = await discoveryResponse.json();
+              const candidates = (Array.isArray(discovery?.data) ? discovery.data : [])
+                .map(item => ({ address: item.attributes?.address || String(item.id || '').split('_').slice(1).join('_'), attrs: item.attributes || {} }))
+                .filter(item => {
+                  const b = String(item.attrs.base_token_address || item.relationships?.base_token?.data?.id?.split('_').slice(1).join('_') || '').toLowerCase();
+                  const q = String(item.attrs.quote_token_address || item.relationships?.quote_token?.data?.id?.split('_').slice(1).join('_') || '').toLowerCase();
+                  return item.address && (b === target || q === target);
+                })
+                .sort((a, b) => Number(b.attrs.reserve_in_usd || 0) - Number(a.attrs.reserve_in_usd || 0));
+              if (!candidates.length) throw new Error('No GeckoTerminal BSC pool was found for this exact ADI contract. Verify the token address or pool listing.');
+              const preferred = candidates.find(item => item.address.toLowerCase() === POOL_ADDRESS.toLowerCase()) || candidates[0];
+              activePoolAddress = preferred.address;
+              attrs = preferred.attrs;
+              baseAddress = String(attrs.base_token_address || preferred.relationships?.base_token?.data?.id?.split('_').slice(1).join('_') || '').toLowerCase();
+              quoteAddress = String(attrs.quote_token_address || preferred.relationships?.quote_token?.data?.id?.split('_').slice(1).join('_') || '').toLowerCase();
+              poolMetadata = { data: { attributes: attrs } };
+            }
+            if (baseAddress === target) poolTokenSide = 'base';
+            else if (quoteAddress === target) poolTokenSide = 'quote';
+            else throw new Error('The selected pool does not match the supplied ADI contract. No unrelated price will be shown.');
+            const verifiedPrice = Number(poolTokenSide === 'base' ? attrs.base_token_price_usd : attrs.quote_token_price_usd);
+            if (Number.isFinite(verifiedPrice) && verifiedPrice > 0) {
+              priceEl.textContent = formatPrice(verifiedPrice);
+              changeEl.textContent = 'Latest pool price · USD';
+              changeEl.style.color = '#9fb3ca';
+              updatedEl.textContent = `Pool checked ${new Date().toLocaleTimeString()}`;
+            }
+          }
+          const url = `${API_ROOT}/networks/bsc/pools/${activePoolAddress}/ohlcv/${tf.period}?aggregate=${tf.aggregate}&limit=${tf.limit}&currency=usd&token=${poolTokenSide}`;
+          let response;
+          try {
+            response = await fetch(url, {
+              signal: requestController.signal,
+              headers: { 'accept': 'application/json;version=20230203' }
+            });
+          } catch (err) {
+            if (err.name === 'AbortError') throw err;
+            throw new Error('Could not reach GeckoTerminal. Check network, browser privacy settings or API availability.');
+          }
+          if (!response.ok) {
+            if (response.status === 429) throw new Error('GeckoTerminal rate limit reached. Please wait a minute and retry.');
+            throw new Error(`GeckoTerminal OHLCV returned HTTP ${response.status}`);
+          }
+          const payload = await response.json();
+          // Cross-check the API's pair metadata when present.
+          const metaBase = String(payload?.meta?.base?.address || '').toLowerCase();
+          const metaQuote = String(payload?.meta?.quote?.address || '').toLowerCase();
+          if (metaBase || metaQuote) {
+            if (metaBase !== ADI_TOKEN_ADDRESS.toLowerCase() && metaQuote !== ADI_TOKEN_ADDRESS.toLowerCase()) {
+              throw new Error('OHLCV response pair does not match the ADI contract. No price will be displayed.');
+            }
+          }
+          const rows = payload?.data?.attributes?.ohlcv_list;
+          if (!Array.isArray(rows) || rows.length === 0) throw new Error('No OHLCV candles returned for this pool/timeframe.');
+          const sorted = rows.slice().sort((a, b) => Number(a[0]) - Number(b[0]));
+          const candles = [];
+          const volumes = [];
+          for (const row of sorted) {
+            const [timestamp, open, high, low, close, volume] = row.map(Number);
+            if (![timestamp, open, high, low, close].every(Number.isFinite)) continue;
+            const time = Math.floor(timestamp);
+            const candle = { time, open, high, low, close };
+            if (candles.length && candles[candles.length - 1].time === time) candles[candles.length - 1] = candle;
+            else candles.push(candle);
+            volumes.push({ time, value: Number.isFinite(volume) ? volume : 0, color: close >= open ? 'rgba(110,214,161,.45)' : 'rgba(237,113,128,.45)' });
+          }
+          if (!candles.length) throw new Error('The API response did not contain valid candles.');
+          candleSeries.setData(candles);
+          volumeSeries.setData(volumes);
+          lastCandle = candles[candles.length - 1];
+          priceEl.textContent = formatPrice(lastCandle.close);
+          const first = candles[0].open;
+          const change = first ? ((lastCandle.close - first) / first) * 100 : 0;
+          changeEl.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}% in selected range`;
+          changeEl.style.color = change >= 0 ? '#6ed6a1' : '#ed7180';
+          updatedEl.textContent = `Updated ${new Date().toLocaleTimeString()}`;
+          setStatus(`ADI contract matched · ${poolTokenSide} side · ${candles.length} candles · ${selectedTimeframe}`);
+          chart.timeScale().fitContent();
+        } catch (error) {
+          if (error.name === 'AbortError') return;
+          console.error('ADI chart data error:', error);
+          setStatus(`${error.message} · Retry automatically in 60s.`, true);
+          if (!lastCandle) {
+            const attrs = poolMetadata?.data?.attributes || {};
+            const verifiedPrice = Number(poolTokenSide === 'base' ? attrs.base_token_price_usd : attrs.quote_token_price_usd);
+            if (Number.isFinite(verifiedPrice) && verifiedPrice > 0) {
+              priceEl.textContent = formatPrice(verifiedPrice);
+              changeEl.textContent = 'Latest verified pool price · USD';
+              changeEl.style.color = '#9fb3ca';
+              updatedEl.textContent = `Pool checked ${new Date().toLocaleTimeString()}`;
+            } else {
+              priceEl.textContent = '—';
+              changeEl.textContent = 'Waiting for verified pool price';
+            }
+            chartEl.innerHTML = `
+              <div class="chart-fallback">
+                <div class="chart-fallback-top">
+                  <span class="chart-live-dot"></span>
+                  <div><strong>ADI / USDT</strong><small>Verified BNB Smart Chain pool</small></div>
+                </div>
+                <iframe title="ADI live market chart on GeckoTerminal" loading="lazy"
+                  src="https://www.geckoterminal.com/bsc/pools/${activePoolAddress}?embed=1&info=0&swaps=0&grayscale=0&light_chart=0"
+                  referrerpolicy="no-referrer" allow="clipboard-read; clipboard-write"
+                  onload="this.dataset.loaded='1'"
+                  onerror="this.insertAdjacentHTML('afterend','<p class=chart-embed-error>Live chart could not be embedded in this browser. Open the pool directly on GeckoTerminal.</p>')"></iframe>
+                <a class="chart-source-link" href="https://www.geckoterminal.com/bsc/pools/${activePoolAddress}" target="_blank" rel="noopener noreferrer">Open ADI / USDT chart on GeckoTerminal ↗</a>
+              </div>`;
+          }
+        }
+      }
+
+      document.querySelectorAll('[data-timeframe]').forEach(button => {
+        button.addEventListener('click', () => {
+          selectedTimeframe = button.dataset.timeframe;
+          document.querySelectorAll('[data-timeframe]').forEach(b => b.classList.toggle('active', b === button));
+          loadChart();
+        });
+      });
+      loadChart();
+      refreshTimer = window.setInterval(loadChart, REFRESH_MS);
+      window.addEventListener('beforeunload', () => {
+        if (refreshTimer) clearInterval(refreshTimer);
+        if (requestController) requestController.abort();
+        resizeObserver.disconnect();
+        chart.remove();
+      });
+    })();
+  </script>
+</body>
+</html>
