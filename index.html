@@ -3565,11 +3565,11 @@
     }
 
     // LEADERBOARD & BADGES SYSTEM (TOP 20 MEMBERS)
-                function loadLeaderboard() {
+                    function loadLeaderboard() {
       const container = document.getElementById('leaderboard-container');
       if (!container || typeof database === 'undefined' || !database.ref) return;
       
-      // ১. আপনার নিজের আইডি বা টেলিগ্রাম আইডি ব্রাউজার থেকে নেওয়ার কোড
+      // আপনার নিজের আইডি বা টেলিগ্রাম আইডি চেনার জন্য
       const myUserId = (typeof currentUserId !== 'undefined' && currentUserId) ? currentUserId : (localStorage.getItem('userId') || localStorage.getItem('telegramId') || ''); 
 
       database.ref('users').on('value', (snapshot) => {
@@ -3602,10 +3602,10 @@
         const esc=v=>String(v).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));
         
         container.innerHTML = top.map((m, i) => {
-          // ২. চেক করা হচ্ছে এটি আপনার আইডি কিনা
+          // চেক করা হচ্ছে এটি আপনার আইডি কিনা
           const isMe = (myUserId && (m.uid === myUserId || m.telegramId == myUserId || m.username === myUserId));
 
-          // ৩. নিজের আইডি হলে কালার এবং বর্ডার হবে, অন্যদের জন্য সাধারণ থাকবে
+          // নিজের আইডি হলে কালার এবং বর্ডার হবে, অন্যদের জন্য সাধারণ থাকবে
           const bgStyle = isMe 
             ? 'background: rgba(255, 215, 0, 0.15); border: 1px solid #ffd700;' 
             : 'background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);'; 
@@ -3614,7 +3614,7 @@
           const badgeText = isMe ? `${i + 1} (You)` : `${i + 1}`;
 
           return `
-            <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 12px; ${bgStyle} border-radius:12px; margin-bottom: 6px;">
+            <div style="display:flex; align-items:center; justify-space-between; padding:10px 12px; ${bgStyle} border-radius:12px; margin-bottom: 6px;">
               <div style="display:flex; align-items:center; gap:10px;">
                 <div style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;">${badgeText}</div>
                 <div><div style="font-size:12px;font-weight:700; ${nameColor}">${esc(m.username)}</div></div>
