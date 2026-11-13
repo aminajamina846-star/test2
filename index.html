@@ -3575,18 +3575,9 @@
           const banned=(u.banned===true || u.isBanned===true || String(u.status||'').toLowerCase()==='banned' || String(u.accountStatus||'').toLowerCase()==='banned');
           return (!banned && (!isLegacyBrowserUid(uid) || uid === BROWSER_SHARED_UID));
         }).map(uid => {
-                const u = users[uid] || {};
-      
-      // আপনার তৈরি করা smart ফাংশনটি এখানে কল করা হলো
-      const finalName = getLeaderboardDisplayName(u) || (uid === 'browser_shared_account' ? 'Browser Miner' : ('User ' + String(uid).slice(-4)));
-      
-      return { 
-        uid, 
-        username: finalName, 
-        balance: Number(u.balance) || 0, 
-        totalMined: Number(u.totalMined) || 0 
-      };
-          
+          const u = users[uid] || {};
+          return { uid, username:u.username||'User', balance:Number(u.balance)||0, totalMined:Number(u.totalMined)||0 };
+        });
         miners.sort((a,b)=>b.balance-a.balance || b.totalMined-a.totalMined);
         const top=miners.slice(0,20);
         if(!top.length){
